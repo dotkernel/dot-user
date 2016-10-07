@@ -1,17 +1,21 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 10/6/2016
  * Time: 7:40 PM
  */
 
 namespace Dot\User\Options;
 
-
 use Zend\Stdlib\AbstractOptions;
 use Zend\Stdlib\ArrayUtils;
 
+/**
+ * Class MessagesOptions
+ * @package Dot\User\Options
+ */
 class MessagesOptions extends AbstractOptions
 {
     /** Confirm account related messages constant */

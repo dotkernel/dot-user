@@ -1,10 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 7/5/2016
  * Time: 11:08 PM
  */
+
 namespace Dot\User\Service;
 
 use Dot\User\Entity\UserEntityInterface;
@@ -131,24 +133,24 @@ interface UserServiceInterface
     /**
      * @return mixed
      */
-    public function getOptions();
+    //public function getOptions();
 
     /**
      * @param UserOptions $options
      * @return mixed
      */
-    public function setOptions(UserOptions $options);
+    //public function setOptions(UserOptions $options);
 
     /**
      * @param UserMapperInterface $userMapper
      * @return mixed
      */
-    public function setUserMapper(UserMapperInterface $userMapper);
+    //public function setUserMapper(UserMapperInterface $userMapper);
 
     /**
      * @return UserMapperInterface
      */
-    public function getUserMapper();
+    //public function getUserMapper();
 
     /**
      * @param ServerRequestInterface $request
@@ -159,7 +161,7 @@ interface UserServiceInterface
     /**
      * @return ServerRequestInterface
      */
-    public function getRequest();
+    //public function getRequest();
 
     /**
      * @param ResponseInterface $response
@@ -170,5 +172,5 @@ interface UserServiceInterface
     /**
      * @return ResponseInterface
      */
-    public function getResponse();
+    //public function getResponse();
 }

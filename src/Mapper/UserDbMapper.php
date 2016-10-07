@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/20/2016
  * Time: 7:55 PM
  */
@@ -15,6 +16,10 @@ use Dot\User\Options\DbOptions;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Sql;
 
+/**
+ * Class UserDbMapper
+ * @package Dot\User\Mapper
+ */
 class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
 {
     protected $idColumn = 'id';

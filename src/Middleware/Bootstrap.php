@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/21/2016
  * Time: 10:55 PM
  */
@@ -32,7 +33,7 @@ class Bootstrap
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
     {
-        if($this->authenticationListener) {
+        if ($this->authenticationListener) {
             $this->authenticationListener->attach($this->getEventManager());
         }
 

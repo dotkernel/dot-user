@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/23/2016
  * Time: 7:48 PM
  */
@@ -11,6 +12,10 @@ namespace Dot\User\Options;
 use Zend\Stdlib\AbstractOptions;
 use Zend\Stdlib\ArrayUtils;
 
+/**
+ * Class RegisterOptions
+ * @package Dot\User\Options
+ */
 class RegisterOptions extends AbstractOptions
 {
     /** @var bool  */

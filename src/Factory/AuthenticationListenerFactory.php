@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/21/2016
  * Time: 10:50 PM
  */
@@ -9,8 +10,8 @@
 namespace Dot\User\Factory;
 
 use Dot\FlashMessenger\FlashMessengerInterface;
-use Dot\User\Form\UserFormManager;
 use Dot\User\Form\LoginForm;
+use Dot\User\Form\UserFormManager;
 use Dot\User\Listener\AuthenticationListener;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserServiceInterface;

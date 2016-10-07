@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 7/26/2016
  * Time: 9:22 PM
  */
@@ -40,7 +41,7 @@ class UserServiceFactory
         $this->options = $options;
 
         $isDebug = isset($container->get('config')['debug'])
-            ? (bool) $container->get('config')['debug']
+            ? (bool)$container->get('config')['debug']
             : false;
 
         $eventManager = $container->has(EventManagerInterface::class)

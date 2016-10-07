@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/23/2016
  * Time: 3:44 PM
  */
@@ -11,6 +12,10 @@ namespace Dot\User\Options;
 use Zend\Stdlib\AbstractOptions;
 use Zend\Stdlib\ArrayUtils;
 
+/**
+ * Class LoginOptions
+ * @package Dot\User\Options
+ */
 class LoginOptions extends AbstractOptions
 {
     /** @var bool  */

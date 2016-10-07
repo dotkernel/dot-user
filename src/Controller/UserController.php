@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/20/2016
  * Time: 10:11 PM
  */
@@ -9,10 +10,8 @@
 namespace Dot\User\Controller;
 
 use Dot\Authentication\Web\Action\LoginAction;
-use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Controller\AbstractActionController;
 use Dot\User\Entity\UserEntityInterface;
-use Dot\User\FlashMessagesTrait;
 use Dot\User\Form\ChangePasswordForm;
 use Dot\User\Form\ForgotPasswordForm;
 use Dot\User\Form\UserFormManager;
@@ -37,8 +36,6 @@ use Zend\Form\Form;
  */
 class UserController extends AbstractActionController
 {
-    use FlashMessagesTrait;
-
     /** @var  UserOptions */
     protected $options;
 
@@ -90,8 +87,7 @@ class UserController extends AbstractActionController
     {
         if (!$this->options->getConfirmAccountOptions()->isEnableAccountConfirmation()) {
             $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED),
-                $this->flashMessenger());
+                MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED));
 
             return new RedirectResponse($this->urlHelper()->generate('login'));
         }
@@ -105,9 +101,9 @@ class UserController extends AbstractActionController
         /** @var ResultInterface $result */
         $result = $this->userService->confirmAccount($email, $token);
         if (!$result->isValid()) {
-            $this->addError($result->getMessages(), $this->flashMessenger());
+            $this->addError($result->getMessages());
         } else {
-            $this->addSuccess($result->getMessages(), $this->flashMessenger());
+            $this->addSuccess($result->getMessages());
         }
 
         return new RedirectResponse($this->urlHelper()->generate('login'));
@@ -119,14 +115,12 @@ class UserController extends AbstractActionController
     public function changePasswordAction()
     {
         $request = $this->getRequest();
-        /** @var FlashMessengerPlugin $messenger */
-        $messenger = $this->flashMessenger();
 
         /** @var Form $form */
         $form = $this->formManager->get(ChangePasswordForm::class);
 
-        $data = $messenger->getData('changePasswordFormData') ?: [];
-        $formMessages = $messenger->getData('changePasswordFormMessages') ?: [];
+        $data = $this->flashMessenger()->getData('changePasswordFormData') ?: [];
+        $formMessages = $this->flashMessenger()->getData('changePasswordFormMessages') ?: [];
 
         //add session form data from previous request(PRG form)
         $form->setData($data);
@@ -140,8 +134,8 @@ class UserController extends AbstractActionController
             $data = $form->getData();
 
             //as we use PRG forms, store form data in session for next page display
-            $messenger->addData('changePasswordFormData', $data);
-            $messenger->addData('changePasswordFormMessages', $form->getMessages());
+            $this->flashMessenger()->addData('changePasswordFormData', $data);
+            $this->flashMessenger()->addData('changePasswordFormMessages', $form->getMessages());
 
             if($isValid) {
                 $oldPassword = $data['password'];
@@ -150,23 +144,23 @@ class UserController extends AbstractActionController
                 /** @var UserOperationResult $result */
                 $result = $this->userService->changePassword($oldPassword, $newPassword);
                 if($result->isValid()) {
-                    $this->addSuccess($result->getMessages(), $messenger);
+                    $this->addSuccess($result->getMessages());
                     return $this->redirectTo($request->getUri(), $request->getQueryParams());
                 }
                 else {
-                    $this->addError($result->getMessages(), $messenger);
+                    $this->addError($result->getMessages());
                     return new RedirectResponse($request->getUri(), 303);
                 }
             }
             else {
                 $messages = $this->getFormMessages($form->getMessages());
-                $this->addError($messages, $messenger);
+                $this->addError($messages);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
 
         return new HtmlResponse($this->template()
-            ->render('dk-user::change-password',
+            ->render('dot-user::change-password',
                 ['form' => $form, 'showLabels' => $this->options->isShowFormInputLabels()]));
     }
 
@@ -179,18 +173,15 @@ class UserController extends AbstractActionController
 
         if(!$this->options->getRegisterOptions()->isEnableRegistration()) {
             return new HtmlResponse(
-                $this->template()->render('dk-user::register',
+                $this->template()->render('dot-user::register',
                     ['enableRegistration' => false]));
         }
-
-        /** @var FlashMessengerPlugin $messenger */
-        $messenger = $this->flashMessenger();
 
         /** @var Form $form */
         $form = $this->formManager->get(RegisterForm::class);
 
-        $data = $messenger->getData('registerFormData') ?: [];
-        $formMessages = $messenger->getData('registerFormMessages') ?: [];
+        $data = $this->flashMessenger()->getData('registerFormData') ?: [];
+        $formMessages = $this->flashMessenger()->getData('registerFormMessages') ?: [];
 
         //add session form data from previous request(PRG form)
         $form->setData($data);
@@ -207,14 +198,14 @@ class UserController extends AbstractActionController
             $data = $form->getData();
 
             //as we use PRG forms, store form data in session for next page display
-            $messenger->addData('registerFormData', $postData);
-            $messenger->addData('registerFormMessages', $form->getMessages());
+            $this->flashMessenger()->addData('registerFormData', $postData);
+            $this->flashMessenger()->addData('registerFormMessages', $form->getMessages());
             
             if($isValid) {
                 /** @var UserOperationResult $result */
                 $result = $this->userService->register($data);
                 if(!$result->isValid()) {
-                    $this->addError($result->getMessages(), $messenger);
+                    $this->addError($result->getMessages());
                     return new RedirectResponse($request->getUri(), 303);
                 }
                 else {
@@ -224,20 +215,20 @@ class UserController extends AbstractActionController
                     }
                     else
                     {
-                        $this->addSuccess($result->getMessages(), $messenger);
+                        $this->addSuccess($result->getMessages());
                         return $this->redirectTo($this->urlHelper()->generate('login'), $request->getQueryParams());
                     }
                 }
             }
             else {
                 $messages = $this->getFormMessages($form->getMessages());
-                $this->addError($messages, $messenger);
+                $this->addError($messages);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
 
         return new HtmlResponse(
-            $this->template()->render('dk-user::register',
+            $this->template()->render('dot-user::register',
                 [
                     'form' => $form,
                     'enableRegistration' => $this->options->getRegisterOptions()->isEnableRegistration(),
@@ -252,13 +243,9 @@ class UserController extends AbstractActionController
      */
     public function resetPasswordAction()
     {
-        /** @var FlashMessengerPlugin $messenger */
-        $messenger = $this->flashMessenger();
-
         if(!$this->options->getPasswordRecoveryOptions()->isEnablePasswordRecovery()) {
             $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED),
-                $messenger);
+                MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED));
 
             return new RedirectResponse($this->urlHelper()->generate('login'));
         }
@@ -272,8 +259,8 @@ class UserController extends AbstractActionController
         /** @var Form $form */
         $form = $this->formManager->get(ResetPasswordForm::class);
 
-        $data = $messenger->getData('resetPasswordFormData') ?: [];
-        $formMessages = $messenger->getData('resetPasswordFormMessages') ?: [];
+        $data = $this->flashMessenger()->getData('resetPasswordFormData') ?: [];
+        $formMessages = $this->flashMessenger()->getData('resetPasswordFormMessages') ?: [];
 
         $form->setData($data);
         $form->setMessages($formMessages);
@@ -285,8 +272,8 @@ class UserController extends AbstractActionController
             $isValid = $form->isValid();
             $data = $form->getData();
 
-            $messenger->addData('resetPasswordFormData', $data);
-            $messenger->addData('resetPasswordFormMessages', $form->getMessages());
+            $this->flashMessenger()->addData('resetPasswordFormData', $data);
+            $this->flashMessenger()->addData('resetPasswordFormMessages', $form->getMessages());
 
             if($isValid) {
                 $newPassword = $data['newPassword'];
@@ -295,17 +282,17 @@ class UserController extends AbstractActionController
                 $result = $this->userService->resetPassword($email, $token, $newPassword);
 
                 if(!$result->isValid()) {
-                    $this->addError($result->getMessages(), $messenger);
+                    $this->addError($result->getMessages());
                     return new RedirectResponse($request->getUri(), 303);
                 }
                 else {
-                    $this->addSuccess($result->getMessages(), $messenger);
+                    $this->addSuccess($result->getMessages());
                     return $this->redirectTo($this->urlHelper()->generate('login'), $request->getQueryParams());
                 }
             }
             else {
                 $messages = $this->getFormMessages($form->getMessages());
-                $this->addError($messages, $messenger);
+                $this->addError($messages);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
@@ -320,13 +307,9 @@ class UserController extends AbstractActionController
      */
     public function forgotPasswordAction()
     {
-        /** @var FlashMessengerPlugin $messenger */
-        $messenger = $this->flashMessenger();
-
         if(!$this->options->getPasswordRecoveryOptions()->isEnablePasswordRecovery()) {
             $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED),
-                $messenger);
+                MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED));
 
             return new RedirectResponse($this->urlHelper()->generate('login'));
         }
@@ -336,8 +319,8 @@ class UserController extends AbstractActionController
         /** @var Form $form */
         $form = $this->formManager->get(ForgotPasswordForm::class);
 
-        $data = $messenger->getData('forgotPasswordFormData') ?: [];
-        $formMessages = $messenger->getData('forgotPasswordFormMessages') ?: [];
+        $data = $this->flashMessenger()->getData('forgotPasswordFormData') ?: [];
+        $formMessages = $this->flashMessenger()->getData('forgotPasswordFormMessages') ?: [];
 
         $form->setData($data);
         $form->setMessages($formMessages);
@@ -349,8 +332,8 @@ class UserController extends AbstractActionController
             $isValid = $form->isValid();
             $data = $form->getData();
 
-            $messenger->addData('forgotPasswordFormData', $data);
-            $messenger->addData('forgotPasswordFormMessages', $form->getMessages());
+            $this->flashMessenger()->addData('forgotPasswordFormData', $data);
+            $this->flashMessenger()->addData('forgotPasswordFormMessages', $form->getMessages());
 
             if($isValid) {
                 $email = $data['email'];
@@ -358,23 +341,23 @@ class UserController extends AbstractActionController
                 /** @var UserOperationResult $result */
                 $result = $this->userService->generateResetToken($email);
                 if($result->isValid()) {
-                    $this->addInfo($result->getMessages(), $messenger);
+                    $this->addInfo($result->getMessages());
                     return $this->redirectTo($this->urlHelper()->generate('login'), $request->getQueryParams());
                 }
                 else {
-                    $this->addError($result->getMessages(), $messenger);
+                    $this->addError($result->getMessages());
                     return new RedirectResponse($request->getUri(), 303);
                 }
             }
             else {
                 $messages = $this->getFormMessages($form->getMessages());
-                $this->addError($messages, $messenger);
+                $this->addError($messages);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
 
         return new HtmlResponse($this->template()->render(
-            'dk-user::forgot-password',
+            'dot-user::forgot-password',
             ['form' => $form, 'showLabels' => false]));
     }
 
@@ -418,11 +401,7 @@ class UserController extends AbstractActionController
         $request = $request->withParsedBody($form->getData())
             ->withUri(new Uri($this->urlHelper()->generate('login')));
 
-        return $this->loginAction->triggerEvent(
-            AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
-            $request->getParsedBody(),
-            $request,
-            $response);
+        return $this->loginAction->triggerAuthenticateEvent($request, $response, $request->getParsedBody());
     }
 
     /**
@@ -464,6 +443,52 @@ class UserController extends AbstractActionController
         }
 
         return new RedirectResponse($uri);
+    }
+
+    /** helpers to add messages into the FlashMessenger */
+
+    /**
+     * @param array|string $messages
+     */
+    public function addError($messages)
+    {
+        $messages = (array) $messages;
+        foreach ($messages as $message) {
+            $this->flashMessenger()->addError($message);
+        }
+    }
+
+    /**
+     * @param array|string $messages
+     */
+    public function addInfo($messages)
+    {
+        $messages = (array) $messages;
+        foreach ($messages as $message) {
+            $this->flashMessenger()->addInfo($message);
+        }
+    }
+
+    /**
+     * @param array|string $messages
+     */
+    public function addWarning($messages)
+    {
+        $messages = (array) $messages;
+        foreach ($messages as $message) {
+            $this->flashMessenger()->addWarning($message);
+        }
+    }
+
+    /**
+     * @param array|string $messages
+     */
+    public function addSuccess($messages)
+    {
+        $messages = (array) $messages;
+        foreach ($messages as $message) {
+            $this->flashMessenger()->addSuccess($message);
+        }
     }
 
 }

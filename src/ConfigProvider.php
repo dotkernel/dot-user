@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/20/2016
  * Time: 7:54 PM
  */
@@ -30,8 +31,15 @@ use Dot\User\Service\PasswordInterface;
 use Dot\User\Service\UserServiceInterface;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
+/**
+ * Class ConfigProvider
+ * @package Dot\User
+ */
 class ConfigProvider
 {
+    /**
+     * @return array
+     */
     public function __invoke()
     {
         //check to see if we are in a zend expressive app and vendor folder

@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 7/6/2016
  * Time: 8:17 PM
  */
@@ -11,6 +12,10 @@ namespace Dot\User\Options;
 use Zend\Stdlib\AbstractOptions;
 use Zend\Stdlib\ArrayUtils;
 
+/**
+ * Class ConfirmAccountOptions
+ * @package Dot\User\Options
+ */
 class ConfirmAccountOptions extends AbstractOptions
 {
     /** @var bool  */

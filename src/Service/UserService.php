@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/20/2016
  * Time: 8:04 PM
  */
@@ -28,6 +29,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Hydrator\HydratorInterface;
 use Zend\Math\Rand;
 
+/**
+ * Class UserService
+ * @package Dot\User\Service
+ */
 class UserService implements UserServiceInterface, UserListenerAwareInterface
 {
     use UserListenerAwareTrait;

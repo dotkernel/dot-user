@@ -1,13 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 7/14/2016
  * Time: 8:39 PM
  */
 
 namespace Dot\User\Form\InputFilter;
-
 
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;

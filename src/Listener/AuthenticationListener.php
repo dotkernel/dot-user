@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 6/21/2016
  * Time: 10:45 PM
  */
@@ -45,8 +46,7 @@ class AuthenticationListener extends AbstractListenerAggregate
         FlashMessengerInterface $flashMessenger,
         UserServiceInterface $userService,
         UserOptions $options
-    )
-    {
+    ) {
         $this->loginForm = $form;
         $this->flashMessenger = $flashMessenger;
         $this->userService = $userService;
@@ -121,13 +121,13 @@ class AuthenticationListener extends AbstractListenerAggregate
         $request = $e->getRequest();
         $form = $e->getParam('form', null);
 
-        if($request->getMethod() === 'POST') {
+        if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
-            
-            if($form instanceof Form) {
+
+            if ($form instanceof Form) {
                 $form->setData($data);
 
-                if(!$form->isValid()) {
+                if (!$form->isValid()) {
                     foreach ($form->getMessages() as $message) {
                         $e->setError(current($message));
                     }
@@ -154,25 +154,24 @@ class AuthenticationListener extends AbstractListenerAggregate
         /** @var Form $form */
         $form = $e->getParam('form');
 
-        if($request->getMethod() === 'POST') {
+        if ($request->getMethod() === 'POST') {
             /** @var AuthenticationResult $result */
             $result = $e->getAuthenticationResult();
-            if($result && !$result->isValid()) {
+            if ($result && !$result->isValid()) {
                 $data = $form->getData();
                 $this->flashMessenger->addData('loginFormData', $data);
-            }
-            elseif($result && $result->isValid()) {
+            } elseif ($result && $result->isValid()) {
                 $user = $result->getIdentity();
-                if(!$user instanceof UserEntityInterface) {
+                if (!$user instanceof UserEntityInterface) {
                     /** @var UserEntityInterface $user */
                     $user = $this->userService->findUser($user->getId());
                 }
 
                 //validate account status
-                if($this->options->isEnableUserStatus()) {
+                if ($this->options->isEnableUserStatus()) {
                     $status = $user->getStatus();
 
-                    if($status && !in_array($status, $this->options->getLoginOptions()->getAllowedLoginStatuses())) {
+                    if ($status && !in_array($status, $this->options->getLoginOptions()->getAllowedLoginStatuses())) {
                         $data = $form->getData();
                         $this->flashMessenger->addData('loginFormData', $data);
 
@@ -184,14 +183,14 @@ class AuthenticationListener extends AbstractListenerAggregate
                         return;
                     }
                 }
-                
+
                 //if remember me is checked, generate a token
-                if($this->options->getLoginOptions()->isEnableRememberMe()) {
+                if ($this->options->getLoginOptions()->isEnableRememberMe()) {
                     $data = $form->getData();
-                    if(isset($data['remember']) && $data['remember'] == 'yes') {
+                    if (isset($data['remember']) && $data['remember'] == 'yes') {
                         //generate and save token to backend storage
                         $result = $this->userService->generateRememberToken($user);
-                        if(!$result->isValid()) {
+                        if (!$result->isValid()) {
                             $this->flashMessenger->addWarning($result->getMessage());
                         }
                     }
@@ -206,11 +205,11 @@ class AuthenticationListener extends AbstractListenerAggregate
         /** @var AuthenticationInterface $authentication */
         $authentication = $e->getAuthenticationService();
         $user = $authentication->getIdentity();
-        if(!$user instanceof UserEntityInterface) {
+        if (!$user instanceof UserEntityInterface) {
             /** @var UserEntityInterface $user */
             $user = $this->userService->findUser($user->getId());
         }
-        
+
         $this->userService->removeRememberToken($user);
     }
 

@@ -1,7 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vrax
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
  * Date: 7/6/2016
  * Time: 7:39 PM
  */
@@ -10,6 +11,10 @@ namespace Dot\User\Options;
 
 use Zend\Stdlib\AbstractOptions;
 
+/**
+ * Class DbOptions
+ * @package Dot\User\Options
+ */
 class DbOptions extends AbstractOptions
 {
     /** @var  string */

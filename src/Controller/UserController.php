@@ -18,7 +18,7 @@ use Dot\User\Form\UserFormManager;
 use Dot\User\Form\LoginForm;
 use Dot\User\Form\RegisterForm;
 use Dot\User\Form\ResetPasswordForm;
-use Dot\User\Options\MessagesOptions;
+use Dot\User\Options\MessageOptions;
 use Dot\User\Options\UserOptions;
 use Dot\User\Result\ResultInterface;
 use Dot\User\Result\UserOperationResult;
@@ -88,8 +88,8 @@ class UserController extends AbstractActionController
     public function confirmAccountAction()
     {
         if (!$this->options->getConfirmAccountOptions()->isEnableAccountConfirmation()) {
-            $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED));
+            $this->addError($this->options->getMessageOptions()->getMessage(
+                MessageOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED));
 
             return new RedirectResponse($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME));
         }
@@ -247,8 +247,8 @@ class UserController extends AbstractActionController
     public function resetPasswordAction()
     {
         if(!$this->options->getPasswordRecoveryOptions()->isEnablePasswordRecovery()) {
-            $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED));
+            $this->addError($this->options->getMessageOptions()->getMessage(
+                MessageOptions::MESSAGE_RESET_PASSWORD_DISABLED));
 
             return new RedirectResponse($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME));
         }
@@ -312,8 +312,8 @@ class UserController extends AbstractActionController
     public function forgotPasswordAction()
     {
         if(!$this->options->getPasswordRecoveryOptions()->isEnablePasswordRecovery()) {
-            $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED));
+            $this->addError($this->options->getMessageOptions()->getMessage(
+                MessageOptions::MESSAGE_RESET_PASSWORD_DISABLED));
 
             return new RedirectResponse($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME));
         }

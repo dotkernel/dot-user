@@ -9,7 +9,7 @@
 
 namespace Dot\User\Form\InputFilter;
 
-use Dot\User\Options\MessagesOptions;
+use Dot\User\Options\MessageOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\InputFilter\InputFilter;
@@ -43,8 +43,8 @@ class ChangePasswordInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_PASSWORD_EMPTY)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_PASSWORD_EMPTY)
                     ]
                 ],
             ]
@@ -57,16 +57,16 @@ class ChangePasswordInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_EMPTY)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_EMPTY)
                     ]
                 ],
                 [
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 4,
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_TOO_SHORT)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_TOO_SHORT)
                     ],
                 ],
             ]
@@ -79,16 +79,16 @@ class ChangePasswordInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_EMPTY)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_EMPTY)
                     ]
                 ],
                 [
                     'name'    => 'Identical',
                     'options' => [
                         'token' => 'newPassword',
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_MISMATCH)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_MISMATCH)
                     ],
                 ],
             ]

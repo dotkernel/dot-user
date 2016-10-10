@@ -20,7 +20,7 @@ use Dot\User\Event\PasswordResetEvent;
 use Dot\User\Event\RegisterEvent;
 use Dot\User\Event\RememberTokenEvent;
 use Dot\User\Mapper\UserMapperInterface;
-use Dot\User\Options\MessagesOptions;
+use Dot\User\Options\MessageOptions;
 use Dot\User\Options\UserOptions;
 use Dot\User\Result\ResultInterface;
 use Dot\User\Result\UserOperationResult;
@@ -181,8 +181,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
         }
         catch (\Exception $e) {
             error_log("Remember token generate error: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR), $user);
+            $result = $this->createUserOperationResultWithException($e, $this->options->getMessageOptions()
+                ->getMessage(MessageOptions::MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR), $user);
 
             $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
                 RememberTokenEvent::EVENT_TOKEN_GENERATE_ERROR,
@@ -255,8 +255,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
         }
         catch(\Exception $e) {
             error_log("Remove remember token error for user " . $user->getId() . " with message: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_REMOVE_ERROR), $user);
+            $result = $this->createUserOperationResultWithException($e, $this->options->getMessageOptions()
+                ->getMessage(MessageOptions::MESSAGE_REMEMBER_TOKEN_REMOVE_ERROR), $user);
             
             $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
                 RememberTokenEvent::EVENT_TOKEN_REMOVE_ERROR,
@@ -278,16 +278,16 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
      */
     public function confirmAccount($email, $token)
     {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_SUCCESS));
+        $result = new UserOperationResult(true, $this->options->getMessageOptions()
+            ->getMessage(MessageOptions::MESSAGE_CONFIRM_ACCOUNT_SUCCESS));
 
         $user = null;
 
         try {
             if (empty($email) || empty($token)) {
                 $result = $this->createUserOperationResultWithMessages(
-                    $this->options->getMessagesOptions()
-                        ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_MISSING_PARAMS)
+                    $this->options->getMessageOptions()
+                        ->getMessage(MessageOptions::MESSAGE_CONFIRM_ACCOUNT_MISSING_PARAMS)
                 );
             } else {
                 /** @var UserEntityInterface $user */
@@ -314,23 +314,23 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                     }
                     else {
                         $result = $this->createUserOperationResultWithMessages(
-                            $this->options->getMessagesOptions()
-                                ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_INVALID_TOKEN)
+                            $this->options->getMessageOptions()
+                                ->getMessage(MessageOptions::MESSAGE_CONFIRM_ACCOUNT_INVALID_TOKEN)
                         );
                     }
                 }
                 else {
                     $result = $this->createUserOperationResultWithMessages(
-                        $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_INVALID_EMAIL)
+                        $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_CONFIRM_ACCOUNT_INVALID_EMAIL)
                     );
                 }
             }
         }
         catch (\Exception $e) {
             error_log("Confirm account error: " . $e->getMessage(), E_USER_ERROR);
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_ERROR),
+            $result = $this->createUserOperationResultWithException($e, $this->options->getMessageOptions()
+                ->getMessage(MessageOptions::MESSAGE_CONFIRM_ACCOUNT_ERROR),
                 $user);
 
             //trigger error event
@@ -353,8 +353,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
      */
     public function generateResetToken($email)
     {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_FORGOT_PASSWORD_SUCCESS));
+        $result = new UserOperationResult(true, $this->options->getMessageOptions()
+            ->getMessage(MessageOptions::MESSAGE_FORGOT_PASSWORD_SUCCESS));
 
         $user = null;
         $data = null;
@@ -387,8 +387,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
             }
         } catch (\Exception $e) {
             error_log("Password reset request error: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_FORGOT_PASSWORD_ERROR), $user);
+            $result = $this->createUserOperationResultWithException($e, $this->options->getMessageOptions()
+                ->getMessage(MessageOptions::MESSAGE_FORGOT_PASSWORD_ERROR), $user);
 
             $this->getEventManager()->triggerEvent(
                 $this->createPasswordResetEvent(
@@ -409,14 +409,14 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
      */
     public function resetPassword($email, $token, $newPassword)
     {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_SUCCESS));
+        $result = new UserOperationResult(true, $this->options->getMessageOptions()
+            ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_SUCCESS));
 
         $user = null;
 
         if (empty($email) || empty($token)) {
-            $result = $this->createUserOperationResultWithMessages($this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_MISSING_PARAMS));
+            $result = $this->createUserOperationResultWithMessages($this->options->getMessageOptions()
+                ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_MISSING_PARAMS));
 
         }
         else {
@@ -424,8 +424,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                 /** @var UserEntityInterface $user */
                 $user = $this->userMapper->findUserBy('email', $email);
                 if (!$user) {
-                    $result = $this->createUserOperationResultWithMessages($this->options->getMessagesOptions()
-                        ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_EMAIL));
+                    $result = $this->createUserOperationResultWithMessages($this->options->getMessageOptions()
+                        ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_INVALID_EMAIL));
                 }
                 else {
                     $r = $this->userMapper->findResetToken((int) $user->getId(), $token);
@@ -449,21 +449,21 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                         }
                         else {
                             $result = $this->createUserOperationResultWithMessages(
-                                $this->options->getMessagesOptions()
-                                    ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_TOKEN_EXPIRED));
+                                $this->options->getMessageOptions()
+                                    ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_TOKEN_EXPIRED));
                         }
                     }
                     else {
                         $result = $this->createUserOperationResultWithMessages(
-                            $this->options->getMessagesOptions()
-                                ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_TOKEN));
+                            $this->options->getMessageOptions()
+                                ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_INVALID_TOKEN));
                     }
                 }
             }
             catch (\Exception $e) {
                 error_log("Password reset error: " . $e->getMessage());
-                $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                    ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_ERROR), $user);
+                $result = $this->createUserOperationResultWithException($e, $this->options->getMessageOptions()
+                    ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_ERROR), $user);
 
                 $this->getEventManager()->triggerEvent(
                     $this->createPasswordResetEvent(
@@ -484,8 +484,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
      */
     public function changePassword($oldPassword, $newPassword)
     {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_OK));
+        $result = new UserOperationResult(true, $this->options->getMessageOptions()
+            ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_OK));
 
         $identity = $this->authentication->getIdentity();
         //we always get it from DB, just to make sure hashed password is not missing
@@ -493,8 +493,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
 
         if(!$currentUser) {
             return $this->createUserOperationResultWithMessages(
-                $this->options->getMessagesOptions()
-                    ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_USER));
+                $this->options->getMessageOptions()
+                    ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_INVALID_USER));
         }
 
         try {
@@ -514,15 +514,15 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
             }
             else {
                 $result = $this->createUserOperationResultWithMessages(
-                    $this->options->getMessagesOptions()
-                        ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_CURRENT_PASSWORD));
+                    $this->options->getMessageOptions()
+                        ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_INVALID_CURRENT_PASSWORD));
             }
         }
         catch (\Exception $e) {
             error_log("Change password error: " . $e->getMessage());
             $result = $this->createUserOperationResultWithException(
-                $e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_ERROR), $currentUser);
+                $e, $this->options->getMessageOptions()
+                ->getMessage(MessageOptions::MESSAGE_CHANGE_PASSWORD_ERROR), $currentUser);
 
             $this->getEventManager()->triggerEvent($this->createUserUpdateEvent(
                 ChangePasswordEvent::EVENT_CHANGE_PASSWORD_ERROR,
@@ -543,8 +543,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
      */
     public function register(UserEntityInterface $user)
     {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_REGISTER_SUCCESS));
+        $result = new UserOperationResult(true, $this->options->getMessageOptions()
+            ->getMessage(MessageOptions::MESSAGE_REGISTER_SUCCESS));
 
         try {
             $this->userMapper->beginTransaction();
@@ -581,8 +581,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
         }
         catch (\Exception $e) {
             error_log("Register error: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REGISTER_ERROR), $user);
+            $result = $this->createUserOperationResultWithException($e, $this->options->getMessageOptions()
+                ->getMessage(MessageOptions::MESSAGE_REGISTER_ERROR), $user);
 
             //trigger error event
             $this->getEventManager()->triggerEvent(

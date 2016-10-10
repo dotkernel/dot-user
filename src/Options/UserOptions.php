@@ -54,8 +54,8 @@ class UserOptions extends AbstractOptions
     /** @var  ConfirmAccountOptions */
     protected $confirmAccountOptions;
 
-    /** @var  MessagesOptions */
-    protected $messagesOptions;
+    /** @var  MessageOptions */
+    protected $messageOptions;
 
     /** @var  TemplateOptions */
     protected $templateOptions;
@@ -325,33 +325,33 @@ class UserOptions extends AbstractOptions
     }
 
     /**
-     * @return MessagesOptions
+     * @return MessageOptions
      */
-    public function getMessagesOptions()
+    public function getMessageOptions()
     {
-        if(!$this->messagesOptions) {
-            $this->setMessagesOptions([]);
+        if(!$this->messageOptions) {
+            $this->setMessageOptions([]);
         }
-        return $this->messagesOptions;
+        return $this->messageOptions;
     }
 
     /**
-     * @param MessagesOptions|array $messagesOptions
+     * @param MessageOptions|array $messageOptions
      * @return UserOptions
      */
-    public function setMessagesOptions($messagesOptions)
+    public function setMessageOptions($messageOptions)
     {
-        if(is_array($messagesOptions)) {
-            $this->messagesOptions = new MessagesOptions($messagesOptions);
+        if(is_array($messageOptions)) {
+            $this->messageOptions = new MessageOptions($messageOptions);
         }
-        elseif($messagesOptions instanceof MessagesOptions){
-            $this->messagesOptions = $messagesOptions;
+        elseif($messageOptions instanceof MessageOptions){
+            $this->messageOptions = $messageOptions;
         }
         else {
             throw new InvalidArgumentException(sprintf(
                 'MessagesOptions should be an array or an %s object. %s provided.',
-                MessagesOptions::class,
-                is_object($messagesOptions) ? get_class($messagesOptions) : gettype($messagesOptions)
+                MessageOptions::class,
+                is_object($messageOptions) ? get_class($messageOptions) : gettype($messageOptions)
             ));
         }
         return $this;
@@ -369,7 +369,7 @@ class UserOptions extends AbstractOptions
     }
 
     /**
-     * @param TemplateOptions $templateOptions
+     * @param TemplateOptions|array $templateOptions
      * @return UserOptions
      */
     public function setTemplateOptions($templateOptions)

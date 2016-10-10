@@ -9,7 +9,7 @@
 
 namespace Dot\User\Form\InputFilter;
 
-use Dot\User\Options\MessagesOptions;
+use Dot\User\Options\MessageOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\InputFilter\InputFilter;
@@ -47,16 +47,16 @@ class ResetPasswordInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD)
                     ]
                 ],
                 [
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 4,
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_TOO_SHORT)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_TOO_SHORT)
                     ],
                 ],
             ],
@@ -72,16 +72,16 @@ class ResetPasswordInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_EMPTY_VERIFY)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_EMPTY_VERIFY)
                     ]
                 ],
                 [
                     'name' => 'Identical',
                     'options' => [
                         'token' => 'newPassword',
-                        'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_MISMATCH)
+                        'message' => $this->options->getMessageOptions()
+                            ->getMessage(MessageOptions::MESSAGE_RESET_PASSWORD_MISMATCH)
                     ],
                 ],
             ],

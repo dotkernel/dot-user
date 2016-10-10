@@ -27,16 +27,16 @@ class UserOptions extends AbstractOptions
     /** @var  string */
     protected $userEntityHydrator = UserEntityHydrator::class;
 
-    /** @var int  */
+    /** @var int */
     protected $passwordCost = 11;
 
-    /** @var bool  */
+    /** @var bool */
     protected $enableUserStatus = true;
 
-    /** @var array  */
+    /** @var array */
     protected $userListeners = [];
 
-    /** @var bool  */
+    /** @var bool */
     protected $showFormInputLabels = false;
 
     /** @var  DbOptions */
@@ -148,7 +148,7 @@ class UserOptions extends AbstractOptions
      */
     public function setUserListeners($userListeners)
     {
-        $this->userListeners = (array) $userListeners;
+        $this->userListeners = (array)$userListeners;
         return $this;
     }
 
@@ -158,7 +158,7 @@ class UserOptions extends AbstractOptions
      */
     public function getDbOptions()
     {
-        if(!$this->dbOptions) {
+        if (!$this->dbOptions) {
             $this->setDbOptions([]);
         }
         return $this->dbOptions;
@@ -170,13 +170,11 @@ class UserOptions extends AbstractOptions
      */
     public function setDbOptions($dbOptions)
     {
-        if(is_array($dbOptions)) {
+        if (is_array($dbOptions)) {
             $this->dbOptions = new DbOptions($dbOptions);
-        }
-        elseif($dbOptions instanceof DbOptions){
+        } elseif ($dbOptions instanceof DbOptions) {
             $this->dbOptions = $dbOptions;
-        }
-        else {
+        } else {
             throw new InvalidArgumentException(sprintf(
                 'DbOptions should be an array or an %s object. %s provided.',
                 DbOptions::class,
@@ -192,7 +190,7 @@ class UserOptions extends AbstractOptions
      */
     public function getLoginOptions()
     {
-        if(!$this->loginOptions) {
+        if (!$this->loginOptions) {
             $this->setLoginOptions([]);
         }
         return $this->loginOptions;
@@ -204,13 +202,11 @@ class UserOptions extends AbstractOptions
      */
     public function setLoginOptions($loginOptions)
     {
-        if(is_array($loginOptions)) {
+        if (is_array($loginOptions)) {
             $this->loginOptions = new LoginOptions($loginOptions);
-        }
-        elseif($loginOptions instanceof LoginOptions){
+        } elseif ($loginOptions instanceof LoginOptions) {
             $this->loginOptions = $loginOptions;
-        }
-        else {
+        } else {
             throw new InvalidArgumentException(sprintf(
                 'LoginOptions should be an array or an %s object. %s provided.',
                 LoginOptions::class,
@@ -226,7 +222,7 @@ class UserOptions extends AbstractOptions
      */
     public function getRegisterOptions()
     {
-        if(!$this->registerOptions) {
+        if (!$this->registerOptions) {
             $this->setRegisterOptions([]);
         }
 
@@ -239,13 +235,11 @@ class UserOptions extends AbstractOptions
      */
     public function setRegisterOptions($registerOptions)
     {
-        if(is_array($registerOptions)) {
+        if (is_array($registerOptions)) {
             $this->registerOptions = new RegisterOptions($registerOptions);
-        }
-        elseif($registerOptions instanceof RegisterOptions){
+        } elseif ($registerOptions instanceof RegisterOptions) {
             $this->registerOptions = $registerOptions;
-        }
-        else {
+        } else {
             throw new InvalidArgumentException(sprintf(
                 'RegisterOptions should be an array or an %s object. %s provided.',
                 RegisterOptions::class,
@@ -261,7 +255,7 @@ class UserOptions extends AbstractOptions
      */
     public function getPasswordRecoveryOptions()
     {
-        if(!$this->passwordRecoveryOptions) {
+        if (!$this->passwordRecoveryOptions) {
             $this->setPasswordRecoveryOptions([]);
         }
 
@@ -274,13 +268,11 @@ class UserOptions extends AbstractOptions
      */
     public function setPasswordRecoveryOptions($passwordRecoveryOptions)
     {
-        if(is_array($passwordRecoveryOptions)) {
+        if (is_array($passwordRecoveryOptions)) {
             $this->passwordRecoveryOptions = new PasswordRecoveryOptions($passwordRecoveryOptions);
-        }
-        elseif($passwordRecoveryOptions instanceof PasswordRecoveryOptions){
+        } elseif ($passwordRecoveryOptions instanceof PasswordRecoveryOptions) {
             $this->passwordRecoveryOptions = $passwordRecoveryOptions;
-        }
-        else {
+        } else {
             throw new InvalidArgumentException(sprintf(
                 'PasswordRecoveryOptions should be an array or an %s object. %s provided.',
                 PasswordRecoveryOptions::class,
@@ -295,7 +287,7 @@ class UserOptions extends AbstractOptions
      */
     public function getConfirmAccountOptions()
     {
-        if(!$this->confirmAccountOptions) {
+        if (!$this->confirmAccountOptions) {
             $this->setConfirmAccountOptions([]);
         }
 
@@ -308,13 +300,11 @@ class UserOptions extends AbstractOptions
      */
     public function setConfirmAccountOptions($confirmAccountOptions)
     {
-        if(is_array($confirmAccountOptions)) {
+        if (is_array($confirmAccountOptions)) {
             $this->confirmAccountOptions = new ConfirmAccountOptions($confirmAccountOptions);
-        }
-        elseif($confirmAccountOptions instanceof ConfirmAccountOptions){
+        } elseif ($confirmAccountOptions instanceof ConfirmAccountOptions) {
             $this->confirmAccountOptions = $confirmAccountOptions;
-        }
-        else {
+        } else {
             throw new InvalidArgumentException(sprintf(
                 'ConfirmAccountOptions should be an array or an %s object. %s provided.',
                 ConfirmAccountOptions::class,
@@ -329,7 +319,7 @@ class UserOptions extends AbstractOptions
      */
     public function getMessageOptions()
     {
-        if(!$this->messageOptions) {
+        if (!$this->messageOptions) {
             $this->setMessageOptions([]);
         }
         return $this->messageOptions;
@@ -341,13 +331,11 @@ class UserOptions extends AbstractOptions
      */
     public function setMessageOptions($messageOptions)
     {
-        if(is_array($messageOptions)) {
+        if (is_array($messageOptions)) {
             $this->messageOptions = new MessageOptions($messageOptions);
-        }
-        elseif($messageOptions instanceof MessageOptions){
+        } elseif ($messageOptions instanceof MessageOptions) {
             $this->messageOptions = $messageOptions;
-        }
-        else {
+        } else {
             throw new InvalidArgumentException(sprintf(
                 'MessagesOptions should be an array or an %s object. %s provided.',
                 MessageOptions::class,
@@ -362,7 +350,7 @@ class UserOptions extends AbstractOptions
      */
     public function getTemplateOptions()
     {
-        if(!$this->templateOptions) {
+        if (!$this->templateOptions) {
             $this->setTemplateOptions([]);
         }
         return $this->templateOptions;
@@ -374,13 +362,11 @@ class UserOptions extends AbstractOptions
      */
     public function setTemplateOptions($templateOptions)
     {
-        if(is_array($templateOptions)) {
+        if (is_array($templateOptions)) {
             $this->templateOptions = new TemplateOptions($templateOptions);
-        }
-        elseif($templateOptions instanceof TemplateOptions){
+        } elseif ($templateOptions instanceof TemplateOptions) {
             $this->templateOptions = $templateOptions;
-        }
-        else {
+        } else {
             throw new InvalidArgumentException(sprintf(
                 'TemplateOptions should be an array or an %s object. %s provided.',
                 TemplateOptions::class,
@@ -409,6 +395,5 @@ class UserOptions extends AbstractOptions
         return $this;
     }
 
-    
-    
+
 }

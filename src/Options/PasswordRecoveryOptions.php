@@ -18,10 +18,10 @@ use Zend\Stdlib\ArrayUtils;
  */
 class PasswordRecoveryOptions extends AbstractOptions
 {
-    /** @var bool  */
+    /** @var bool */
     protected $enablePasswordRecovery = true;
 
-    /** @var int  */
+    /** @var int */
     protected $resetPasswordTokenTimeout = 1800;
 
     /**

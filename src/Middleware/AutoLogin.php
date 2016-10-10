@@ -49,14 +49,13 @@ class AutoLogin
      * @param FlashMessengerInterface $messenger
      * @param UserOptions $options
      */
-    public function  __construct(
+    public function __construct(
         AuthenticationInterface $authentication,
         UserServiceInterface $userService,
         UrlHelper $urlHelper,
         FlashMessengerInterface $messenger,
         UserOptions $options
-    )
-    {
+    ) {
         $this->authentication = $authentication;
         $this->userService = $userService;
         $this->urlHelper = $urlHelper;
@@ -74,11 +73,11 @@ class AutoLogin
     {
         $this->request = $request;
 
-        if(!$this->authentication->hasIdentity()) {
+        if (!$this->authentication->hasIdentity()) {
             $cookies = $request->getCookieParams();
             $key = $this->options->getLoginOptions()->getRememberMeCookieName();
 
-            if(isset($cookies[$key])) {
+            if (isset($cookies[$key])) {
                 try {
                     $data = @unserialize(base64_decode($cookies[$key]));
 
@@ -99,16 +98,13 @@ class AutoLogin
                                 //autologin user
                                 $this->authentication->setIdentity($user);
                             }
-                        }
-                        else {
+                        } else {
                             $this->unsetRememberCookie($key);
                         }
-                    }
-                    else {
+                    } else {
                         $this->unsetRememberCookie($key);
                     }
-                }
-                catch(\Exception $e) {
+                } catch (\Exception $e) {
                     error_log("Auto-login error: " . $e->getMessage());
                     $this->unsetRememberCookie($key);
                 }
@@ -120,7 +116,7 @@ class AutoLogin
 
     protected function unsetRememberCookie($key)
     {
-        if(isset($_COOKIE[$key])) {
+        if (isset($_COOKIE[$key])) {
             unset($_COOKIE[$key]);
             setcookie($key, '', time() - 3600, '/');
         }

@@ -9,7 +9,7 @@
 
 namespace Dot\User\Form\InputFilter;
 
-use Dot\User\Options\MessageOptions;
+use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\InputFilter\InputFilter;
@@ -41,8 +41,8 @@ class RegisterInputFilter extends InputFilter
     public function __construct(
         UserOptions $options,
         $emailValidator = null,
-        $usernameValidator = null)
-    {
+        $usernameValidator = null
+    ) {
         $this->options = $options;
         $this->emailValidator = $emailValidator;
         $this->usernameValidator = $usernameValidator;
@@ -60,23 +60,23 @@ class RegisterInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_EMPTY_EMAIL),
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_EMPTY_EMAIL),
                     ]
                 ],
                 [
                     'name' => 'EmailAddress',
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_INVALID_EMAIL)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_INVALID_EMAIL)
                     ]
                 ],
             ],
         ];
 
-        if($this->emailValidator) {
-            $this->emailValidator->setMessage($this->options->getMessageOptions()
-                ->getMessage(MessageOptions::MESSAGE_REGISTER_EMAIL_ALREADY_REGISTERED));
+        if ($this->emailValidator) {
+            $this->emailValidator->setMessage($this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_REGISTER_EMAIL_ALREADY_REGISTERED));
 
             $email['validators'][] = $this->emailValidator;
         }
@@ -93,8 +93,8 @@ class RegisterInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_EMPTY_USERNAME)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_EMPTY_USERNAME)
                     ]
                 ],
                 [
@@ -102,35 +102,35 @@ class RegisterInputFilter extends InputFilter
                     'options' => [
                         'min' => 3,
                         'max' => 255,
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_USERNAME_TOO_SHORT)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_USERNAME_TOO_SHORT)
                     ]
                 ],
                 [
                     'name' => 'Regex',
                     'options' => [
                         'pattern' => '/^[a-zA-Z0-9-_]+$/',
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_USERNAME_INVALID_CHARACTERS)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_USERNAME_INVALID_CHARACTERS)
                     ]
                 ],
             ],
         ];
 
-        if($this->usernameValidator) {
-            $this->usernameValidator->setMessage($this->options->getMessageOptions()
-                ->getMessage(MessageOptions::MESSAGE_REGISTER_USERNAME_ALREADY_REGISTERED));
+        if ($this->usernameValidator) {
+            $this->usernameValidator->setMessage($this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_REGISTER_USERNAME_ALREADY_REGISTERED));
 
             $username['validators'][] = $this->usernameValidator;
         }
 
-        if($this->options->getRegisterOptions()->isEnableUsername()) {
+        if ($this->options->getRegisterOptions()->isEnableUsername()) {
             $this->add($username);
         }
-        
+
         $this->add([
-            'name'       => 'password',
-            'filters'    => [
+            'name' => 'password',
+            'filters' => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -138,24 +138,24 @@ class RegisterInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_EMPTY_PASSWORD)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_EMPTY_PASSWORD)
                     ]
                 ],
                 [
-                    'name'    => 'StringLength',
+                    'name' => 'StringLength',
                     'options' => [
                         'min' => 4,
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_PASSWORD_TOO_SHORT)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_PASSWORD_TOO_SHORT)
                     ],
                 ],
             ],
         ]);
 
         $this->add([
-            'name'       => 'passwordVerify',
-            'filters'    => [
+            'name' => 'passwordVerify',
+            'filters' => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -163,16 +163,16 @@ class RegisterInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_EMPTY_PASSWORD_CONFIRM)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_EMPTY_PASSWORD_CONFIRM)
                     ]
                 ],
                 [
-                    'name'    => 'Identical',
+                    'name' => 'Identical',
                     'options' => [
                         'token' => 'password',
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_REGISTER_PASSWORD_CONFIRM_NOT_MATCH)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_PASSWORD_CONFIRM_NOT_MATCH)
                     ],
                 ],
             ],

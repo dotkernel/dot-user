@@ -17,7 +17,7 @@ abstract class AbstractResult implements ResultInterface
 {
     const DEFAULT_MESSAGE = 'Success!';
 
-    /** @var bool  */
+    /** @var bool */
     protected $valid = true;
 
     /** @var  string[] */
@@ -35,7 +35,7 @@ abstract class AbstractResult implements ResultInterface
     public function __construct($valid = true, $messages = self::DEFAULT_MESSAGE, \Exception $exception = null)
     {
         $this->valid = $valid;
-        $this->messages = (array) $messages;
+        $this->messages = (array)$messages;
         $this->exception = $exception;
     }
 

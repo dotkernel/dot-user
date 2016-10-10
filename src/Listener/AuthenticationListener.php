@@ -16,7 +16,7 @@ use Dot\Authentication\Web\Action\LogoutAction;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\User\Entity\UserEntityInterface;
-use Dot\User\Options\MessageOptions;
+use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserServiceInterface;
 use Zend\EventManager\AbstractListenerAggregate;
@@ -175,8 +175,8 @@ class AuthenticationListener extends AbstractListenerAggregate
                         $data = $form->getData();
                         $this->flashMessenger->addData('loginFormData', $data);
 
-                        $e->setError($this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_LOGIN_ACCOUNT_INACTIVE));
+                        $e->setError($this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_LOGIN_ACCOUNT_INACTIVE));
 
                         //clear identity <=> logout
                         $e->getAuthenticationService()->clearIdentity();

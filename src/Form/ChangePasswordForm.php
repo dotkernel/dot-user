@@ -34,8 +34,8 @@ class ChangePasswordForm extends Form
     public function __construct(
         UserOptions $userOptions,
         $name = 'change-password',
-        array $options = [])
-    {
+        array $options = []
+    ) {
         $this->userOptions = $userOptions;
         parent::__construct($name, $options);
     }

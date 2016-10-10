@@ -16,19 +16,19 @@ use Zend\Stdlib\AbstractOptions;
  */
 class TemplateOptions extends AbstractOptions
 {
-    /** @var string  */
+    /** @var string */
     protected $loginTemplate = 'dot-user::login';
 
-    /** @var string  */
+    /** @var string */
     protected $registerTemplate = 'dot-user::register';
 
-    /** @var string  */
+    /** @var string */
     protected $changePasswordTemplate = 'dot-user::change-password';
 
-    /** @var string  */
+    /** @var string */
     protected $forgotPasswordTemplate = 'dot-user::forgot-password';
 
-    /** @var string  */
+    /** @var string */
     protected $resetPasswordTemplate = 'dot-user::reset-password';
 
     /**

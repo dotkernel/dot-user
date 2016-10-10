@@ -18,32 +18,32 @@ use Zend\Stdlib\ArrayUtils;
  */
 class RegisterOptions extends AbstractOptions
 {
-    /** @var bool  */
+    /** @var bool */
     protected $enableRegistration = true;
 
-    /** @var bool  */
+    /** @var bool */
     protected $enableUsername = true;
 
     /** @var  mixed */
     protected $defaultUserStatus = 'pending';
 
-    /** @var int  */
+    /** @var int */
     protected $userFormTimeout = 1800;
 
-    /** @var bool  */
+    /** @var bool */
     protected $useRegistrationFormCaptcha = true;
 
     /** @var  mixed */
     protected $formCaptchaOptions = [
-        'class'   => 'Figlet',
+        'class' => 'Figlet',
         'options' => [
-            'wordLen'    => 5,
+            'wordLen' => 5,
             'expiration' => 300,
-            'timeout'    => 300,
+            'timeout' => 300,
         ],
     ];
 
-    /** @var bool  */
+    /** @var bool */
     protected $loginAfterRegistration = false;
 
     /**
@@ -171,5 +171,5 @@ class RegisterOptions extends AbstractOptions
         $this->loginAfterRegistration = $loginAfterRegistration;
         return $this;
     }
-    
+
 }

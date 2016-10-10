@@ -29,7 +29,7 @@ class DbOptions extends AbstractOptions
     /** @var  string */
     protected $userConfirmTokenTable = 'user_confirm_token';
 
-    /** @var string  */
+    /** @var string */
     protected $userRememberTokenTable = 'user_remember_token';
 
     /**
@@ -122,6 +122,5 @@ class DbOptions extends AbstractOptions
         return $this;
     }
 
-    
-    
+
 }

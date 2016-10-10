@@ -35,8 +35,8 @@ class LoginForm extends Form
     public function __construct(
         UserOptions $userOptions,
         $name = 'login',
-        $options = array())
-    {
+        $options = array()
+    ) {
         $this->userOptions = $userOptions;
         parent::__construct($name, $options);
     }
@@ -73,7 +73,7 @@ class LoginForm extends Form
             ),
         ));
 
-        if($this->userOptions->getLoginOptions()->isEnableRememberMe()) {
+        if ($this->userOptions->getLoginOptions()->isEnableRememberMe()) {
             $this->add(array(
                 'type' => 'checkbox',
                 'name' => 'remember',
@@ -101,12 +101,12 @@ class LoginForm extends Form
             ->setLabel('Sign In')
             ->setValue('Sign In')
             ->setAttributes(array(
-                'type'  => 'submit',
+                'type' => 'submit',
             ));
         $this->add($submitElement, array(
             'priority' => -100,
         ));
-        
+
         $this->getEventManager()->trigger('init', $this);
     }
 }

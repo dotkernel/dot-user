@@ -9,7 +9,7 @@
 
 namespace Dot\User\Form\InputFilter;
 
-use Dot\User\Options\MessageOptions;
+use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\InputFilter\InputFilter;
@@ -31,16 +31,15 @@ class ForgotPasswordInputFilter extends InputFilter
      */
     public function __construct(
         UserOptions $options
-    )
-    {
+    ) {
         $this->options = $options;
     }
 
     public function init()
     {
         $this->add([
-            'name'       => 'email',
-            'filters'    => [
+            'name' => 'email',
+            'filters' => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -48,15 +47,15 @@ class ForgotPasswordInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_FORGOT_PASSWORD_MISSING_EMAIL)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_FORGOT_PASSWORD_MISSING_EMAIL)
                     ]
                 ],
                 [
                     'name' => 'EmailAddress',
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_FORGOT_PASSWORD_INVALID_EMAIL),
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_FORGOT_PASSWORD_INVALID_EMAIL),
                     ]
                 ],
             ],

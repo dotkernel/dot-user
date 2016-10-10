@@ -29,7 +29,7 @@ class ResetPasswordForm extends Form
     {
         parent::__construct($name, $options);
     }
-    
+
     public function init()
     {
         $this->add(array(

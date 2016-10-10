@@ -12,6 +12,10 @@ namespace Dot\User\Entity;
 use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentityInterface;
 use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentityInterface;
 
+/**
+ * Class UserEntity
+ * @package Dot\User\Entity
+ */
 class UserEntity implements
     UserEntityInterface,
     AuthenticationIdentityInterface,
@@ -43,7 +47,7 @@ class UserEntity implements
      */
     public function getName()
     {
-        if($this->username) {
+        if ($this->username) {
             return $this->username;
         }
 
@@ -181,5 +185,5 @@ class UserEntity implements
         return $this;
     }
 
-    
+
 }

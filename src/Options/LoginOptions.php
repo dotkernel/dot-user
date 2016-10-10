@@ -18,25 +18,25 @@ use Zend\Stdlib\ArrayUtils;
  */
 class LoginOptions extends AbstractOptions
 {
-    /** @var bool  */
+    /** @var bool */
     protected $enableRememberMe = true;
 
-    /** @var string  */
+    /** @var string */
     protected $rememberMeCookieName = 'rememberMe';
 
-    /** @var int  */
-    protected $rememberMeCookieExpire = 60*60*24*30;
+    /** @var int */
+    protected $rememberMeCookieExpire = 60 * 60 * 24 * 30;
 
-    /** @var bool  */
+    /** @var bool */
     protected $rememberMeCookieSecure = false;
 
-    /** @var array  */
+    /** @var array */
     protected $authIdentityFields = ['username', 'email'];
 
     /** @var  array */
     protected $allowedLoginStatuses = ['active'];
 
-    /** @var int  */
+    /** @var int */
     protected $loginFormTimeout = 1800;
 
     /**
@@ -71,7 +71,7 @@ class LoginOptions extends AbstractOptions
      */
     public function setAuthIdentityFields($authIdentityFields)
     {
-        $this->authIdentityFields = (array) $authIdentityFields;
+        $this->authIdentityFields = (array)$authIdentityFields;
         return $this;
     }
 

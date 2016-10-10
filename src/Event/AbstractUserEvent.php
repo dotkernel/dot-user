@@ -20,13 +20,13 @@ use Dot\User\Service\UserServiceInterface;
  */
 abstract class AbstractUserEvent extends Event
 {
-    /** @var UserServiceInterface  */
+    /** @var UserServiceInterface */
     protected $userService;
 
-    /** @var UserEntityInterface  */
+    /** @var UserEntityInterface */
     protected $user;
 
-    /** @var ResultInterface|null  */
+    /** @var ResultInterface|null */
     protected $result;
 
     /**
@@ -103,6 +103,5 @@ abstract class AbstractUserEvent extends Event
         return $this;
     }
 
-    
 
 }

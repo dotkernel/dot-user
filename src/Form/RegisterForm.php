@@ -38,8 +38,8 @@ class RegisterForm extends Form
     public function __construct(
         UserOptions $userOptions,
         $name = 'register',
-        $options = array())
-    {
+        $options = array()
+    ) {
         $this->userOptions = $userOptions;
         parent::__construct($name, $options);
     }
@@ -60,7 +60,7 @@ class RegisterForm extends Form
 
         ));
 
-        if($this->userOptions->getRegisterOptions()->isEnableUsername()) {
+        if ($this->userOptions->getRegisterOptions()->isEnableUsername()) {
             $this->add(array(
                 'type' => 'text',
                 'name' => 'username',
@@ -98,7 +98,7 @@ class RegisterForm extends Form
             ),
         ), ['priority' => -20]);
 
-        if($this->userOptions->getRegisterOptions()->isUseRegistrationFormCaptcha()) {
+        if ($this->userOptions->getRegisterOptions()->isUseRegistrationFormCaptcha()) {
             //add captcha element
             $this->add([
                 'type' => 'Captcha',
@@ -125,7 +125,7 @@ class RegisterForm extends Form
             ),
         ), ['priority' => -100]);
 
-        if($this->userOptions->getRegisterOptions()->isUseRegistrationFormCaptcha() && $this->captcha) {
+        if ($this->userOptions->getRegisterOptions()->isUseRegistrationFormCaptcha() && $this->captcha) {
             $this->add($this->captcha, ['name' => 'captcha']);
         }
 

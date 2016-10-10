@@ -42,8 +42,8 @@ class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
         AdapterInterface $adapter,
         $features = null,
         $resultSetPrototype = null,
-        $sql = null)
-    {
+        $sql = null
+    ) {
         parent::__construct($table, $adapter, $features, $resultSetPrototype, $sql);
         $this->dbOptions = $dbOptions;
     }
@@ -83,7 +83,7 @@ class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
      */
     public function createUser($data)
     {
-        if($data instanceof UserEntityInterface) {
+        if ($data instanceof UserEntityInterface) {
             $data = $this->entityToArray($data);
         }
 
@@ -92,17 +92,16 @@ class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
 
     public function updateUser($data)
     {
-        if($data instanceof UserEntityInterface) {
+        if ($data instanceof UserEntityInterface) {
             $data = $this->entityToArray($data);
         }
 
-        if(isset($data[$this->idColumn])) {
+        if (isset($data[$this->idColumn])) {
             $id = $data[$this->idColumn];
             unset($data[$this->idColumn]);
 
             return $this->update($data, [$this->idColumn => $id]);
-        }
-        else {
+        } else {
             throw new InvalidArgumentException('Cannot update user - missing id field');
         }
     }

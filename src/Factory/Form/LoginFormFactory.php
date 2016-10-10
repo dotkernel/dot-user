@@ -34,7 +34,7 @@ class LoginFormFactory
         $filter = new LoginInputFilter($options);
         $filter->setEventManager($this->getEventManager($container));
         $filter->init();
-        
+
         $form = new LoginForm($options);
         $form->setInputFilter($filter);
         $form->setEventManager($this->getEventManager($container));

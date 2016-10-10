@@ -18,7 +18,7 @@ use Zend\Stdlib\ArrayUtils;
  */
 class ConfirmAccountOptions extends AbstractOptions
 {
-    /** @var bool  */
+    /** @var bool */
     protected $enableAccountConfirmation = true;
 
     /** @var  mixed */

@@ -44,6 +44,5 @@ class PasswordResetEvent extends AbstractUserEvent
         return $this;
     }
 
-    
 
 }

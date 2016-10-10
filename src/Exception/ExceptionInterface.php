@@ -15,5 +15,5 @@ namespace Dot\User\Exception;
  */
 interface ExceptionInterface
 {
-    
+
 }

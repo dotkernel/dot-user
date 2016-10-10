@@ -9,7 +9,7 @@
 
 namespace Dot\User\Form\InputFilter;
 
-use Dot\User\Options\MessageOptions;
+use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\InputFilter\InputFilter;
@@ -43,8 +43,8 @@ class LoginInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_LOGIN_EMPTY_IDENTITY)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_LOGIN_EMPTY_IDENTITY)
                     ]
                 ]
             ]
@@ -58,16 +58,16 @@ class LoginInputFilter extends InputFilter
                     'name' => 'NotEmpty',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_LOGIN_EMPTY_PASSWORD)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_LOGIN_EMPTY_PASSWORD)
                     ]
                 ],
                 [
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 4,
-                        'message' => $this->options->getMessageOptions()
-                            ->getMessage(MessageOptions::MESSAGE_LOGIN_PASSWORD_TOO_SHORT)
+                        'message' => $this->options->getMessagesOptions()
+                            ->getMessage(MessagesOptions::MESSAGE_LOGIN_PASSWORD_TOO_SHORT)
                     ]
                 ]
             ],

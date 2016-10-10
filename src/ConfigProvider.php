@@ -80,7 +80,9 @@ class ConfigProvider
 
                 'confirm_account_options' => [],
 
-                'messages_options' => [],
+                'messages_options' => [
+                    'messages' => []
+                ],
 
                 'template_options' => [],
 
@@ -97,7 +99,7 @@ class ConfigProvider
 
                     'after_logout_route' => 'login',
                     'after_login_route' => 'home',
-                    
+
                     'allow_redirect_param' => true,
                     'redirect_param_name' => 'redirect',
                 ]

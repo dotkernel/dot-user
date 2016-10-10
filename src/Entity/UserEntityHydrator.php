@@ -13,8 +13,16 @@ use Zend\Hydrator\ClassMethods;
 use Zend\Hydrator\Filter\FilterComposite;
 use Zend\Hydrator\Filter\MethodMatchFilter;
 
+/**
+ * Class UserEntityHydrator
+ * @package Dot\User\Entity
+ */
 class UserEntityHydrator extends ClassMethods
 {
+    /**
+     * UserEntityHydrator constructor.
+     * @param bool $underscoreSeparatedKeys
+     */
     public function __construct($underscoreSeparatedKeys = false)
     {
         parent::__construct($underscoreSeparatedKeys);

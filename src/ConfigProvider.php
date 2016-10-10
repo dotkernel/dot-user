@@ -44,42 +44,17 @@ class ConfigProvider
     {
         //check to see if we are in a zend expressive app and vendor folder
         //if so, install dk-user template path if exists in the root application, for template overwriting
-        $addTemplatePath = false;
+        /*$addTemplatePath = false;
         $currentDir = getcwd();
 
         $templatePath = $currentDir . '/../../../../templates/dot-user';
         if(is_dir($templatePath)) {
             $addTemplatePath = true;
-        }
+        }*/
 
         $config = [
 
-            'dependencies' => [
-                'factories' => [
-                    UserOptions::class => UserOptionsFactory::class,
-
-                    UserMapperInterface::class => UserDbMapperFactory::class,
-                    UserServiceInterface::class => UserServiceFactory::class,
-
-                    UserController::class => UserControllerFactory::class,
-
-                    UserFormManager::class => UserFormManagerFactory::class,
-
-                    UserEntity::class => InvokableFactory::class,
-                    UserEntityHydrator::class => InvokableFactory::class,
-
-                    AuthenticationListener::class => AuthenticationListenerFactory::class,
-
-                    Bootstrap::class => BootstrapFactory::class,
-                    AutoLogin::class => AutoLoginFactory::class,
-
-                    PasswordInterface::class => PasswordDefaultFactory::class,
-                ],
-
-                'shared' => [
-                    UserEntity::class => false,
-                ],
-            ],
+            'dependencies' => $this->getDependencyConfig(),
 
             'middleware_pipeline' => [
                 [
@@ -150,16 +125,45 @@ class ConfigProvider
 
             'templates' => [
                 'paths' => [
-                    //we add the usual template path of a zend expressive app too
-                    'dk-user' => [realpath(__DIR__ . '/../templates/dot-user')],
+                    'dot-user' => [realpath(__DIR__ . '/../templates/dot-user')],
                 ]
             ],
         ];
 
-        if($addTemplatePath) {
+        /*if($addTemplatePath) {
             array_unshift($config['templates']['paths']['dot-user'], realpath($templatePath));
-        }
+        }*/
 
         return $config;
+    }
+
+    public function getDependencyConfig()
+    {
+        return [
+            'factories' => [
+                UserOptions::class => UserOptionsFactory::class,
+
+                UserMapperInterface::class => UserDbMapperFactory::class,
+                UserServiceInterface::class => UserServiceFactory::class,
+
+                UserController::class => UserControllerFactory::class,
+
+                UserFormManager::class => UserFormManagerFactory::class,
+
+                UserEntity::class => InvokableFactory::class,
+                UserEntityHydrator::class => InvokableFactory::class,
+
+                AuthenticationListener::class => AuthenticationListenerFactory::class,
+
+                Bootstrap::class => BootstrapFactory::class,
+                AutoLogin::class => AutoLoginFactory::class,
+
+                PasswordInterface::class => PasswordDefaultFactory::class,
+            ],
+
+            'shared' => [
+                UserEntity::class => false,
+            ],
+        ];
     }
 }

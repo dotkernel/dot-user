@@ -46,6 +46,7 @@ class ConfigProvider
         //if so, install dk-user template path if exists in the root application, for template overwriting
         $addTemplatePath = false;
         $currentDir = getcwd();
+
         $templatePath = $currentDir . '/../../../../templates/dot-user';
         if(is_dir($templatePath)) {
             $addTemplatePath = true;

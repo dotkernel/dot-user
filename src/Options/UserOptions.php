@@ -391,7 +391,6 @@ class UserOptions extends AbstractOptions
     }
 
 
-
     /**
      * @return boolean
      */

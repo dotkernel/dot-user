@@ -34,7 +34,7 @@ class UserOptions extends AbstractOptions
     protected $enableUserStatus = true;
 
     /** @var array */
-    protected $userListeners = [];
+    protected $userEventListeners = [];
 
     /** @var bool */
     protected $showFormInputLabels = false;
@@ -137,18 +137,18 @@ class UserOptions extends AbstractOptions
     /**
      * @return array
      */
-    public function getUserListeners()
+    public function getUserEventListeners()
     {
-        return $this->userListeners;
+        return $this->userEventListeners;
     }
 
     /**
-     * @param array $userListeners
+     * @param array $userEventListeners
      * @return UserOptions
      */
-    public function setUserListeners($userListeners)
+    public function setUserEventListeners($userEventListeners)
     {
-        $this->userListeners = (array)$userListeners;
+        $this->userEventListeners = (array)$userEventListeners;
         return $this;
     }
 

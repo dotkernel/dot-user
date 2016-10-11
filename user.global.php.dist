@@ -1,0 +1,137 @@
+<?php
+
+return [
+
+    'dependencies' => [
+
+    ],
+
+    'dot_user' => [
+
+        //overwrite user entity, must implement UserEntityInterface
+        //service names are required here
+        'user_entity' => '',
+        'user_entity_hydrator' => '',
+
+        //bcrypt password cost, don't change if unsure
+        'password_cost' => 11,
+
+        //whether to use user status throughout the user module
+        'enable_user_status' => true,
+
+        //when displaying forms, show labels along the intputs
+        'show_form_input_labels' => true,
+
+        //database options for mysql/pdo mapper
+        'db_options' => [
+            //service name of the database adapter
+            'db_adapter' => '',
+
+            //user table name
+            'user_table' => '',
+
+            //table name where reset tokens are stored
+            'user_reset_token_table' => '',
+
+            //table name where confirm tokens are stored
+            'user_confirm_token_table' => '',
+
+            //table name where remember tokens are stored
+            'user_remember_token_table' => ''
+        ],
+
+        'login_options' => [
+            //activate remember me logic, and enable remember me checkbox in login form
+            'enable_remember_me' => true,
+
+            //cookie name to use for remember me tokens
+            'remember_me_cookie_name' => 'rememberMe',
+
+            //remember me cookie expiration
+            'remember_me_cookie_expire' => 60 * 60 * 24 * 30,
+
+            //use cookie only on secure connections
+            'remember_me_cookie_secure' => true,
+
+            //what fields to use when authenticating
+            'auth_identity_fields' => ['username', 'email'],
+
+            //whitelist user statuses that are allowed to authenticate successfully
+            'allowed_login_statuses' => ['active'],
+
+            //csrf login form expiration
+            'login_form_timeout' => 1800,
+        ],
+
+        //config for user registration related flow
+        'register_options' => [
+            //enable user registration through the website
+            'enable_registration' => true,
+
+            //enable the username field, along with the email
+            'enable_username' => true,
+
+            //what status should newly registered users be assigned
+            'default_user_status' => 'pending',
+
+            //csrf form expiration
+            'user_form_timeout' => 1800,
+
+            //use captcha when registering
+            'use_registration_form_captcha' => true,
+
+            //if captcha enabled, this is its config
+            'form_captcha_options' => [
+                'class' => 'Figlet',
+                'options' => [
+                    'wordLen' => 5,
+                    'expiration' => 300,
+                    'timeout' => 300,
+                ],
+            ],
+        ],
+
+        'password_recovery_options' => [
+            //enable password recovery
+            'enable_password_recovery' => true,
+
+            //expiration for reset token
+            'reset_password_token_timeout' => 1800,
+        ],
+
+        'confirm_account_options' => [
+            //enable account confirmation
+            'enable_account_confirmation' => true,
+
+            //what status should be assigned to users that confirm their account
+            'active_user_status' => 'active',
+        ],
+
+        //overwrite default user module messages
+        'messages_options' => [
+            'messages' => [
+
+            ],
+        ],
+
+        //overwrite default templates
+        'template_options' => [
+            'login_template' => '',
+
+            'register_template' => '',
+
+            'change_password_template' => '',
+
+            'forgot_password_template' => '',
+
+            'reset_password_template' => '',
+        ],
+
+        //default user event listeners
+        'user_event_listeners' => [
+
+        ],
+        
+    ],
+
+];

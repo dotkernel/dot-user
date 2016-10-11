@@ -71,7 +71,7 @@ class UserServiceFactory
      */
     protected function attachUserListeners(UserListenerAwareInterface $service, ContainerInterface $container)
     {
-        $listeners = $this->options->getUserListeners();
+        $listeners = $this->options->getUserEventListeners();
         foreach ($listeners as $listener) {
             if (is_string($listener) && $container->has($listener)) {
                 $listener = $container->get($listener);

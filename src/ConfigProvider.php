@@ -42,17 +42,7 @@ class ConfigProvider
      */
     public function __invoke()
     {
-        //check to see if we are in a zend expressive app and vendor folder
-        //if so, install dk-user template path if exists in the root application, for template overwriting
-        /*$addTemplatePath = false;
-        $currentDir = getcwd();
-
-        $templatePath = $currentDir . '/../../../../templates/dot-user';
-        if(is_dir($templatePath)) {
-            $addTemplatePath = true;
-        }*/
-
-        $config = [
+        return [
 
             'dependencies' => $this->getDependencyConfig(),
 
@@ -131,12 +121,6 @@ class ConfigProvider
                 ]
             ],
         ];
-
-        /*if($addTemplatePath) {
-            array_unshift($config['templates']['paths']['dot-user'], realpath($templatePath));
-        }*/
-
-        return $config;
     }
 
     public function getDependencyConfig()

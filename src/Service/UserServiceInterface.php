@@ -127,9 +127,4 @@ interface UserServiceInterface extends HttpMessagesAwareInterface
      * @return UserService
      */
     public function setUserEntityPrototype($userEntityPrototype);
-
-    /**
-     * @return UserMapperInterface
-     */
-    public function getUserMapper();
 }

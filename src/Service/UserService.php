@@ -639,43 +639,6 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
     }
 
     /**
-     * @return UserMapperInterface
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param UserMapperInterface $userMapper
-     * @return UserService
-     */
-    public function setUserMapper(UserMapperInterface $userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /**
-     * @return UserOptions
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param UserOptions $options
-     * @return UserService
-     */
-    public function setOptions(UserOptions $options)
-    {
-        $this->options = $options;
-        return $this;
-    }
-
-
-    /**
      * @return UserEntityInterface
      */
     public function getUserEntityPrototype()

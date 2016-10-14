@@ -9,17 +9,15 @@
 
 namespace Dot\User\Service;
 
+use Dot\Helpers\Psr7\HttpMessagesAwareInterface;
 use Dot\User\Entity\UserEntityInterface;
 use Dot\User\Mapper\UserMapperInterface;
-use Dot\User\Options\UserOptions;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Interface UserServiceInterface
  * @package Dot\User\Service
  */
-interface UserServiceInterface
+interface UserServiceInterface extends HttpMessagesAwareInterface
 {
     /**
      * Find user by its id
@@ -131,46 +129,7 @@ interface UserServiceInterface
     public function setUserEntityPrototype($userEntityPrototype);
 
     /**
-     * @return mixed
-     */
-    //public function getOptions();
-
-    /**
-     * @param UserOptions $options
-     * @return mixed
-     */
-    //public function setOptions(UserOptions $options);
-
-    /**
-     * @param UserMapperInterface $userMapper
-     * @return mixed
-     */
-    //public function setUserMapper(UserMapperInterface $userMapper);
-
-    /**
      * @return UserMapperInterface
      */
-    //public function getUserMapper();
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return mixed
-     */
-    public function setRequest(ServerRequestInterface $request);
-
-    /**
-     * @return ServerRequestInterface
-     */
-    //public function getRequest();
-
-    /**
-     * @param ResponseInterface $response
-     * @return mixed
-     */
-    public function setResponse(ResponseInterface $response);
-
-    /**
-     * @return ResponseInterface
-     */
-    //public function getResponse();
+    public function getUserMapper();
 }

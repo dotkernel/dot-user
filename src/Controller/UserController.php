@@ -75,7 +75,7 @@ class UserController extends AbstractActionController
     public function dispatch()
     {
         //set request/response object on user service for each request
-        $this->userService->setRequest($this->getRequest());
+        $this->userService->setServerRequest($this->getRequest());
         $this->userService->setResponse($this->getResponse());
 
         return parent::dispatch();

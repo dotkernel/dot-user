@@ -714,7 +714,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
     /**
      * @return ServerRequestInterface
      */
-    public function getRequest()
+    public function getServerRequest()
     {
         return $this->request;
     }
@@ -723,7 +723,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
      * @param ServerRequestInterface $request
      * @return UserService
      */
-    public function setRequest(ServerRequestInterface $request)
+    public function setServerRequest(ServerRequestInterface $request)
     {
         $this->request = $request;
         return $this;

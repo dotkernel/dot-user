@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: n3vra
- * Date: 10/9/2016
- * Time: 11:51 PM
+ * @copyright: DotKernel
+ * @library: dotkernel/dot-user
+ * @author: n3vrax
+ * Date: 7/6/2016
+ * Time: 8:13 PM
  */
 
 namespace Dot\User\Options;

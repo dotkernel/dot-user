@@ -4,29 +4,29 @@
 
 {% for element in form %}
 
-    {% if element is captchaElement %}
+    {% if element is Captcha %}
         <div class="form-group">
             {% set dummy = element.setAttribute('class', 'form-control') %}
             {{ formLabel(element) }}
             {{ formCaptcha(element) }}
         </div>
 
-    {% elseif element is checkboxElement %}
+    {% elseif element is Checkbox %}
         <div class="checkbox">
             <label>
                 {{ formCheckbox(element) }} {{ element.getLabel() }}
             </label>
         </div>
 
-    {% elseif element is buttonElement and element.getName() != 'submit' %}
+    {% elseif element is Button and element.getName() != 'submit' %}
         {% set dummy = element.setAttribute('class', 'btn btn-block') %}
         {{ formButton(element) }}
 
-    {% elseif element is submitElement or element is buttonElement and element.getName() == 'submit' %}
+    {% elseif element is Submit or element is Button and element.getName() == 'submit' %}
         {% set dummy = element.setAttribute('class', 'btn btn-lg btn-primary btn-block') %}
         {{ formSubmit(element) }}
 
-    {% elseif element is fieldsetElement %}
+    {% elseif element is Fieldset %}
         {% include '@dot-user/_form.html.twig' with {'form' : element, 'showLabels' : showLabels} only %}
 
     {% else %}

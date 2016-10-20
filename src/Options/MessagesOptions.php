@@ -156,8 +156,8 @@ class MessagesOptions extends AbstractOptions
     }
 
     /**
-     * @param array $messages
-     * @return ConfirmAccountOptions
+     * @param $messages
+     * @return $this
      */
     public function setMessages($messages)
     {

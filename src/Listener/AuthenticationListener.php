@@ -128,9 +128,11 @@ class AuthenticationListener extends AbstractListenerAggregate
                 $form->setData($data);
 
                 if (!$form->isValid()) {
+                    $messages = [];
                     foreach ($form->getMessages() as $message) {
-                        $e->setError(current($message));
+                        $messages[] = $message;
                     }
+                    $e->setError($messages);
 
                     $this->flashMessenger->addData('loginFormData', $data);
                     $this->flashMessenger->addData('loginFormMessages', $form->getMessages());

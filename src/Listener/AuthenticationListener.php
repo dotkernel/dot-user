@@ -130,7 +130,7 @@ class AuthenticationListener extends AbstractListenerAggregate
                 if (!$form->isValid()) {
                     $messages = [];
                     foreach ($form->getMessages() as $message) {
-                        $messages[] = $message;
+                        $messages[] = current($message);
                     }
                     $e->setError($messages);
 

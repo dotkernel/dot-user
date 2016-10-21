@@ -90,7 +90,7 @@ class UserController extends AbstractActionController
             $this->addError($this->options->getMessagesOptions()->getMessage(
                 MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED));
 
-            return new RedirectResponse($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();
@@ -107,7 +107,7 @@ class UserController extends AbstractActionController
             $this->addSuccess($result->getMessages());
         }
 
-        return new RedirectResponse($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME));
+        return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
     }
 
     /**
@@ -211,7 +211,7 @@ class UserController extends AbstractActionController
                         return $this->autoLoginUser($user, $postData['password']);
                     } else {
                         $this->addSuccess($result->getMessages());
-                        return $this->redirectTo($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME),
+                        return $this->redirectTo($this->url()->generate(self::LOGIN_ROUTE_NAME),
                             $request->getQueryParams());
                     }
                 }
@@ -242,7 +242,7 @@ class UserController extends AbstractActionController
             $this->addError($this->options->getMessagesOptions()->getMessage(
                 MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED));
 
-            return new RedirectResponse($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();
@@ -281,7 +281,7 @@ class UserController extends AbstractActionController
                     return new RedirectResponse($request->getUri(), 303);
                 } else {
                     $this->addSuccess($result->getMessages());
-                    return $this->redirectTo($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME),
+                    return $this->redirectTo($this->url()->generate(self::LOGIN_ROUTE_NAME),
                         $request->getQueryParams());
                 }
             } else {
@@ -305,7 +305,7 @@ class UserController extends AbstractActionController
             $this->addError($this->options->getMessagesOptions()->getMessage(
                 MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED));
 
-            return new RedirectResponse($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();
@@ -336,7 +336,7 @@ class UserController extends AbstractActionController
                 $result = $this->userService->generateResetToken($email);
                 if ($result->isValid()) {
                     $this->addInfo($result->getMessages());
-                    return $this->redirectTo($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME),
+                    return $this->redirectTo($this->url()->generate(self::LOGIN_ROUTE_NAME),
                         $request->getQueryParams());
                 } else {
                     $this->addError($result->getMessages());
@@ -392,7 +392,7 @@ class UserController extends AbstractActionController
         $form->isValid();
 
         $request = $request->withParsedBody($form->getData())
-            ->withUri(new Uri($this->urlHelper()->generate(self::LOGIN_ROUTE_NAME)));
+            ->withUri(new Uri($this->url()->generate(self::LOGIN_ROUTE_NAME)));
 
         return $this->loginAction->triggerAuthenticateEvent($request, $response, $request->getParsedBody());
     }

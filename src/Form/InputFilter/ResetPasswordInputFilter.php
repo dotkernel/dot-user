@@ -55,8 +55,9 @@ class ResetPasswordInputFilter extends InputFilter
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 4,
+                        'max' => 255,
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_TOO_SHORT)
+                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_PASSWORD_CHARACTER_LIMIT)
                     ],
                 ],
             ],
@@ -73,7 +74,7 @@ class ResetPasswordInputFilter extends InputFilter
                     'break_chain_on_failure' => true,
                     'options' => [
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_EMPTY_VERIFY)
+                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD_VERIFY)
                     ]
                 ],
                 [
@@ -81,7 +82,7 @@ class ResetPasswordInputFilter extends InputFilter
                     'options' => [
                         'token' => 'newPassword',
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_MISMATCH)
+                            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_PASSWORD_MISMATCH)
                     ],
                 ],
             ],

@@ -103,7 +103,7 @@ class RegisterInputFilter extends InputFilter
                         'min' => 3,
                         'max' => 255,
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_USERNAME_TOO_SHORT)
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_USERNAME_CHARACTER_LIMIT)
                     ]
                 ],
                 [
@@ -147,7 +147,7 @@ class RegisterInputFilter extends InputFilter
                     'options' => [
                         'min' => 4,
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_PASSWORD_TOO_SHORT)
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_PASSWORD_CHARACTER_LIMIT)
                     ],
                 ],
             ],
@@ -172,7 +172,7 @@ class RegisterInputFilter extends InputFilter
                     'options' => [
                         'token' => 'password',
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_PASSWORD_CONFIRM_NOT_MATCH)
+                            ->getMessage(MessagesOptions::MESSAGE_REGISTER_PASSWORD_MISMATCH)
                     ],
                 ],
             ],

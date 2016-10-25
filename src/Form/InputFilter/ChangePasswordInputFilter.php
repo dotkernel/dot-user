@@ -44,7 +44,7 @@ class ChangePasswordInputFilter extends InputFilter
                     'break_chain_on_failure' => true,
                     'options' => [
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_PASSWORD_EMPTY)
+                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD)
                     ]
                 ],
             ]
@@ -58,7 +58,7 @@ class ChangePasswordInputFilter extends InputFilter
                     'break_chain_on_failure' => true,
                     'options' => [
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_EMPTY)
+                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_NEW_PASSWORD)
                     ]
                 ],
                 [
@@ -66,7 +66,7 @@ class ChangePasswordInputFilter extends InputFilter
                     'options' => [
                         'min' => 4,
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_TOO_SHORT)
+                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_CHARACTER_LIMIT)
                     ],
                 ],
             ]
@@ -80,7 +80,7 @@ class ChangePasswordInputFilter extends InputFilter
                     'break_chain_on_failure' => true,
                     'options' => [
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_EMPTY)
+                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD_VERIFY)
                     ]
                 ],
                 [
@@ -88,7 +88,7 @@ class ChangePasswordInputFilter extends InputFilter
                     'options' => [
                         'token' => 'newPassword',
                         'message' => $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_MISMATCH)
+                            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_PASSWORD_MISMATCH)
                     ],
                 ],
             ]

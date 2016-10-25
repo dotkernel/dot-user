@@ -78,6 +78,8 @@ class MessagesOptions extends AbstractOptions
     const MESSAGE_CHANGE_PASSWORD_CONFIRM_EMPTY = 48;
     const MESSAGE_CHANGE_PASSWORD_CONFIRM_MISMATCH = 49;
 
+    const MESSAGE_CSRF_EXPIRED = 50;
+
     protected $__strictMode__ = false;
 
     protected $messages = [
@@ -145,7 +147,9 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_EMPTY => 'New password is required and cannot be empty',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_TOO_SHORT => 'New password must contain at least 4 characters',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_EMPTY => 'Password verify is required and cannot be empty',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_MISMATCH => 'Password verify does not match'
+        MessagesOptions::MESSAGE_CHANGE_PASSWORD_CONFIRM_MISMATCH => 'Password verify does not match',
+
+        MessagesOptions::MESSAGE_CSRF_EXPIRED => 'This form has expired. Refresh page and try again',
     ];
 
 

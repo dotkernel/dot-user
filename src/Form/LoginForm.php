@@ -9,6 +9,7 @@
 
 namespace Dot\User\Form;
 
+use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\Form\Element\Csrf;
@@ -91,7 +92,8 @@ class LoginForm extends Form
 
         $csrf = new Csrf('login_csrf', [
             'csrf_options' => [
-                'timeout' => $this->userOptions->getLoginOptions()->getLoginFormTimeout()
+                'timeout' => $this->userOptions->getLoginOptions()->getLoginFormTimeout(),
+                'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
             ]
         ]);
         $this->add($csrf);

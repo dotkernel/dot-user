@@ -9,6 +9,7 @@
 
 namespace Dot\User\Form;
 
+use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\Form\Element\Captcha;
@@ -112,7 +113,8 @@ class RegisterForm extends Form
 
         $csrf = new Csrf('register_csrf', [
             'csrf_options' => [
-                'timeout' => $this->userOptions->getRegisterOptions()->getUserFormTimeout()
+                'timeout' => $this->userOptions->getRegisterOptions()->getUserFormTimeout(),
+                'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
             ]
         ]);
         $this->add($csrf);

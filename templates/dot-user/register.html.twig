@@ -15,14 +15,14 @@
             <div class="col-md-5 col-md-offset-3">
                 <h3>Sign Up</h3>
 
-                {{ flashMessagesPartial('partial::alerts') }}
+                {{ flashMessagesPartial('dot-partial::alerts') }}
 
                 {% set dummy = form.setAttribute('method', 'post') %}
                 {% set dummy = form.setAttribute('autocomplete', 'off') %}
                 {% set dummy = form.prepare() %}
 
                 {{ form().openTag(form) | raw }}
-                {% include '@dot-user/_form.html.twig' with {'form' : form, 'showLabels' : showLabels} only %}
+                {% include '@dot-form/form.html.twig' with {'form' : form, 'showLabels' : showLabels} only %}
                 {{ form().closeTag() | raw }}
 
             </div>

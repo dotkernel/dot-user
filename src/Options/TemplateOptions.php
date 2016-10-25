@@ -32,6 +32,8 @@ class TemplateOptions extends AbstractOptions
     /** @var string */
     protected $resetPasswordTemplate = 'dot-user::reset-password';
 
+    protected $__strictMode__ = false;
+
     /**
      * @return string
      */

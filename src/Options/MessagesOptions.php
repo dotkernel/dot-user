@@ -78,6 +78,8 @@ class MessagesOptions extends AbstractOptions
     const MESSAGE_CHANGE_PASSWORD_CONFIRM_EMPTY = 48;
     const MESSAGE_CHANGE_PASSWORD_CONFIRM_MISMATCH = 49;
 
+    protected $__strictMode__ = false;
+
     protected $messages = [
         /** account confirmation messages */
         MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED => 'Account confirmation is disabled',

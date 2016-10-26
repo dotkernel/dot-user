@@ -73,7 +73,7 @@ class AutoLogin
     {
         $this->request = $request;
 
-        if (!$this->authentication->hasIdentity()) {
+        if ($this->options->getLoginOptions()->isEnableRememberMe() && !$this->authentication->hasIdentity()) {
             $cookies = $request->getCookieParams();
             $key = $this->options->getLoginOptions()->getRememberMeCookieName();
 

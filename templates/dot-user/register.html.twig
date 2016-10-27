@@ -7,10 +7,6 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-
-    {% if enableRegistration == false %}
-        <h1><img src="{{ asset('img/sign-warning-icon.png') }}" width="64" height="64" />Registration disabled!</h1>
-    {% else %}
         <div class="row">
             <div class="col-md-5 col-md-offset-3">
                 <h3>Sign Up</h3>
@@ -27,6 +23,5 @@
 
             </div>
         </div>
-    {% endif %}
 
 {% endblock %}

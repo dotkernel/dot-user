@@ -171,9 +171,10 @@ class UserController extends AbstractActionController
         $request = $this->getRequest();
 
         if (!$this->options->getRegisterOptions()->isEnableRegistration()) {
-            return new HtmlResponse(
-                $this->template()->render($this->options->getTemplateOptions()->getRegisterTemplate(),
-                    ['enableRegistration' => false]));
+            $this->addError($this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_REGISTER_DISABLED));
+
+            return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
         }
 
         /** @var Form $form */

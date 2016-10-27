@@ -52,7 +52,7 @@ class ConfigProvider
                         Bootstrap::class,
                         AutoLogin::class,
                     ],
-                    'priority' => 10000,
+                    'priority' => 9999,
                 ]
             ],
 

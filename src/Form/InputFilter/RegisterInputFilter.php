@@ -101,7 +101,7 @@ class RegisterInputFilter extends InputFilter
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 3,
-                        'max' => 255,
+                        'max' => 150,
                         'message' => $this->options->getMessagesOptions()
                             ->getMessage(MessagesOptions::MESSAGE_REGISTER_USERNAME_CHARACTER_LIMIT)
                     ]
@@ -146,6 +146,7 @@ class RegisterInputFilter extends InputFilter
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 4,
+                        'max' => 150,
                         'message' => $this->options->getMessagesOptions()
                             ->getMessage(MessagesOptions::MESSAGE_REGISTER_PASSWORD_CHARACTER_LIMIT)
                     ],

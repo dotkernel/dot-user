@@ -66,7 +66,7 @@ class LoginInputFilter extends InputFilter
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 4,
-                        'max' => 255,
+                        'max' => 150,
                         'message' => $this->options->getMessagesOptions()
                             ->getMessage(MessagesOptions::MESSAGE_LOGIN_PASSWORD_CHARACTER_LIMIT)
                     ]

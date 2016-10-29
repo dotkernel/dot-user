@@ -55,7 +55,7 @@ class ResetPasswordInputFilter extends InputFilter
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 4,
-                        'max' => 255,
+                        'max' => 150,
                         'message' => $this->options->getMessagesOptions()
                             ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_PASSWORD_CHARACTER_LIMIT)
                     ],

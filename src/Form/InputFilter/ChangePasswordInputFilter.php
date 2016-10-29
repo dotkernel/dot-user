@@ -65,6 +65,7 @@ class ChangePasswordInputFilter extends InputFilter
                     'name' => 'StringLength',
                     'options' => [
                         'min' => 4,
+                        'max' => 150,
                         'message' => $this->options->getMessagesOptions()
                             ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_CHARACTER_LIMIT)
                     ],

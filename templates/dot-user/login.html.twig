@@ -22,9 +22,11 @@
             {% include '@dot-form/form.html.twig' with {'form' : form, 'showLabels' : showLabels} only %}
             {{ form().closeTag() | raw }}
 
+            {% if passwordRecoveryEnabled is defined and passwordRecoveryEnabled %}
             <div style="margin-top: 5px;">
                 <a href="{{ path('user', {'action':'forgot-password'}) }}" >Forgot Password?</a>
             </div>
+            {% endif %}
         </div>
     </div>
 

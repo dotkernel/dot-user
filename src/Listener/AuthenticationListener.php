@@ -105,6 +105,8 @@ class AuthenticationListener extends AbstractListenerAggregate
         $form->setMessages($messages);
 
         $e->setParam('form', $form);
+        $e->setParam('passwordRecoveryEnabled', $this->options->getPasswordRecoveryOptions()
+            ->isEnablePasswordRecovery());
     }
 
     /**

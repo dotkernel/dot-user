@@ -95,7 +95,7 @@ class MessagesOptions extends AbstractOptions
         /** user login messages */
         MessagesOptions::MESSAGE_LOGIN_EMPTY_IDENTITY => 'Identity is required and cannot be empty',
         MessagesOptions::MESSAGE_LOGIN_EMPTY_PASSWORD => 'Password is required and cannot be empty',
-        MessagesOptions::MESSAGE_LOGIN_PASSWORD_CHARACTER_LIMIT => 'Password must have at least 4 to 150 characters',
+        MessagesOptions::MESSAGE_LOGIN_PASSWORD_CHARACTER_LIMIT => 'Password must have at least 4 and up to 150 characters',
         MessagesOptions::MESSAGE_LOGIN_ACCOUNT_INACTIVE => 'Account is not active or it has not been confirmed',
         MessagesOptions::MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR => [
             'Remember me feature encountered an error.',
@@ -118,7 +118,7 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_TOKEN => 'Password reset error. Invalid parameters',
         MessagesOptions::MESSAGE_RESET_PASSWORD_MISSING_PARAMS => 'Password reset error. Invalid parameters',
         MessagesOptions::MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD => 'Password is required and cannot be empty',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_PASSWORD_CHARACTER_LIMIT => 'Password must have at least 4 to 150 characters',
+        MessagesOptions::MESSAGE_RESET_PASSWORD_PASSWORD_CHARACTER_LIMIT => 'Password must have at least 4 and up to 150 characters',
         MessagesOptions::MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD_VERIFY => 'Password confirmation is required and cannot be empty',
         MessagesOptions::MESSAGE_RESET_PASSWORD_PASSWORD_MISMATCH => 'Password confirmation does not match',
         MessagesOptions::MESSAGE_RESET_PASSWORD_TOKEN_EXPIRED => 'Password reset error. Reset token has expired',
@@ -127,13 +127,13 @@ class MessagesOptions extends AbstractOptions
         /** register messages constants */
         MessagesOptions::MESSAGE_REGISTER_EMPTY_EMAIL => 'Email address is required and cannot be empty',
         MessagesOptions::MESSAGE_REGISTER_INVALID_EMAIL => 'Email address format is not valid',
-        MessagesOptions::MESSAGE_REGISTER_EMAIL_ALREADY_REGISTERED => 'Email address is already in use',
+        MessagesOptions::MESSAGE_REGISTER_EMAIL_ALREADY_REGISTERED => 'Email address is already registered',
         MessagesOptions::MESSAGE_REGISTER_EMPTY_USERNAME => 'Username is required and cannot be empty',
-        MessagesOptions::MESSAGE_REGISTER_USERNAME_CHARACTER_LIMIT => 'Username must have at least 3 to 150 characters',
+        MessagesOptions::MESSAGE_REGISTER_USERNAME_CHARACTER_LIMIT => 'Username must have at least 3 and up to 150 characters',
         MessagesOptions::MESSAGE_REGISTER_USERNAME_INVALID_CHARACTERS => 'Username contains invalid characters',
-        MessagesOptions::MESSAGE_REGISTER_USERNAME_ALREADY_REGISTERED => 'Username is already registered',
+        MessagesOptions::MESSAGE_REGISTER_USERNAME_ALREADY_REGISTERED => 'Username is already taken',
         MessagesOptions::MESSAGE_REGISTER_EMPTY_PASSWORD => 'Password is required and cannot be empty',
-        MessagesOptions::MESSAGE_REGISTER_PASSWORD_CHARACTER_LIMIT => 'Password must have at least 4 to 150 characters',
+        MessagesOptions::MESSAGE_REGISTER_PASSWORD_CHARACTER_LIMIT => 'Password must have at least 4 and up to 150 characters',
         MessagesOptions::MESSAGE_REGISTER_EMPTY_PASSWORD_CONFIRM => 'Password confirmation is required',
         MessagesOptions::MESSAGE_REGISTER_PASSWORD_MISMATCH => 'Password confirmation does not match',
         MessagesOptions::MESSAGE_REGISTER_ERROR => 'Registration error. Please try again',
@@ -142,12 +142,12 @@ class MessagesOptions extends AbstractOptions
 
         /** other user messages */
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_OK => 'Password successfully updated',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_USER => 'Change password error. Invalid authenticated user',
+        MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_USER => 'Change password cannot be completed. Authenticated identity is not valid',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_CURRENT_PASSWORD => 'Invalid current password provided',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_ERROR => 'Change password error. Please try again.',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD => 'Password is required and cannot be empty',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_NEW_PASSWORD => 'New password is required and cannot be empty',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_CHARACTER_LIMIT => 'New password must have at least 4 to 150 characters',
+        MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_CHARACTER_LIMIT => 'New password must have at least 4 and up to 150 characters',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD_VERIFY => 'Password verify is required and cannot be empty',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_PASSWORD_MISMATCH => 'Password verify does not match',
 

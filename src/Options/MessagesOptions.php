@@ -151,7 +151,7 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD_VERIFY => 'Password verify is required and cannot be empty',
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_PASSWORD_MISMATCH => 'Password verify does not match',
 
-        MessagesOptions::MESSAGE_CSRF_EXPIRED => 'This form has expired. Refresh page and try again',
+        MessagesOptions::MESSAGE_CSRF_EXPIRED => 'The form used to make the request has expired. Please try again now',
     ];
 
 

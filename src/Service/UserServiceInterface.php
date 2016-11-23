@@ -9,49 +9,15 @@
 
 namespace Dot\User\Service;
 
-use Dot\Helpers\Psr7\HttpMessagesAwareInterface;
+use Dot\Ems\Service\ServiceInterface;
 use Dot\User\Entity\UserEntityInterface;
-use Dot\User\Mapper\UserMapperInterface;
 
 /**
  * Interface UserServiceInterface
  * @package Dot\User\Service
  */
-interface UserServiceInterface extends HttpMessagesAwareInterface
+interface UserServiceInterface extends ServiceInterface
 {
-    /**
-     * Find user by its id
-     *
-     * @param $id
-     * @return mixed
-     */
-    public function findUser($id);
-
-    /**
-     * Get a user entity by some given field and value
-     *
-     * @param $field
-     * @param $value
-     * @return mixed
-     */
-    public function findUserBy($field, $value);
-
-    /**
-     * Save user is working as in create/update user, based on the presence of user id in the data
-     *
-     * @param UserEntityInterface $user
-     * @return mixed
-     */
-    public function saveUser(UserEntityInterface $user);
-
-    /**
-     * Remove an user based on its id
-     *
-     * @param $id
-     * @return mixed
-     */
-    public function removeUser($id);
-
     /**
      * Change user status from unconfirmed to active based on an email and valid confirmation token
      *
@@ -116,15 +82,4 @@ interface UserServiceInterface extends HttpMessagesAwareInterface
      * @return mixed
      */
     public function removeRememberToken(UserEntityInterface $user);
-
-    /**
-     * @return UserEntityInterface
-     */
-    public function getUserEntityPrototype();
-
-    /**
-     * @param UserEntityInterface $userEntityPrototype
-     * @return UserService
-     */
-    public function setUserEntityPrototype($userEntityPrototype);
 }

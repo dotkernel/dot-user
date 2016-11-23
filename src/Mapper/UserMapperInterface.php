@@ -9,7 +9,8 @@
 
 namespace Dot\User\Mapper;
 
-use Dot\Mapper\MapperInterface;
+use Dot\Ems\Mapper\MapperInterface;
+
 
 /**
  * Interface UserMapperInterface
@@ -17,53 +18,6 @@ use Dot\Mapper\MapperInterface;
  */
 interface UserMapperInterface extends MapperInterface
 {
-    /**
-     * Get a user entity object based on its id
-     *
-     * @param $id
-     * @return mixed
-     */
-    public function findUser($id);
-
-    /**
-     * Get a user entity object based on a dynamically named field
-     *
-     * @param $field
-     * @param $id
-     * @return mixed
-     */
-    public function findUserBy($field, $id);
-
-    /**
-     * Get a list of user entity object, with optional filters
-     *
-     * @param array $filters
-     * @return mixed
-     */
-    public function findAllUsers(array $filters = []);
-
-    /**
-     * Creates or updates a user, depending on the presence of the user id in the data
-     *
-     * @param $data
-     * @return mixed
-     */
-    public function createUser($data);
-
-    /**
-     * @param $data
-     * @return mixed
-     */
-    public function updateUser($data);
-
-    /**
-     * Removes a user or flags it as deleted
-     *
-     * @param $id
-     * @return mixed
-     */
-    public function removeUser($id);
-
     /**
      * Insert a reset token into the backend
      *

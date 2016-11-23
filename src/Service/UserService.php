@@ -10,7 +10,9 @@
 namespace Dot\User\Service;
 
 use Dot\Authentication\AuthenticationInterface;
+use Dot\Ems\Service\EntityService;
 use Dot\Event\Event;
+use Dot\Helpers\Psr7\HttpMessagesAwareInterface;
 use Dot\User\Entity\UserEntityInterface;
 use Dot\User\Event\ChangePasswordEvent;
 use Dot\User\Event\ConfirmAccountEvent;
@@ -26,28 +28,22 @@ use Dot\User\Result\ResultInterface;
 use Dot\User\Result\UserOperationResult;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Hydrator\HydratorInterface;
+use Zend\Crypt\Password\PasswordInterface;
 use Zend\Math\Rand;
 
 /**
  * Class UserService
  * @package Dot\User\Service
  */
-class UserService implements UserServiceInterface, UserListenerAwareInterface
+class UserService extends EntityService  implements UserServiceInterface, UserListenerAwareInterface, HttpMessagesAwareInterface
 {
     use UserListenerAwareTrait;
 
     /** @var  UserMapperInterface */
-    protected $userMapper;
+    protected $mapper;
 
     /** @var  UserOptions */
     protected $options;
-
-    /** @var  UserEntityInterface */
-    protected $userEntityPrototype;
-
-    /** @var  HydratorInterface */
-    protected $userEntityHydrator;
 
     /** @var  PasswordInterface */
     protected $passwordService;
@@ -66,70 +62,21 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
 
     /**
      * UserService constructor.
-     * @param UserMapperInterface $userMapper
+     * @param UserMapperInterface $mapper
      * @param UserOptions $options
-     * @param PasswordInterface $passwordService
+     * @param PasswordInterface $password
      * @param AuthenticationInterface $authentication
      */
     public function __construct(
-        UserMapperInterface $userMapper,
+        UserMapperInterface $mapper,
         UserOptions $options,
-        PasswordInterface $passwordService,
-        AuthenticationInterface $authentication
-    ) {
-        $this->userMapper = $userMapper;
+        PasswordInterface $password,
+        AuthenticationInterface $authentication)
+    {
+        parent::__construct($mapper);
         $this->options = $options;
-        $this->passwordService = $passwordService;
+        $this->passwordService = $password;
         $this->authentication = $authentication;
-    }
-
-    /**
-     * Find user by its id
-     *
-     * @param $id
-     * @return mixed
-     */
-    public function findUser($id)
-    {
-        return $this->userMapper->findUser($id);
-    }
-
-    /**
-     * Get a user entity by some given field and value
-     *
-     * @param $field
-     * @param $value
-     * @return mixed
-     */
-    public function findUserBy($field, $value)
-    {
-        return $this->userMapper->findUserBy($field, $value);
-    }
-
-    /**
-     * Save user is working as in create/update user, based on the presence of user id in the data
-     *
-     * @param $user
-     * @return mixed
-     */
-    public function saveUser(UserEntityInterface $user)
-    {
-        if (!$user->getId()) {
-            $this->userMapper->createUser($user);
-        } else {
-            $this->userMapper->updateUser($user);
-        }
-    }
-
-    /**
-     * Remove an user based on its id
-     *
-     * @param $id
-     * @return mixed
-     */
-    public function removeUser($id)
-    {
-        return $this->userMapper->removeUser($id);
     }
 
     /**
@@ -162,7 +109,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
             $dbData = (array)$data;
             $dbData['token'] = md5($dbData['token']);
 
-            $this->userMapper->saveRememberToken($dbData);
+            $this->mapper->saveRememberToken($dbData);
 
             $cookieData = base64_encode(serialize(['selector' => $selector, 'token' => $token]));
 
@@ -200,13 +147,13 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
     public function checkRememberToken($selector, $token)
     {
         try {
-            $r = $this->userMapper->findRememberToken($selector);
+            $r = $this->mapper->findRememberToken($selector);
             if ($r) {
                 if ($r['token'] == md5($token)) {
                     return $r;
                 } else {
                     //clear any tokens for this user as security measure
-                    $user = $this->findUser($r['userId']);
+                    $user = $this->mapper->fetch([$this->getMapper()->getIdentifierName() => $r['userId']]);
                     if ($user) {
                         $this->removeRememberToken($user);
                     }
@@ -235,7 +182,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                 $user
             ));
 
-            $this->userMapper->removeRememberToken($user->getId());
+            $this->mapper->removeRememberToken($user->getId());
 
             //clear cookies
             if (isset($_COOKIE[$this->options->getLoginOptions()->getRememberMeCookieName()])) {
@@ -285,22 +232,22 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                 );
             } else {
                 /** @var UserEntityInterface $user */
-                $user = $this->findUserBy('email', $email);
+                $user = $this->mapper->fetch(['email' => $email]);
                 if ($user) {
-                    $r = $this->userMapper->findConfirmToken($user->getId(), $token);
+                    $r = $this->mapper->findConfirmToken($user->getId(), $token);
                     if ($r) {
-                        $this->userMapper->beginTransaction();
+                        $this->mapper->beginTransaction();
 
                         //trigger pre event
                         $this->getEventManager()->triggerEvent(
                             $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_PRE, $user));
 
                         $user->setStatus($this->options->getConfirmAccountOptions()->getActiveUserStatus());
-                        $this->saveUser($user);
+                        $this->save($user);
 
-                        $this->userMapper->removeConfirmToken($user->getId(), $token);
+                        $this->mapper->removeConfirmToken($user->getId(), $token);
 
-                        $this->userMapper->commit();
+                        $this->mapper->commit();
 
                         //post confirm event
                         $this->getEventManager()->triggerEvent(
@@ -328,7 +275,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
             $this->getEventManager()->triggerEvent(
                 $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_ERROR, $user, $result));
 
-            $this->userMapper->rollback();
+            $this->mapper->rollback();
             return $result;
         }
 
@@ -352,7 +299,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
 
         try {
             /** @var UserEntityInterface $user */
-            $user = $this->findUserBy('email', $email);
+            $user = $this->find(['email' => $email]);
 
             if ($user) {
                 $data = new \stdClass();
@@ -368,7 +315,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                         $data
                     ));
 
-                $this->userMapper->saveResetToken((array)$data);
+                $this->mapper->saveResetToken((array)$data);
 
                 $this->getEventManager()->triggerEvent($this->createPasswordResetEvent(
                     PasswordResetEvent::EVENT_PASSWORD_RESET_TOKEN_POST,
@@ -412,12 +359,12 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
         } else {
             try {
                 /** @var UserEntityInterface $user */
-                $user = $this->userMapper->findUserBy('email', $email);
+                $user = $this->find(['email' => $email]);
                 if (!$user) {
                     $result = $this->createUserOperationResultWithMessages($this->options->getMessagesOptions()
                         ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_EMAIL));
                 } else {
-                    $r = $this->userMapper->findResetToken((int)$user->getId(), $token);
+                    $r = $this->mapper->findResetToken((int)$user->getId(), $token);
                     if ($r) {
                         $expireAt = $r['expireAt'];
 
@@ -429,7 +376,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                                 $user
                             ));
 
-                            $this->saveUser($user);
+                            $this->save($user);
 
                             $this->getEventManager()->triggerEvent($this->createPasswordResetEvent(
                                 PasswordResetEvent::EVENT_PASSWORD_RESET_POST,
@@ -475,7 +422,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
 
         $identity = $this->authentication->getIdentity();
         //we always get it from DB, just to make sure hashed password is not missing
-        $currentUser = $this->findUser($identity->getId());
+        $currentUser = $this->find([$this->getMapper()->getIdentifierName() => $identity->getId()]);
 
         if (!$currentUser) {
             return $this->createUserOperationResultWithMessages(
@@ -492,7 +439,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                     ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE, $currentUser
                 ));
 
-                $this->saveUser($currentUser);
+                $this->save($currentUser);
 
                 $this->getEventManager()->triggerEvent($this->createUserUpdateEvent(
                     ChangePasswordEvent::EVENT_CHANGE_PASSWORD_POST, $currentUser
@@ -530,8 +477,11 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
         $result = new UserOperationResult(true, $this->options->getMessagesOptions()
             ->getMessage(MessagesOptions::MESSAGE_REGISTER_SUCCESS));
 
+        $isAtomic = $this->isAtomicOperations();
+
         try {
-            $this->userMapper->beginTransaction();
+            $this->setAtomicOperations(false);
+            $this->mapper->beginTransaction();
 
             $user->setPassword($this->passwordService->create($user->getPassword()));
             if ($this->options->isEnableUserStatus()) {
@@ -542,10 +492,10 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
             $this->getEventManager()->triggerEvent(
                 $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_PRE, $user));
 
-            $this->saveUser($user);
+            $this->save($user);
 
             //get newly created user id and save it to the object
-            $id = $this->userMapper->lastInsertValue();
+            $id = $this->mapper->lastInsertValue();
             if ($id) {
                 $user->setId($id);
             }
@@ -561,7 +511,9 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
             $this->getEventManager()->triggerEvent(
                 $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_POST, $user));
 
-            $this->userMapper->commit();
+            $this->mapper->commit();
+            $this->setAtomicOperations($isAtomic);
+
         } catch (\Exception $e) {
             error_log("Register error: " . $e->getMessage());
             $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
@@ -571,7 +523,8 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
             $this->getEventManager()->triggerEvent(
                 $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_ERROR, $user, $result));
 
-            $this->userMapper->rollback();
+            $this->mapper->rollback();
+            $this->setAtomicOperations($isAtomic);
         }
 
         return $result;
@@ -597,7 +550,7 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
                     $data
                 ));
 
-            $this->userMapper->saveConfirmToken((array)$data);
+            $this->mapper->saveConfirmToken((array)$data);
 
             $this->getEventManager()->triggerEvent(
                 $this->createConfirmAccountEvent(
@@ -635,42 +588,6 @@ class UserService implements UserServiceInterface, UserListenerAwareInterface
     public function setPasswordService($passwordService)
     {
         $this->passwordService = $passwordService;
-        return $this;
-    }
-
-    /**
-     * @return UserEntityInterface
-     */
-    public function getUserEntityPrototype()
-    {
-        return $this->userEntityPrototype;
-    }
-
-    /**
-     * @param UserEntityInterface $userEntityPrototype
-     * @return UserService
-     */
-    public function setUserEntityPrototype($userEntityPrototype)
-    {
-        $this->userEntityPrototype = $userEntityPrototype;
-        return $this;
-    }
-
-    /**
-     * @return HydratorInterface
-     */
-    public function getUserEntityHydrator()
-    {
-        return $this->userEntityHydrator;
-    }
-
-    /**
-     * @param HydratorInterface $userEntityHydrator
-     * @return UserService
-     */
-    public function setUserEntityHydrator($userEntityHydrator)
-    {
-        $this->userEntityHydrator = $userEntityHydrator;
         return $this;
     }
 

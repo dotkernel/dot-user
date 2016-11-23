@@ -9,12 +9,12 @@
 
 namespace Dot\User\Factory\Form;
 
+use Dot\Ems\Validator\NoRecordsExists;
 use Dot\User\EventManagerAwareFactoryTrait;
 use Dot\User\Form\InputFilter\RegisterInputFilter;
 use Dot\User\Form\RegisterForm;
-use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Options\UserOptions;
-use Dot\User\Validator\NoRecordsExists;
+use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -37,11 +37,11 @@ class RegisterFormFactory
         $filter = new RegisterInputFilter(
             $options,
             new NoRecordsExists([
-                'mapper' => $container->get(UserMapperInterface::class),
+                'service' => $container->get(UserServiceInterface::class),
                 'key' => 'email'
             ]),
             new NoRecordsExists([
-                'mapper' => $container->get(UserMapperInterface::class),
+                'mapper' => $container->get(UserServiceInterface::class),
                 'key' => 'username'
             ])
         );

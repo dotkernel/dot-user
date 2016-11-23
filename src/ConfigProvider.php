@@ -14,9 +14,9 @@ use Dot\User\Entity\UserEntity;
 use Dot\User\Entity\UserEntityHydrator;
 use Dot\User\Factory\AuthenticationListenerFactory;
 use Dot\User\Factory\AutoLoginFactory;
+use Dot\User\Factory\BcryptPasswordFactory;
 use Dot\User\Factory\BootstrapFactory;
 use Dot\User\Factory\Form\UserFormManagerFactory;
-use Dot\User\Factory\PasswordDefaultFactory;
 use Dot\User\Factory\UserControllerFactory;
 use Dot\User\Factory\UserDbMapperFactory;
 use Dot\User\Factory\UserOptionsFactory;
@@ -27,8 +27,8 @@ use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Middleware\AutoLogin;
 use Dot\User\Middleware\Bootstrap;
 use Dot\User\Options\UserOptions;
-use Dot\User\Service\PasswordInterface;
 use Dot\User\Service\UserServiceInterface;
+use Zend\Crypt\Password\PasswordInterface;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 /**
@@ -144,7 +144,7 @@ class ConfigProvider
                 Bootstrap::class => BootstrapFactory::class,
                 AutoLogin::class => AutoLoginFactory::class,
 
-                PasswordInterface::class => PasswordDefaultFactory::class,
+                PasswordInterface::class => BcryptPasswordFactory::class,
             ],
 
             'shared' => [

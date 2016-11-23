@@ -27,9 +27,10 @@
     "zendframework/zend-inputfilter": "^2.7",
     "zendframework/zend-db": "^2.8",
     "zendframework/zend-math": "^3.0",
+    "zendframework/zend-crypt": "^3.1",
 
     "dotkernel/dot-helpers": "0.6.x-dev",
-    "dotkernel/dot-mapper": "0.6.x-dev",
+    "dotkernel/dot-ems": "0.6.x-dev",
     "dotkernel/dot-event": "0.6.x-dev",
     "dotkernel/dot-flashmessenger": "0.6.x-dev",
     "dotkernel/dot-controller": "0.6.x-dev",
@@ -44,6 +45,12 @@
     "phpunit/phpunit": "^4.8",
     "squizlabs/php_codesniffer": "^2.3"
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/dotkernel/dot-ems"
+    }
+  ],
   "autoload": {
     "psr-4": {
       "Dot\\User\\": "src/"

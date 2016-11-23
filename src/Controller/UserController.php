@@ -11,6 +11,7 @@ namespace Dot\User\Controller;
 
 use Dot\Authentication\Web\Action\LoginAction;
 use Dot\Controller\AbstractActionController;
+use Dot\Helpers\Psr7\HttpMessagesAwareInterface;
 use Dot\User\Entity\UserEntityInterface;
 use Dot\User\Form\ChangePasswordForm;
 use Dot\User\Form\ForgotPasswordForm;
@@ -75,8 +76,10 @@ class UserController extends AbstractActionController
     public function dispatch()
     {
         //set request/response object on user service for each request
-        $this->userService->setServerRequest($this->getRequest());
-        $this->userService->setResponse($this->getResponse());
+        if($this->userService instanceof HttpMessagesAwareInterface) {
+            $this->userService->setServerRequest($this->getRequest());
+            $this->userService->setResponse($this->getResponse());
+        }
 
         return parent::dispatch();
     }
@@ -189,7 +192,7 @@ class UserController extends AbstractActionController
 
         if ($request->getMethod() === 'POST') {
             $postData = $request->getParsedBody();
-            $form->bind($this->userService->getUserEntityPrototype());
+            $form->bind($this->userService->getMapper()->getPrototype());
             $form->setData($postData);
 
             $isValid = $form->isValid();

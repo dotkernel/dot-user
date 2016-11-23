@@ -14,9 +14,9 @@ use Dot\User\Event\Listener\UserListenerAwareInterface;
 use Dot\User\Exception\InvalidArgumentException;
 use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Options\UserOptions;
-use Dot\User\Service\PasswordInterface;
 use Dot\User\Service\UserService;
 use Interop\Container\ContainerInterface;
+use Zend\Crypt\Password\PasswordInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
@@ -55,8 +55,6 @@ class UserServiceFactory
             $container->get(AuthenticationInterface::class)
         );
 
-        $service->setUserEntityPrototype($container->get($options->getUserEntity()));
-        $service->setUserEntityHydrator($container->get($options->getUserEntityHydrator()));
         $service->setEventManager($eventManager);
         $service->setDebug($isDebug);
 

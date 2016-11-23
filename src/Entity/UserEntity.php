@@ -11,6 +11,7 @@ namespace Dot\User\Entity;
 
 use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentityInterface;
 use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentityInterface;
+use Dot\Ems\Entity\IgnorePropertyProvider;
 
 /**
  * Class UserEntity
@@ -19,7 +20,9 @@ use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentityInterfa
 class UserEntity implements
     UserEntityInterface,
     AuthenticationIdentityInterface,
-    AuthorizationIdentityInterface
+    AuthorizationIdentityInterface,
+    \JsonSerializable,
+    IgnorePropertyProvider
 {
     /** @var  string|int */
     protected $id;
@@ -183,6 +186,22 @@ class UserEntity implements
     {
         $this->role = $role;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
+    }
+
+    /**
+     * @return array
+     */
+    public function ignoredProperties()
+    {
+        return ['roles', 'name', 'dateCreated'];
     }
 
 

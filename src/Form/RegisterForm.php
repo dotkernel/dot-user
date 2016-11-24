@@ -14,7 +14,9 @@ use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\Form\Element\Captcha;
 use Zend\Form\Element\Csrf;
+use Zend\Form\Fieldset;
 use Zend\Form\Form;
+use Zend\InputFilter\InputFilter;
 
 /**
  * Class RegisterForm
@@ -27,77 +29,45 @@ class RegisterForm extends Form
     /** @var  UserOptions */
     protected $userOptions;
 
+    /** @var  Fieldset */
+    protected $userFieldset;
+
+    /** @var  InputFilter */
+    protected $userInputFilter;
+
     /** @var  Captcha */
     protected $captcha;
 
     /**
      * RegisterForm constructor.
      * @param UserOptions $userOptions
-     * @param string $name
+     * @param Fieldset $userFieldset
+     * @param InputFilter $userInputFilter
      * @param array $options
      */
     public function __construct(
         UserOptions $userOptions,
-        $name = 'register',
+        Fieldset $userFieldset,
+        InputFilter $userInputFilter,
         $options = array()
     ) {
         $this->userOptions = $userOptions;
-        parent::__construct($name, $options);
+        $this->userFieldset = $userFieldset;
+        $this->userInputFilter = $userInputFilter;
+        parent::__construct('user_register_form', $options);
     }
 
     public function init()
     {
-        $this->add(array(
-            'name' => 'email',
-            'type' => 'text',
-            'options' => [
-                'label' => 'Email Address'
-            ],
-            'attributes' => array(
-                'placeholder' => 'Email Address',
-                //'required' => true,
-                'autofocus' => true,
-            ),
-
-        ));
+        $this->userFieldset->setName('user');
+        $this->userFieldset->setUseAsBaseFieldset(true);
 
         if ($this->userOptions->getRegisterOptions()->isEnableUsername()) {
-            $this->add(array(
-                'type' => 'text',
-                'name' => 'username',
-                'options' => [
-                    'label' => 'Username',
-                ],
-                'attributes' => array(
-                    'placeholder' => 'Username',
-                    //'required' => true,
-                ),
-            ));
+            $this->userFieldset->remove('username');
         }
 
-        $this->add(array(
-            'type' => 'password',
-            'name' => 'password',
-            'options' => [
-                'label' => 'Password'
-            ],
-            'attributes' => array(
-                'placeholder' => 'Password',
-                //'required' => true,
-            ),
-        ), ['priority' => -20]);
-
-        $this->add(array(
-            'type' => 'password',
-            'name' => 'passwordVerify',
-            'options' => [
-                'label' => 'Repeat Password'
-            ],
-            'attributes' => array(
-                'placeholder' => 'Confirm Password',
-                //'required' => true,
-            ),
-        ), ['priority' => -20]);
+        $this->add($this->userFieldset);
+        $this->getInputFilter()->add($this->userInputFilter, 'user');
 
         if ($this->userOptions->getRegisterOptions()->isUseRegistrationFormCaptcha()) {
             //add captcha element

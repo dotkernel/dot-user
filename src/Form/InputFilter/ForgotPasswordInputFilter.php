@@ -20,8 +20,6 @@ use Zend\InputFilter\InputFilter;
  */
 class ForgotPasswordInputFilter extends InputFilter
 {
-    use EventManagerAwareTrait;
-
     /** @var  UserOptions */
     protected $options;
 
@@ -60,7 +58,5 @@ class ForgotPasswordInputFilter extends InputFilter
                 ],
             ],
         ]);
-
-        $this->getEventManager()->trigger('init', $this);
     }
 }

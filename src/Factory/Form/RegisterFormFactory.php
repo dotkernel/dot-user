@@ -9,12 +9,12 @@
 
 namespace Dot\User\Factory\Form;
 
-use Dot\Ems\Validator\NoRecordsExists;
+
 use Dot\User\EventManagerAwareFactoryTrait;
-use Dot\User\Form\InputFilter\RegisterInputFilter;
+use Dot\User\Form\Fieldset\UserFieldset;
+use Dot\User\Form\InputFilter\UserInputFilter;
 use Dot\User\Form\RegisterForm;
 use Dot\User\Options\UserOptions;
-use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -34,23 +34,10 @@ class RegisterFormFactory
         /** @var UserOptions $moduleOptions */
         $options = $container->get(UserOptions::class);
 
-        $filter = new RegisterInputFilter(
-            $options,
-            new NoRecordsExists([
-                'service' => $container->get(UserServiceInterface::class),
-                'key' => 'email'
-            ]),
-            new NoRecordsExists([
-                'mapper' => $container->get(UserServiceInterface::class),
-                'key' => 'username'
-            ])
-        );
-        $filter->setEventManager($this->getEventManager($container));
-        $filter->init();
+        $filter = $container->get(UserInputFilter::class);
+        $fieldset = $container->get(UserFieldset::class);
 
-        $form = new RegisterForm($options);
-        $form->setInputFilter($filter);
-        $form->setHydrator($container->get($options->getUserEntityHydrator()));
+        $form = new RegisterForm($options, $fieldset, $filter);
         $form->setEventManager($this->getEventManager($container));
         $form->init();
 

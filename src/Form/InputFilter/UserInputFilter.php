@@ -3,26 +3,24 @@
  * @copyright: DotKernel
  * @library: dotkernel/dot-user
  * @author: n3vrax
- * Date: 6/20/2016
- * Time: 8:05 PM
+ * Date: 11/24/2016
+ * Time: 8:01 PM
  */
 
 namespace Dot\User\Form\InputFilter;
 
+
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
-use Zend\EventManager\EventManagerAwareTrait;
 use Zend\InputFilter\InputFilter;
 use Zend\Validator\AbstractValidator;
 
 /**
- * Class RegisterInputFilter
+ * Class UserInputFilter
  * @package Dot\User\Form\InputFilter
  */
-class RegisterInputFilter extends InputFilter
+class UserInputFilter extends InputFilter
 {
-    use EventManagerAwareTrait;
-
     /** @var  UserOptions */
     protected $options;
 
@@ -33,7 +31,7 @@ class RegisterInputFilter extends InputFilter
     protected $usernameValidator;
 
     /**
-     * RegisterInputFilter constructor.
+     * UserInputFilter constructor.
      * @param UserOptions $options
      * @param null $emailValidator
      * @param null $usernameValidator
@@ -50,6 +48,11 @@ class RegisterInputFilter extends InputFilter
 
     public function init()
     {
+        $this->add([
+            'name' => 'id',
+            'required' => false,
+        ]);
+
         $email = [
             'name' => 'email',
             'filters' => [
@@ -178,8 +181,6 @@ class RegisterInputFilter extends InputFilter
                 ],
             ],
         ]);
-
-        $this->getEventManager()->trigger('init', $this);
     }
 
 }

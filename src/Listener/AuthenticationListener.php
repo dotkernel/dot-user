@@ -169,7 +169,7 @@ class AuthenticationListener extends AbstractListenerAggregate
                 $user = $result->getIdentity();
                 if (!$user instanceof UserEntityInterface) {
                     /** @var UserEntityInterface $user */
-                    $user = $this->userService->findUser($user->getId());
+                    $user = $this->userService->find([$this->userService->getMapper()->getIdentifierName() => $user->getId()]);
                 }
 
                 //validate account status
@@ -212,7 +212,7 @@ class AuthenticationListener extends AbstractListenerAggregate
         $user = $authentication->getIdentity();
         if (!$user instanceof UserEntityInterface) {
             /** @var UserEntityInterface $user */
-            $user = $this->userService->findUser($user->getId());
+            $user = $this->userService->find([$this->userService->getMapper()->getIdentifierName() => $user->getId()]);
         }
 
         $this->userService->removeRememberToken($user);

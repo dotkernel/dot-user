@@ -20,8 +20,6 @@ use Zend\InputFilter\InputFilter;
  */
 class ResetPasswordInputFilter extends InputFilter
 {
-    use EventManagerAwareTrait;
-
     /** @var  UserOptions */
     protected $options;
 
@@ -87,7 +85,5 @@ class ResetPasswordInputFilter extends InputFilter
                 ],
             ],
         ]);
-
-        $this->getEventManager()->trigger('init', $this);
     }
 }

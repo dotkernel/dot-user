@@ -32,7 +32,6 @@ class LoginFormFactory
         $options = $container->get(UserOptions::class);
 
         $filter = new LoginInputFilter($options);
-        $filter->setEventManager($this->getEventManager($container));
         $filter->init();
 
         $form = new LoginForm($options);

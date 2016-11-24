@@ -32,7 +32,6 @@ class ChangePasswordFormFactory
         $options = $container->get(UserOptions::class);
 
         $filter = new ChangePasswordInputFilter($options);
-        $filter->setEventManager($this->getEventManager($container));
         $filter->init();
 
         $form = new ChangePasswordForm($options);

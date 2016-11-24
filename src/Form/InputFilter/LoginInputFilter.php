@@ -20,8 +20,6 @@ use Zend\InputFilter\InputFilter;
  */
 class LoginInputFilter extends InputFilter
 {
-    use EventManagerAwareTrait;
-
     /** @var  UserOptions */
     protected $options;
 
@@ -73,7 +71,5 @@ class LoginInputFilter extends InputFilter
                 ]
             ],
         ]);
-
-        $this->getEventManager()->trigger('init', $this);
     }
 }

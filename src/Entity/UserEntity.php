@@ -37,10 +37,10 @@ class UserEntity implements
     protected $password;
 
     /** @var  string */
-    protected $role;
+    protected $role = 'user';
 
     /** @var  string */
-    protected $status;
+    protected $status = 'pending';
 
     /** @var  string|int */
     protected $dateCreated;

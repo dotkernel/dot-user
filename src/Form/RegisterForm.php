@@ -64,6 +64,7 @@ class RegisterForm extends Form
 
         if (!$this->userOptions->getRegisterOptions()->isEnableUsername()) {
             $this->userFieldset->remove('username');
+            $this->userInputFilter->remove('username');
         }
 
         $this->add($this->userFieldset);

@@ -88,7 +88,7 @@ class AutoLogin
                         $r = $this->userService->checkRememberToken($selector, $token);
                         if ($r) {
                             $userId = (int)$r['userId'];
-                            $user = $this->userService->findUser($userId);
+                            $user = $this->userService->find([$this->userService->getMapper()->getIdentifierName() => $userId]);
 
                             if ($user) {
                                 //renew the tokens

@@ -431,7 +431,7 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
         }
 
         try {
-            if ($this->passwordService->verify($currentUser->getPassword(), $oldPassword)) {
+            if ($this->passwordService->verify($oldPassword, $currentUser->getPassword())) {
                 //update password
                 $currentUser->setPassword($this->passwordService->create($newPassword));
 

@@ -23,7 +23,7 @@ use Zend\Hydrator\HydratorInterface;
  */
 class UserDbMapperFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, $requestedName)
     {
         /** @var UserOptions $options */
         $options = $container->get(UserOptions::class);
@@ -60,7 +60,8 @@ class UserDbMapperFactory
             }
         }
 
-        $mapper = new UserDbMapper(
+        /** @var UserDbMapper $mapper */
+        $mapper = new $requestedName(
             $options->getDbOptions()->getUserTable(),
             $dbAdapter,
             $prototype,

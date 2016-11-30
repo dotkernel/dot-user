@@ -25,10 +25,12 @@ use Dot\User\Form\Fieldset\UserFieldset;
 use Dot\User\Form\InputFilter\UserInputFilter;
 use Dot\User\Form\UserFormManager;
 use Dot\User\Listener\AuthenticationListener;
+use Dot\User\Mapper\UserDbMapper;
 use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Middleware\AutoLogin;
 use Dot\User\Middleware\Bootstrap;
 use Dot\User\Options\UserOptions;
+use Dot\User\Service\UserService;
 use Dot\User\Service\UserServiceInterface;
 use Zend\Crypt\Password\PasswordInterface;
 
@@ -132,8 +134,8 @@ class ConfigProvider
 
                 UserController::class => UserControllerFactory::class,
 
-                UserMapperInterface::class => UserDbMapperFactory::class,
-                UserServiceInterface::class => UserServiceFactory::class,
+                UserDbMapper::class => UserDbMapperFactory::class,
+                UserService::class => UserServiceFactory::class,
 
                 UserFormManager::class => UserFormManagerFactory::class,
 
@@ -147,6 +149,11 @@ class ConfigProvider
                 UserFieldset::class => UserFieldsetFactory::class,
                 UserInputFilter::class => UserInputFilterFactory::class,
             ],
+
+            'aliases' => [
+                UserServiceInterface::class => UserService::class,
+                UserMapperInterface::class => UserDbMapper::class,
+            ]
         ];
     }
 }

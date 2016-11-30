@@ -9,7 +9,7 @@ return [
     'dot_user' => [
 
         //overwrite user entity, must implement UserEntityInterface
-        //service names are required here
+        //service name or class name, defaults to UserEntity and ClassMethods(false)
         'user_entity' => '',
         'user_entity_hydrator' => '',
 

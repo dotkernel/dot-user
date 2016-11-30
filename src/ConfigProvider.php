@@ -10,8 +10,6 @@
 namespace Dot\User;
 
 use Dot\User\Controller\UserController;
-use Dot\User\Entity\UserEntity;
-use Dot\User\Entity\UserEntityHydrator;
 use Dot\User\Factory\AuthenticationListenerFactory;
 use Dot\User\Factory\AutoLoginFactory;
 use Dot\User\Factory\BcryptPasswordFactory;
@@ -33,7 +31,6 @@ use Dot\User\Middleware\Bootstrap;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserServiceInterface;
 use Zend\Crypt\Password\PasswordInterface;
-use Zend\ServiceManager\Factory\InvokableFactory;
 
 /**
  * Class ConfigProvider
@@ -133,15 +130,12 @@ class ConfigProvider
             'factories' => [
                 UserOptions::class => UserOptionsFactory::class,
 
+                UserController::class => UserControllerFactory::class,
+
                 UserMapperInterface::class => UserDbMapperFactory::class,
                 UserServiceInterface::class => UserServiceFactory::class,
 
-                UserController::class => UserControllerFactory::class,
-
                 UserFormManager::class => UserFormManagerFactory::class,
-
-                UserEntity::class => InvokableFactory::class,
-                UserEntityHydrator::class => InvokableFactory::class,
 
                 AuthenticationListener::class => AuthenticationListenerFactory::class,
 
@@ -152,10 +146,6 @@ class ConfigProvider
 
                 UserFieldset::class => UserFieldsetFactory::class,
                 UserInputFilter::class => UserInputFilterFactory::class,
-            ],
-
-            'shared' => [
-                UserEntity::class => false,
             ],
         ];
     }

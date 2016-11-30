@@ -11,9 +11,7 @@ namespace Dot\User\Mapper;
 
 use Dot\Ems\Mapper\RelationalDbMapper;
 use Dot\User\Options\DbOptions;
-use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
-use Zend\Hydrator\HydratorInterface;
 
 /**
  * Class UserDbMapper
@@ -23,23 +21,6 @@ class UserDbMapper extends RelationalDbMapper implements UserMapperInterface
 {
     /** @var  DbOptions */
     protected $dbOptions;
-
-    /**
-     * UserDbMapper constructor.
-     * @param $table
-     * @param Adapter $adapter
-     * @param DbOptions $dbOptions
-     * @param null|HydratorInterface $prototype
-     * @param HydratorInterface|null $hydrator
-     * @param null $features
-     */
-    public function __construct($table, Adapter $adapter, DbOptions $dbOptions, $prototype,
-        HydratorInterface $hydrator = null, $features = null)
-    {
-        parent::__construct($table, $adapter, $prototype, $hydrator, $features);
-        $this->dbOptions = $dbOptions;
-    }
-
 
     /**
      * @param $data
@@ -149,5 +130,23 @@ class UserDbMapper extends RelationalDbMapper implements UserMapperInterface
 
         $stmt = $sql->prepareStatementForSqlObject($delete);
         return $stmt->execute();
+    }
+
+    /**
+     * @return DbOptions
+     */
+    public function getDbOptions()
+    {
+        return $this->dbOptions;
+    }
+
+    /**
+     * @param DbOptions $dbOptions
+     * @return UserDbMapper
+     */
+    public function setDbOptions(DbOptions $dbOptions)
+    {
+        $this->dbOptions = $dbOptions;
+        return $this;
     }
 }

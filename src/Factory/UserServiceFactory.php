@@ -32,9 +32,10 @@ class UserServiceFactory
 
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return UserService
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, $requestedName)
     {
         /** @var UserOptions $options */
         $options = $container->get(UserOptions::class);
@@ -48,7 +49,8 @@ class UserServiceFactory
             ? $container->get(EventManagerInterface::class)
             : new EventManager();
 
-        $service = new UserService(
+        /** @var UserService $service */
+        $service = new $requestedName(
             $container->get(UserMapperInterface::class),
             $options,
             $container->get(PasswordInterface::class),

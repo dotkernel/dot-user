@@ -167,7 +167,11 @@ class UserController extends AbstractActionController
 
         return new HtmlResponse($this->template()
             ->render($this->options->getTemplateOptions()->getChangePasswordTemplate(),
-                ['form' => $form, 'showLabels' => $this->options->isShowFormInputLabels()]));
+                [
+                    'form' => $form,
+                    'showLabels' => $this->options->isShowFormInputLabels(),
+                    'layoutTemplate' => $this->options->getTemplateOptions()->getChangePasswordTemplateLayout()
+                ]));
     }
 
     /**
@@ -235,7 +239,8 @@ class UserController extends AbstractActionController
                 [
                     'form' => $form,
                     'enableRegistration' => $this->options->getRegisterOptions()->isEnableRegistration(),
-                    'showLabels' => $this->options->isShowFormInputLabels()
+                    'showLabels' => $this->options->isShowFormInputLabels(),
+                    'layoutTemplate' => $this->options->getTemplateOptions()->getRegisterTemplateLayout()
                 ]));
     }
 
@@ -317,7 +322,11 @@ class UserController extends AbstractActionController
 
         return new HtmlResponse($this->template()->render(
             $this->options->getTemplateOptions()->getAccountTemplate(),
-            ['form' => $form, 'showLabels' => $this->options->isShowFormInputLabels()]));
+            [
+                'form' => $form,
+                'showLabels' => $this->options->isShowFormInputLabels(),
+                'layoutTemplate' => $this->options->getTemplateOptions()->getAccountTemplateLayout()
+            ]));
     }
 
     /**
@@ -382,7 +391,11 @@ class UserController extends AbstractActionController
 
         return new HtmlResponse($this->template()->render(
             $this->options->getTemplateOptions()->getResetPasswordTemplate(),
-            ['form' => $form, 'showLabels' => $this->options->isShowFormInputLabels()]));
+            [
+                'form' => $form,
+                'showLabels' => $this->options->isShowFormInputLabels(),
+                'layoutTemplate' => $this->options->getTemplateOptions()->getResetPasswordTemplateLayout()
+            ]));
     }
 
     /**
@@ -440,7 +453,11 @@ class UserController extends AbstractActionController
 
         return new HtmlResponse($this->template()->render(
             $this->options->getTemplateOptions()->getForgotPasswordTemplate(),
-            ['form' => $form, 'showLabels' => false]));
+            [
+                'form' => $form,
+                'showLabels' => false,
+                'layoutTemplate' => $this->options->getTemplateOptions()->getForgotPasswordTemplateLayout()
+            ]));
     }
 
     /**

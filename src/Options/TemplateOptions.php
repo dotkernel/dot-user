@@ -20,20 +20,37 @@ class TemplateOptions extends AbstractOptions
     /** @var string */
     protected $loginTemplate = 'dot-user::login';
 
+    protected $loginTemplateLayout = '@layout/default.html.twig';
+
     /** @var string */
     protected $registerTemplate = 'dot-user::register';
 
     /** @var string  */
+    protected $registerTemplateLayout = '@layout/default.html.twig';
+
+    /** @var string  */
     protected $accountTemplate = 'dot-user::account';
+
+    /** @var string  */
+    protected $accountTemplateLayout = '@layout/default.html.twig';
 
     /** @var string */
     protected $changePasswordTemplate = 'dot-user::change-password';
 
+    /** @var string  */
+    protected $changePasswordTemplateLayout = '@layout/default.html.twig';
+
     /** @var string */
     protected $forgotPasswordTemplate = 'dot-user::forgot-password';
 
+    /** @var string  */
+    protected $forgotPasswordTemplateLayout = '@layout/default.html.twig';
+
     /** @var string */
     protected $resetPasswordTemplate = 'dot-user::reset-password';
+
+    /** @var string  */
+    protected $resetPasswordTemplateLayout = '@layout/default.html.twig';
 
     protected $__strictMode__ = false;
 
@@ -142,6 +159,114 @@ class TemplateOptions extends AbstractOptions
     public function setAccountTemplate($accountTemplate)
     {
         $this->accountTemplate = $accountTemplate;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLoginTemplateLayout()
+    {
+        return $this->loginTemplateLayout;
+    }
+
+    /**
+     * @param string $loginTemplateLayout
+     * @return TemplateOptions
+     */
+    public function setLoginTemplateLayout($loginTemplateLayout)
+    {
+        $this->loginTemplateLayout = $loginTemplateLayout;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRegisterTemplateLayout()
+    {
+        return $this->registerTemplateLayout;
+    }
+
+    /**
+     * @param string $registerTemplateLayout
+     * @return TemplateOptions
+     */
+    public function setRegisterTemplateLayout($registerTemplateLayout)
+    {
+        $this->registerTemplateLayout = $registerTemplateLayout;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccountTemplateLayout()
+    {
+        return $this->accountTemplateLayout;
+    }
+
+    /**
+     * @param string $accountTemplateLayout
+     * @return TemplateOptions
+     */
+    public function setAccountTemplateLayout($accountTemplateLayout)
+    {
+        $this->accountTemplateLayout = $accountTemplateLayout;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChangePasswordTemplateLayout()
+    {
+        return $this->changePasswordTemplateLayout;
+    }
+
+    /**
+     * @param string $changePasswordTemplateLayout
+     * @return TemplateOptions
+     */
+    public function setChangePasswordTemplateLayout($changePasswordTemplateLayout)
+    {
+        $this->changePasswordTemplateLayout = $changePasswordTemplateLayout;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getForgotPasswordTemplateLayout()
+    {
+        return $this->forgotPasswordTemplateLayout;
+    }
+
+    /**
+     * @param string $forgotPasswordTemplateLayout
+     * @return TemplateOptions
+     */
+    public function setForgotPasswordTemplateLayout($forgotPasswordTemplateLayout)
+    {
+        $this->forgotPasswordTemplateLayout = $forgotPasswordTemplateLayout;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResetPasswordTemplateLayout()
+    {
+        return $this->resetPasswordTemplateLayout;
+    }
+
+    /**
+     * @param string $resetPasswordTemplateLayout
+     * @return TemplateOptions
+     */
+    public function setResetPasswordTemplateLayout($resetPasswordTemplateLayout)
+    {
+        $this->resetPasswordTemplateLayout = $resetPasswordTemplateLayout;
         return $this;
     }
 

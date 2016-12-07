@@ -1,4 +1,4 @@
-{% extends '@layout/default.html.twig' %}
+{% extends '{{ layoutTemplate }}' %}
 
 {% if showLabels is not defined %}
     {% set showLabels = false %}

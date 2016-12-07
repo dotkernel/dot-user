@@ -17,6 +17,7 @@ use Dot\User\Factory\BootstrapFactory;
 use Dot\User\Factory\Fieldset\UserFieldsetFactory;
 use Dot\User\Factory\Form\UserFormManagerFactory;
 use Dot\User\Factory\InputFilter\UserInputFilterFactory;
+use Dot\User\Factory\PasswordCheckFactory;
 use Dot\User\Factory\UserControllerFactory;
 use Dot\User\Factory\UserDbMapperFactory;
 use Dot\User\Factory\UserOptionsFactory;
@@ -26,12 +27,11 @@ use Dot\User\Form\InputFilter\UserInputFilter;
 use Dot\User\Form\UserFormManager;
 use Dot\User\Listener\AuthenticationListener;
 use Dot\User\Mapper\UserDbMapper;
-use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Middleware\AutoLogin;
 use Dot\User\Middleware\Bootstrap;
 use Dot\User\Options\UserOptions;
+use Dot\User\Service\PasswordCheck;
 use Dot\User\Service\UserService;
-use Dot\User\Service\UserServiceInterface;
 use Zend\Crypt\Password\PasswordInterface;
 
 /**
@@ -145,14 +145,15 @@ class ConfigProvider
                 AutoLogin::class => AutoLoginFactory::class,
 
                 PasswordInterface::class => BcryptPasswordFactory::class,
+                PasswordCheck::class => PasswordCheckFactory::class,
 
                 UserFieldset::class => UserFieldsetFactory::class,
                 UserInputFilter::class => UserInputFilterFactory::class,
             ],
 
             'aliases' => [
-                UserServiceInterface::class => UserService::class,
-                UserMapperInterface::class => UserDbMapper::class,
+                'UserService' => UserService::class,
+                'UserMapper' => UserDbMapper::class,
             ]
         ];
     }

@@ -13,7 +13,6 @@ use Dot\User\Entity\UserEntity;
 use Dot\User\Entity\UserEntityHydrator;
 use Dot\User\Exception\InvalidArgumentException;
 use Zend\Stdlib\AbstractOptions;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class UserOptions
@@ -38,6 +37,8 @@ class UserOptions extends AbstractOptions
 
     /** @var bool */
     protected $showFormInputLabels = false;
+
+    protected $formCsrfTimeout = 3600;
 
     /** @var  DbOptions */
     protected $dbOptions;
@@ -395,5 +396,22 @@ class UserOptions extends AbstractOptions
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getFormCsrfTimeout()
+    {
+        return $this->formCsrfTimeout;
+    }
+
+    /**
+     * @param int $formCsrfTimeout
+     * @return UserOptions
+     */
+    public function setFormCsrfTimeout($formCsrfTimeout)
+    {
+        $this->formCsrfTimeout = $formCsrfTimeout;
+        return $this;
+    }
 
 }

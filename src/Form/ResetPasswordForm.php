@@ -9,7 +9,10 @@
 
 namespace Dot\User\Form;
 
+use Dot\User\Options\MessagesOptions;
+use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
+use Zend\Form\Element\Csrf;
 use Zend\Form\Form;
 
 /**
@@ -20,13 +23,18 @@ class ResetPasswordForm extends Form
 {
     use EventManagerAwareTrait;
 
+    /** @var  UserOptions */
+    protected $userOptions;
+
     /**
      * ResetPasswordForm constructor.
+     * @param UserOptions $userOptions
      * @param string $name
      * @param array $options
      */
-    public function __construct($name = 'reset-password', array $options = [])
+    public function __construct(UserOptions $userOptions, $name = 'reset-password', array $options = [])
     {
+        $this->userOptions = $userOptions;
         parent::__construct($name, $options);
     }
 
@@ -63,6 +71,14 @@ class ResetPasswordForm extends Form
                 'value' => 'Reset password',
             ),
         ), ['priority' => -100]);
+
+        $csrf = new Csrf('reset_password_csrf', [
+            'csrf_options' => [
+                'timeout' => $this->userOptions->getFormCsrfTimeout(),
+                'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
+            ]
+        ]);
+        $this->add($csrf);
 
         $this->getEventManager()->trigger('init', $this);
     }

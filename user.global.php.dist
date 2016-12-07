@@ -22,6 +22,9 @@ return [
         //when displaying forms, show labels along the intputs
         'show_form_input_labels' => true,
 
+        //CSRF token expiration for all defined forms
+        'form_csrf_timeout' => 3600,
+
         //database options for mysql/pdo mapper
         'db_options' => [
             //service name of the database adapter
@@ -58,9 +61,6 @@ return [
 
             //whitelist user statuses that are allowed to authenticate successfully
             'allowed_login_statuses' => ['active'],
-
-            //csrf login form expiration
-            'login_form_timeout' => 1800,
         ],
 
         //config for user registration related flow
@@ -73,9 +73,6 @@ return [
 
             //what status should newly registered users be assigned
             'default_user_status' => 'pending',
-
-            //csrf form expiration
-            'user_form_timeout' => 1800,
 
             //use captcha when registering
             'use_registration_form_captcha' => true,
@@ -96,7 +93,7 @@ return [
             'enable_password_recovery' => true,
 
             //expiration for reset token
-            'reset_password_token_timeout' => 1800,
+            'reset_password_token_timeout' => 3600,
         ],
 
         'confirm_account_options' => [
@@ -119,6 +116,8 @@ return [
             'login_template' => '',
 
             'register_template' => '',
+
+            'account_template' => '',
 
             'change_password_template' => '',
 

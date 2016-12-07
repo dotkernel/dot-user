@@ -9,9 +9,12 @@
 
 namespace Dot\User\Form\Fieldset;
 
-
 use Zend\Form\Fieldset;
 
+/**
+ * Class UserFieldset
+ * @package Dot\User\Form\Fieldset
+ */
 class UserFieldset extends Fieldset
 {
     /**

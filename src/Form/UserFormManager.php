@@ -14,6 +14,7 @@ use Dot\User\Factory\Form\ForgotPasswordFormFactory;
 use Dot\User\Factory\Form\LoginFormFactory;
 use Dot\User\Factory\Form\RegisterFormFactory;
 use Dot\User\Factory\Form\ResetPasswordFormFactory;
+use Dot\User\Factory\Form\UserFormFactory;
 use Zend\Form\Form;
 use Zend\ServiceManager\AbstractPluginManager;
 
@@ -31,5 +32,6 @@ class UserFormManager extends AbstractPluginManager
         ResetPasswordForm::class => ResetPasswordFormFactory::class,
         ForgotPasswordForm::class => ForgotPasswordFormFactory::class,
         ChangePasswordForm::class => ChangePasswordFormFactory::class,
+        UserForm::class => UserFormFactory::class,
     ];
 }

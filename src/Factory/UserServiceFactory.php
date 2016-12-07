@@ -12,7 +12,6 @@ namespace Dot\User\Factory;
 use Dot\Authentication\AuthenticationInterface;
 use Dot\User\Event\Listener\UserListenerAwareInterface;
 use Dot\User\Exception\InvalidArgumentException;
-use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserService;
 use Interop\Container\ContainerInterface;
@@ -51,7 +50,7 @@ class UserServiceFactory
 
         /** @var UserService $service */
         $service = new $requestedName(
-            $container->get(UserMapperInterface::class),
+            $container->get('UserMapper'),
             $options,
             $container->get(PasswordInterface::class),
             $container->get(AuthenticationInterface::class)

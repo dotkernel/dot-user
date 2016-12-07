@@ -16,7 +16,6 @@ use Zend\Form\Element\Captcha;
 use Zend\Form\Element\Csrf;
 use Zend\Form\Fieldset;
 use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
 
 /**
  * Class RegisterForm
@@ -32,9 +31,6 @@ class RegisterForm extends Form
     /** @var  Fieldset */
     protected $userFieldset;
 
-    /** @var  InputFilter */
-    protected $userInputFilter;
-
     /** @var  Captcha */
     protected $captcha;
 
@@ -42,18 +38,15 @@ class RegisterForm extends Form
      * RegisterForm constructor.
      * @param UserOptions $userOptions
      * @param Fieldset $userFieldset
-     * @param InputFilter $userInputFilter
      * @param array $options
      */
     public function __construct(
         UserOptions $userOptions,
         Fieldset $userFieldset,
-        InputFilter $userInputFilter,
         $options = array()
     ) {
         $this->userOptions = $userOptions;
         $this->userFieldset = $userFieldset;
-        $this->userInputFilter = $userInputFilter;
         parent::__construct('user_register_form', $options);
     }
 
@@ -62,15 +55,7 @@ class RegisterForm extends Form
         $this->userFieldset->setName('user');
         $this->userFieldset->setUseAsBaseFieldset(true);
 
-        $this->userFieldset->remove('id');
-        $this->userInputFilter->remove('id');
-        if (!$this->userOptions->getRegisterOptions()->isEnableUsername()) {
-            $this->userFieldset->remove('username');
-            $this->userInputFilter->remove('username');
-        }
-
         $this->add($this->userFieldset);
-        $this->getInputFilter()->add($this->userInputFilter, 'user');
 
         if ($this->userOptions->getRegisterOptions()->isUseRegistrationFormCaptcha()) {
             //add captcha element
@@ -86,7 +71,7 @@ class RegisterForm extends Form
 
         $csrf = new Csrf('register_csrf', [
             'csrf_options' => [
-                'timeout' => $this->userOptions->getRegisterOptions()->getUserFormTimeout(),
+                'timeout' => $this->userOptions->getFormCsrfTimeout(),
                 'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
             ]
         ]);

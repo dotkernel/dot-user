@@ -9,6 +9,7 @@
 
 namespace Dot\User\Factory;
 
+use Dot\Helpers\DependencyHelperTrait;
 use Dot\User\Entity\UserEntityInterface;
 use Dot\User\Exception\RuntimeException;
 use Dot\User\Mapper\UserDbMapper;
@@ -23,41 +24,22 @@ use Zend\Hydrator\HydratorInterface;
  */
 class UserDbMapperFactory
 {
+    use DependencyHelperTrait;
+
     public function __invoke(ContainerInterface $container, $requestedName)
     {
         /** @var UserOptions $options */
         $options = $container->get(UserOptions::class);
         $dbAdapter = $container->get($options->getDbOptions()->getDbAdapter());
 
-        $prototype = $options->getUserEntity();
-        if($container->has($prototype)) {
-            $prototype = $container->get($prototype);
-        }
-
-        if(is_string($prototype) && class_exists($prototype)) {
-            $prototype = new $prototype;
-        }
-
+        $prototype = $this->getDependencyObject($container, $options->getUserEntity());
         if(!$prototype instanceof UserEntityInterface) {
             throw new RuntimeException('User entity prototype not valid');
         }
 
-        if(!$options->getUserEntityHydrator()) {
+        $hydrator = $this->getDependencyObject($container, $options->getUserEntityHydrator());
+        if(!$hydrator instanceof HydratorInterface) {
             $hydrator = new ClassMethods(false);
-        }
-        else {
-            $hydrator = $options->getUserEntityHydrator();
-            if($container->has($hydrator)) {
-                $hydrator = $container->get($hydrator);
-            }
-
-            if(is_string($hydrator) && class_exists($hydrator)) {
-                $hydrator = new $hydrator;
-            }
-
-            if(!$hydrator instanceof HydratorInterface) {
-                throw new RuntimeException('Invalid user entity hydrator');
-            }
         }
 
         /** @var UserDbMapper $mapper */

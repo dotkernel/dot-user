@@ -14,7 +14,6 @@ use Dot\User\Form\LoginForm;
 use Dot\User\Form\UserFormManager;
 use Dot\User\Listener\AuthenticationListener;
 use Dot\User\Options\UserOptions;
-use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -37,7 +36,7 @@ class AuthenticationListenerFactory
         return new AuthenticationListener(
             $formManager->get(LoginForm::class),
             $container->get(FlashMessengerInterface::class),
-            $container->get(UserServiceInterface::class),
+            $container->get('UserService'),
             $options
         );
     }

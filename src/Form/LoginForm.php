@@ -92,7 +92,7 @@ class LoginForm extends Form
 
         $csrf = new Csrf('login_csrf', [
             'csrf_options' => [
-                'timeout' => $this->userOptions->getLoginOptions()->getLoginFormTimeout(),
+                'timeout' => $this->userOptions->getFormCsrfTimeout(),
                 'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
             ]
         ]);

@@ -23,6 +23,9 @@ class TemplateOptions extends AbstractOptions
     /** @var string */
     protected $registerTemplate = 'dot-user::register';
 
+    /** @var string  */
+    protected $accountTemplate = 'dot-user::account';
+
     /** @var string */
     protected $changePasswordTemplate = 'dot-user::change-password';
 
@@ -121,6 +124,24 @@ class TemplateOptions extends AbstractOptions
     public function setResetPasswordTemplate($resetPasswordTemplate)
     {
         $this->resetPasswordTemplate = $resetPasswordTemplate;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccountTemplate()
+    {
+        return $this->accountTemplate;
+    }
+
+    /**
+     * @param string $accountTemplate
+     * @return TemplateOptions
+     */
+    public function setAccountTemplate($accountTemplate)
+    {
+        $this->accountTemplate = $accountTemplate;
         return $this;
     }
 

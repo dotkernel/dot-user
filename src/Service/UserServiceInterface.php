@@ -64,6 +64,12 @@ interface UserServiceInterface extends ServiceInterface
      * @param UserEntityInterface $user
      * @return mixed
      */
+    public function updateAccount(UserEntityInterface $user);
+
+    /**
+     * @param UserEntityInterface $user
+     * @return mixed
+     */
     public function generateRememberToken(UserEntityInterface $user);
 
     /**

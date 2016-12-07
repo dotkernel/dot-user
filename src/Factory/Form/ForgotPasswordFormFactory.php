@@ -29,10 +29,11 @@ class ForgotPasswordFormFactory
      */
     public function __invoke(ContainerInterface $container)
     {
-        $filter = new ForgotPasswordInputFilter($container->get(UserOptions::class));
+        $options = $container->get(UserOptions::class);
+        $filter = new ForgotPasswordInputFilter($options);
         $filter->init();
 
-        $form = new ForgotPasswordForm();
+        $form = new ForgotPasswordForm($options);
         $form->setInputFilter($filter);
         $form->setEventManager($this->getEventManager($container));
         $form->init();

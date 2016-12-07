@@ -9,7 +9,6 @@
 
 namespace Dot\User\Factory;
 
-
 use Dot\User\Options\UserOptions;
 use Interop\Container\ContainerInterface;
 use Zend\Crypt\Password\Bcrypt;

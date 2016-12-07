@@ -78,7 +78,7 @@ class ChangePasswordForm extends Form
 
         $csrf = new Csrf('change_password_csrf', [
             'csrf_options' => [
-                'timeout' => $this->userOptions->getRegisterOptions()->getUserFormTimeout(),
+                'timeout' => $this->userOptions->getFormCsrfTimeout(),
                 'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
             ]
         ]);

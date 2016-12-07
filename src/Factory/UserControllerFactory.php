@@ -13,7 +13,6 @@ use Dot\Authentication\Web\Action\LoginAction;
 use Dot\User\Controller\UserController;
 use Dot\User\Form\UserFormManager;
 use Dot\User\Options\UserOptions;
-use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -26,8 +25,8 @@ class UserControllerFactory
     {
         /** @var UserOptions $options */
         $options = $container->get(UserOptions::class);
-        $userService = $container->get(UserServiceInterface::class);
 
+        $userService = $container->get('UserService');
         $controller = new UserController(
             $userService,
             $container->get(LoginAction::class),

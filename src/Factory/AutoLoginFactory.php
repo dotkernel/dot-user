@@ -13,7 +13,6 @@ use Dot\Authentication\AuthenticationInterface;
 use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\User\Middleware\AutoLogin;
 use Dot\User\Options\UserOptions;
-use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
 use Zend\Expressive\Helper\UrlHelper;
 
@@ -31,7 +30,7 @@ class AutoLoginFactory
     {
         return new AutoLogin(
             $container->get(AuthenticationInterface::class),
-            $container->get(UserServiceInterface::class),
+            $container->get('UserService'),
             $container->get(UrlHelper::class),
             $container->get(FlashMessengerInterface::class),
             $container->get(UserOptions::class)

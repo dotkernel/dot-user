@@ -10,7 +10,6 @@
 namespace Dot\User\Options;
 
 use Zend\Stdlib\AbstractOptions;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class RegisterOptions
@@ -26,9 +25,6 @@ class RegisterOptions extends AbstractOptions
 
     /** @var  mixed */
     protected $defaultUserStatus = 'pending';
-
-    /** @var int */
-    protected $userFormTimeout = 1800;
 
     /** @var bool */
     protected $useRegistrationFormCaptcha = true;
@@ -97,24 +93,6 @@ class RegisterOptions extends AbstractOptions
     public function setDefaultUserStatus($defaultUserStatus)
     {
         $this->defaultUserStatus = $defaultUserStatus;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getUserFormTimeout()
-    {
-        return $this->userFormTimeout;
-    }
-
-    /**
-     * @param int $userFormTimeout
-     * @return RegisterOptions
-     */
-    public function setUserFormTimeout($userFormTimeout)
-    {
-        $this->userFormTimeout = $userFormTimeout;
         return $this;
     }
 

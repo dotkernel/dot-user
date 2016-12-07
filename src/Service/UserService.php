@@ -21,6 +21,7 @@ use Dot\User\Event\Listener\UserListenerAwareTrait;
 use Dot\User\Event\PasswordResetEvent;
 use Dot\User\Event\RegisterEvent;
 use Dot\User\Event\RememberTokenEvent;
+use Dot\User\Event\UserUpdateEvent;
 use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
@@ -125,8 +126,10 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             ));
         } catch (\Exception $e) {
             error_log("Remember token generate error: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR), $user);
+
+            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR);
+            $result = $this->createUserOperationResultWithException($e, $message, $user);
 
             $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
                 RememberTokenEvent::EVENT_TOKEN_GENERATE_ERROR,
@@ -196,8 +199,10 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             ));
         } catch (\Exception $e) {
             error_log("Remove remember token error for user " . $user->getId() . " with message: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_REMOVE_ERROR), $user);
+
+            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_REMOVE_ERROR);
+            $result = $this->createUserOperationResultWithException($e, $message, $user);
 
             $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
                 RememberTokenEvent::EVENT_TOKEN_REMOVE_ERROR,
@@ -267,9 +272,10 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             }
         } catch (\Exception $e) {
             error_log("Confirm account error: " . $e->getMessage(), E_USER_ERROR);
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_ERROR),
-                $user);
+
+            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_ERROR);
+            $result = $this->createUserOperationResultWithException($e, $message, $user);
 
             //trigger error event
             $this->getEventManager()->triggerEvent(
@@ -325,8 +331,10 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             }
         } catch (\Exception $e) {
             error_log("Password reset request error: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_FORGOT_PASSWORD_ERROR), $user);
+
+            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_FORGOT_PASSWORD_ERROR);
+            $result = $this->createUserOperationResultWithException($e, $message, $user);
 
             $this->getEventManager()->triggerEvent(
                 $this->createPasswordResetEvent(
@@ -395,8 +403,10 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                 }
             } catch (\Exception $e) {
                 error_log("Password reset error: " . $e->getMessage());
-                $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                    ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_ERROR), $user);
+
+                $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
+                    ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_ERROR);
+                $result = $this->createUserOperationResultWithException($e, $message, $user);
 
                 $this->getEventManager()->triggerEvent(
                     $this->createPasswordResetEvent(
@@ -435,13 +445,13 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                 //update password
                 $currentUser->setPassword($this->passwordService->create($newPassword));
 
-                $this->getEventManager()->triggerEvent($this->createUserUpdateEvent(
+                $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
                     ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE, $currentUser
                 ));
 
                 $this->save($currentUser);
 
-                $this->getEventManager()->triggerEvent($this->createUserUpdateEvent(
+                $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
                     ChangePasswordEvent::EVENT_CHANGE_PASSWORD_POST, $currentUser
                 ));
             } else {
@@ -451,11 +461,12 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             }
         } catch (\Exception $e) {
             error_log("Change password error: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException(
-                $e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_ERROR), $currentUser);
 
-            $this->getEventManager()->triggerEvent($this->createUserUpdateEvent(
+            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_ERROR);
+            $result = $this->createUserOperationResultWithException($e, $message, $currentUser);
+
+            $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
                 ChangePasswordEvent::EVENT_CHANGE_PASSWORD_ERROR,
                 $currentUser, $result
             ));
@@ -516,8 +527,10 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
         } catch (\Exception $e) {
             error_log("Register error: " . $e->getMessage());
-            $result = $this->createUserOperationResultWithException($e, $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REGISTER_ERROR), $user);
+
+            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_REGISTER_ERROR);
+            $result = $this->createUserOperationResultWithException($e, $message, $user);
 
             //trigger error event
             $this->getEventManager()->triggerEvent(
@@ -571,6 +584,55 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             throw $e;
         }
+    }
+
+    /**
+     * @param UserEntityInterface $user
+     * @return UserOperationResult
+     */
+    public function updateAccount(UserEntityInterface $user)
+    {
+        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
+            ->getMessage(MessagesOptions::MESSAGE_ACCOUNT_UPDATE_OK));
+
+        $isAtomic = $this->isAtomicOperations();
+        try {
+            $this->setAtomicOperations(false);
+            $this->mapper->beginTransaction();
+
+            $this->getEventManager()->triggerEvent(
+                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_PRE, $user));
+
+            if(!empty($user->getPassword())) {
+                $user->setPassword($this->passwordService->create($user->getPassword()));
+            }
+            $this->save($user);
+
+            $result->setUser($user);
+
+            $this->getEventManager()->triggerEvent(
+                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_POST, $user));
+
+            $this->mapper->commit();
+            $this->setAtomicOperations($isAtomic);
+
+        } catch (\Exception $e) {
+            error_log('Update user error: ' . $e->getMessage());
+
+            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
+                ->getMessage(MessagesOptions::MESSAGE_ACCOUNT_UPDATE_ERROR);
+
+            $result = $this->createUserOperationResultWithException(
+                $e, $message, $user);
+
+            $this->getEventManager()->triggerEvent(
+                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_ERROR, $user, $result));
+
+            $this->mapper->rollback();
+            $this->setAtomicOperations($isAtomic);
+        }
+
+        return $result;
     }
 
     /**
@@ -789,12 +851,27 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
      * @param ResultInterface|null $result
      * @return Event
      */
-    protected function createUserUpdateEvent(
+    protected function createChangePasswordEvent(
         $name = ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE,
         UserEntityInterface $user = null,
         ResultInterface $result = null
     ) {
         $event = new ChangePasswordEvent($this, $name, $user, $result);
+        return $this->setupEventPsr7Messages($event);
+    }
+
+    /**
+     * @param $name
+     * @param UserEntityInterface|null $user
+     * @param ResultInterface|null $result
+     * @return Event
+     */
+    protected function createUpdateEvent(
+        $name = UserUpdateEvent::EVENT_UPDATE_PRE,
+        UserEntityInterface $user = null,
+        ResultInterface $result = null
+    ) {
+        $event = new UserUpdateEvent($this, $name, $user, $result);
         return $this->setupEventPsr7Messages($event);
     }
 }

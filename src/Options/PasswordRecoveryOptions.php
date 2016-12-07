@@ -10,7 +10,6 @@
 namespace Dot\User\Options;
 
 use Zend\Stdlib\AbstractOptions;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class PasswordRecoveryOptions
@@ -22,7 +21,7 @@ class PasswordRecoveryOptions extends AbstractOptions
     protected $enablePasswordRecovery = true;
 
     /** @var int */
-    protected $resetPasswordTokenTimeout = 1800;
+    protected $resetPasswordTokenTimeout = 3600;
 
     /**
      * @return boolean

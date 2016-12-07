@@ -10,7 +10,6 @@
 namespace Dot\User\Options;
 
 use Zend\Stdlib\AbstractOptions;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class ConfirmAccountOptions

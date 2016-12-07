@@ -11,13 +11,16 @@ namespace Dot\User\Controller;
 
 use Dot\Authentication\Web\Action\LoginAction;
 use Dot\Controller\AbstractActionController;
+use Dot\Helpers\FormMessagesHelperTrait;
 use Dot\Helpers\Psr7\HttpMessagesAwareInterface;
 use Dot\User\Entity\UserEntityInterface;
+use Dot\User\Exception\RuntimeException;
 use Dot\User\Form\ChangePasswordForm;
 use Dot\User\Form\ForgotPasswordForm;
 use Dot\User\Form\LoginForm;
 use Dot\User\Form\RegisterForm;
 use Dot\User\Form\ResetPasswordForm;
+use Dot\User\Form\UserForm;
 use Dot\User\Form\UserFormManager;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
@@ -28,7 +31,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
-use Zend\Form\Element\Csrf;
 use Zend\Form\Form;
 
 /**
@@ -37,6 +39,8 @@ use Zend\Form\Form;
  */
 class UserController extends AbstractActionController
 {
+    use FormMessagesHelperTrait;
+
     const LOGIN_ROUTE_NAME = 'login';
 
     /** @var  UserOptions */
@@ -236,6 +240,87 @@ class UserController extends AbstractActionController
     }
 
     /**
+     * @return HtmlResponse|RedirectResponse
+     * @throws \Exception
+     */
+    public function accountAction()
+    {
+        $request = $this->getRequest();
+
+        /** @var UserForm $form */
+        $form = $this->formManager->get(UserForm::class);
+
+        /** @var UserEntityInterface $identity */
+        $identity = $this->authentication()->getIdentity();
+        $user = $this->userService->find([$this->userService->getMapper()->getIdentifierName() => $identity->getId()]);
+
+        //this should never happen, that's why we treat it as exception
+        if(!$user instanceof UserEntityInterface) {
+            throw new RuntimeException('Could not load user entity for identity ID');
+        }
+
+        $form->bind($user);
+
+        /**
+         * Get previous form data stored in session, to re-display the information and/or errors
+         */
+        $userFormData = $this->flashMessenger()->getData('userFormData') ?: [];
+        $userFormMessages = $this->flashMessenger()->getData('userFormMessages') ?: [];
+
+        $form->setData($userFormData);
+        $form->setMessages($userFormMessages);
+
+        if ($request->getMethod() === 'POST') {
+            $data = $request->getParsedBody();
+
+            //in case username is changed we need to check its uniqueness
+            //but only in case username was actually changed from the previous one
+            if (isset($data['user']['username']) && $data['user']['username'] === $identity->getUsername()) {
+                //consider we don't want to change username, remove the uniqueness check
+                $form->removeUsernameValidation();
+                $form->applyValidationGroup();
+            }
+
+            if (isset($data['user']['email']) && $data['user']['email'] === $identity->getEmail()) {
+                //consider we don't want to change email, remove the uniqueness check
+                $form->removeEmailValidation();
+                $form->applyValidationGroup();
+            }
+
+            $form->setData($data);
+
+            $isValid = $form->isValid();
+
+            //add form data and messages to the session, in case we do a PRG redirect
+            $this->flashMessenger()->addData('userFormData', $data);
+            $this->flashMessenger()->addData('userFormMessages', $form->getMessages());
+
+            if ($isValid) {
+                /** @var UserEntityInterface $user */
+                $user = $form->getData();
+
+                /** @var UserOperationResult $result */
+                $result = $this->userService->updateAccount($user);
+
+                if ($result->isValid()) {
+                    $this->addSuccess($result->getMessages());
+                    return new RedirectResponse($request->getUri());
+                } else {
+                    $this->addError($result->getMessages());
+                    return new RedirectResponse($request->getUri(), 303);
+                }
+            } else {
+                $this->addError($this->getFormMessages($form->getMessages()));
+                return new RedirectResponse($request->getUri(), 303);
+            }
+        }
+
+        return new HtmlResponse($this->template()->render(
+            $this->options->getTemplateOptions()->getAccountTemplate(),
+            ['form' => $form, 'showLabels' => $this->options->isShowFormInputLabels()]));
+    }
+
+    /**
      * Show the reset password form, validate data
      *
      * @return HtmlResponse|RedirectResponse
@@ -371,15 +456,9 @@ class UserController extends AbstractActionController
         $request = $this->getRequest();
         $response = $this->getResponse();
 
+        /** @var Form $form */
         $form = $this->formManager->get(LoginForm::class);
-        $form->init();
-        $csrf = ['name' => '', 'value' => ''];
-        foreach ($form->getElements() as $element) {
-            if ($element instanceof Csrf) {
-                $csrf['name'] = $element->getName();
-                $csrf['value'] = $element->getValue();
-            }
-        }
+        $csrf = $form->get('login_csrf');
 
         $loginData = [
             'identity' => $user->getEmail(),
@@ -387,41 +466,17 @@ class UserController extends AbstractActionController
             'remember' => 'no',
         ];
 
-        if (!empty($csrf['name'])) {
-            $loginData[$csrf['name']] = $csrf['value'];
+        if ($csrf) {
+            $loginData[$csrf->getName()] = $csrf->getValue();
         }
 
         $form->setData($loginData);
-
         $form->isValid();
 
         $request = $request->withParsedBody($form->getData())
             ->withUri(new Uri($this->url()->generate(self::LOGIN_ROUTE_NAME)));
 
         return $this->loginAction->triggerAuthenticateEvent($request, $response, $request->getParsedBody());
-    }
-
-    /**
-     * @param array $formMessages
-     * @return array
-     */
-    protected function getFormMessages(array $formMessages)
-    {
-        $messages = [];
-        foreach ($formMessages as $message) {
-            if (is_array($message)) {
-                foreach ($message as $m) {
-                    if (is_string($m)) {
-                        $messages[] = $m;
-                    } elseif (is_array($m)) {
-                        $messages = array_merge($messages, $this->getFormMessages($message));
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $messages;
     }
 
     /**

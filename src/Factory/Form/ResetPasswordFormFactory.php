@@ -34,7 +34,7 @@ class ResetPasswordFormFactory
         $filter = new ResetPasswordInputFilter($options);
         $filter->init();
 
-        $form = new ResetPasswordForm();
+        $form = new ResetPasswordForm($options);
         $form->setInputFilter($filter);
         $form->setEventManager($this->getEventManager($container));
         $form->init();

@@ -9,7 +9,6 @@
 
 namespace Dot\User\Form\InputFilter;
 
-
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Zend\InputFilter\InputFilter;

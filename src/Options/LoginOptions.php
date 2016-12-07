@@ -10,7 +10,6 @@
 namespace Dot\User\Options;
 
 use Zend\Stdlib\AbstractOptions;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class LoginOptions
@@ -35,9 +34,6 @@ class LoginOptions extends AbstractOptions
 
     /** @var  array */
     protected $allowedLoginStatuses = ['active'];
-
-    /** @var int */
-    protected $loginFormTimeout = 1800;
 
     /**
      * @return boolean
@@ -90,24 +86,6 @@ class LoginOptions extends AbstractOptions
     public function setAllowedLoginStatuses($allowedLoginStatuses)
     {
         $this->allowedLoginStatuses = $allowedLoginStatuses;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLoginFormTimeout()
-    {
-        return $this->loginFormTimeout;
-    }
-
-    /**
-     * @param int $loginFormTimeout
-     * @return LoginOptions
-     */
-    public function setLoginFormTimeout($loginFormTimeout)
-    {
-        $this->loginFormTimeout = $loginFormTimeout;
         return $this;
     }
 

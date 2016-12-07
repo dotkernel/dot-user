@@ -21,11 +21,10 @@ class UserEntityHydrator extends ClassMethods
 {
     /**
      * UserEntityHydrator constructor.
-     * @param bool $underscoreSeparatedKeys
      */
-    public function __construct($underscoreSeparatedKeys = false)
+    public function __construct()
     {
-        parent::__construct($underscoreSeparatedKeys);
+        parent::__construct(false);
         $this->addFilter('name', new MethodMatchFilter('getName'), FilterComposite::CONDITION_AND);
         $this->addFilter('roles', new MethodMatchFilter('getRoles'), FilterComposite::CONDITION_AND);
     }

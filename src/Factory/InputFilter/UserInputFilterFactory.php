@@ -9,11 +9,9 @@
 
 namespace Dot\User\Factory\InputFilter;
 
-
 use Dot\Ems\Validator\NoRecordsExists;
 use Dot\User\Form\InputFilter\UserInputFilter;
 use Dot\User\Options\UserOptions;
-use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -24,7 +22,7 @@ class UserInputFilterFactory
 {
     public function __invoke(ContainerInterface $container)
     {
-        $service = $container->get(UserServiceInterface::class);
+        $service = $container->get('UserService');
         $inputFilter = new UserInputFilter(
             $container->get(UserOptions::class),
             new NoRecordsExists([

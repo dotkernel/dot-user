@@ -81,6 +81,9 @@ class MessagesOptions extends AbstractOptions
 
     const MESSAGE_CSRF_EXPIRED = 90;
 
+    const MESSAGE_ACCOUNT_UPDATE_OK = 100;
+    const MESSAGE_ACCOUNT_UPDATE_ERROR = 101;
+
     protected $__strictMode__ = false;
 
     protected $messages = [
@@ -152,6 +155,9 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::MESSAGE_CHANGE_PASSWORD_PASSWORD_MISMATCH => 'Password verify does not match',
 
         MessagesOptions::MESSAGE_CSRF_EXPIRED => 'The form used to make the request has expired. Please try again now',
+
+        MessagesOptions::MESSAGE_ACCOUNT_UPDATE_OK => 'You account was successfully updated',
+        MessagesOptions::MESSAGE_ACCOUNT_UPDATE_ERROR => 'Account could not be updated due to a server error. Please try again',
     ];
 
 

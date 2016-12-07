@@ -108,6 +108,7 @@ class AuthenticationListener extends AbstractListenerAggregate
         $e->setParam('passwordRecoveryEnabled', $this->options->getPasswordRecoveryOptions()
             ->isEnablePasswordRecovery());
         $e->setParam('showLabels', $this->options->isShowFormInputLabels());
+        $e->setParam('layoutTemplate', $this->options->getTemplateOptions()->getLoginTemplateLayout());
     }
 
     /**

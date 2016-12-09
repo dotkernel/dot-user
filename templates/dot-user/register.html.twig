@@ -6,22 +6,16 @@
 
 {% block title %}Sign Up{% endblock %}
 
+{% block page_title %}Sign Up{% endblock %}
+
 {% block content %}
-        <div class="row">
-            <div class="col-md-5 col-md-offset-3">
-                <h3>Sign Up</h3>
+    {{ flashMessagesPartial('dot-partial::alerts') }}
 
-                {{ flashMessagesPartial('dot-partial::alerts') }}
+    {% set dummy = form.setAttribute('method', 'post') %}
+    {% set dummy = form.setAttribute('autocomplete', 'off') %}
+    {% set dummy = form.prepare() %}
 
-                {% set dummy = form.setAttribute('method', 'post') %}
-                {% set dummy = form.setAttribute('autocomplete', 'off') %}
-                {% set dummy = form.prepare() %}
-
-                {{ form().openTag(form) | raw }}
-                {% include '@dot-form/form.html.twig' with {'form' : form, 'showLabels' : showLabels} only %}
-                {{ form().closeTag() | raw }}
-
-            </div>
-        </div>
-
+    {{ form().openTag(form) | raw }}
+    {% include '@dot-form/form.html.twig' with {'form' : form, 'showLabels' : showLabels} only %}
+    {{ form().closeTag() | raw }}
 {% endblock %}

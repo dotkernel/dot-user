@@ -130,7 +130,7 @@ class UserForm extends Form
             if(is_array($value)) {
                 $validationGroup[$key] = $this->getActiveValidationGroup($value);
             }
-            elseif($value === true) {
+            elseif($value === true && $this->get($key) !== null) {
                 $validationGroup[] = $key;
             }
         }

@@ -280,13 +280,13 @@ class UserController extends AbstractActionController
 
             //in case username is changed we need to check its uniqueness
             //but only in case username was actually changed from the previous one
-            if (isset($data['user']['username']) && $data['user']['username'] === $identity->getUsername()) {
+            if (isset($data['user']['username']) && $data['user']['username'] === $user->getUsername()) {
                 //consider we don't want to change username, remove the uniqueness check
                 $form->removeUsernameValidation();
                 $form->applyValidationGroup();
             }
 
-            if (isset($data['user']['email']) && $data['user']['email'] === $identity->getEmail()) {
+            if (isset($data['user']['email']) && $data['user']['email'] === $user->getEmail()) {
                 //consider we don't want to change email, remove the uniqueness check
                 $form->removeEmailValidation();
                 $form->applyValidationGroup();

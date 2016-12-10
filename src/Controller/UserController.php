@@ -188,7 +188,7 @@ class UserController extends AbstractActionController
             return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
         }
 
-        /** @var Form $form */
+        /** @var RegisterForm $form */
         $form = $this->formManager->get(RegisterForm::class);
 
         $data = $this->flashMessenger()->getData('registerFormData') ?: [];
@@ -283,15 +283,14 @@ class UserController extends AbstractActionController
             if (isset($data['user']['username']) && $data['user']['username'] === $user->getUsername()) {
                 //consider we don't want to change username, remove the uniqueness check
                 $form->removeUsernameValidation();
-                $form->applyValidationGroup();
             }
 
             if (isset($data['user']['email']) && $data['user']['email'] === $user->getEmail()) {
                 //consider we don't want to change email, remove the uniqueness check
                 $form->removeEmailValidation();
-                $form->applyValidationGroup();
             }
 
+            $form->applyValidationGroup();
             $form->setData($data);
 
             $isValid = $form->isValid();

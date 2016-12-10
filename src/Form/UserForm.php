@@ -13,6 +13,7 @@ use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\Form\Fieldset;
+use Zend\Form\FieldsetInterface;
 use Zend\Form\Form;
 use Zend\Form\FormInterface;
 
@@ -119,18 +120,20 @@ class UserForm extends Form
 
     public function applyValidationGroup()
     {
-        $validationGroup = $this->getActiveValidationGroup($this->currentValidationGroup);
+        $validationGroup = $this->getActiveValidationGroup($this->currentValidationGroup, $this->getBaseFieldset());
         $this->setValidationGroup(['user' => $validationGroup]);
     }
 
-    public function getActiveValidationGroup($groups)
+    public function getActiveValidationGroup($groups, FieldsetInterface $prevElement)
     {
         $validationGroup = [];
         foreach ($groups as $key => $value) {
             if(is_array($value)) {
-                $validationGroup[$key] = $this->getActiveValidationGroup($value);
+                if($prevElement->has($key)) {
+                    $validationGroup[$key] = $this->getActiveValidationGroup($value, $prevElement->get($key));
+                }
             }
-            elseif($value === true && $this->has($key)) {
+            elseif($value === true && $prevElement->has($key)) {
                 $validationGroup[] = $key;
             }
         }

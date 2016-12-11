@@ -22,6 +22,7 @@ use Dot\User\Event\PasswordResetEvent;
 use Dot\User\Event\RegisterEvent;
 use Dot\User\Event\RememberTokenEvent;
 use Dot\User\Event\UserUpdateEvent;
+use Dot\User\Exception\RuntimeException;
 use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
@@ -597,6 +598,13 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
         $isAtomic = $this->isAtomicOperations();
         try {
+            $identity = $this->authentication->getIdentity();
+            //last check if identity ID and the user ID to be updated are matching
+            if($user->getId() !== $identity->getId()) {
+                //trying to update a different account?...
+                throw new RuntimeException('Identity ID and user ID do not match.');
+            }
+
             $this->setAtomicOperations(false);
             $this->mapper->beginTransaction();
 

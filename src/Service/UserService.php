@@ -239,6 +239,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             } else {
                 /** @var UserEntityInterface $user */
                 $user = $this->mapper->fetch(['email' => $email]);
+                $user->setPassword(null);
+
                 if ($user) {
                     $r = $this->mapper->findConfirmToken($user->getId(), $token);
                     if ($r) {
@@ -307,6 +309,7 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
         try {
             /** @var UserEntityInterface $user */
             $user = $this->find(['email' => $email]);
+            $user->setPassword(null);
 
             if ($user) {
                 $data = new \stdClass();
@@ -369,6 +372,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             try {
                 /** @var UserEntityInterface $user */
                 $user = $this->find(['email' => $email]);
+                $user->setPassword(null);
+
                 if (!$user) {
                     $result = $this->createUserOperationResultWithMessages($this->options->getMessagesOptions()
                         ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_EMAIL));

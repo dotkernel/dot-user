@@ -28,12 +28,4 @@ class UserEntityHydrator extends ClassMethods
         $this->addFilter('name', new MethodMatchFilter('getName'), FilterComposite::CONDITION_AND);
         $this->addFilter('roles', new MethodMatchFilter('getRoles'), FilterComposite::CONDITION_AND);
     }
-
-    public function hydrate(array $data, $object)
-    {
-        if(isset($data['password'])) {
-            unset($data['password']);
-        }
-        return parent::hydrate($data, $object);
-    }
 }

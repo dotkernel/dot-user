@@ -258,6 +258,7 @@ class UserController extends AbstractActionController
         /** @var UserEntityInterface $identity */
         $identity = $this->authentication()->getIdentity();
         $user = $this->userService->find([$this->userService->getMapper()->getIdentifierName() => $identity->getId()]);
+        $user->setPassword(null);
 
         //this should never happen, that's why we treat it as exception
         if(!$user instanceof UserEntityInterface) {

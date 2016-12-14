@@ -17,6 +17,7 @@ use Dot\User\Options\UserOptions;
 use Interop\Container\ContainerInterface;
 use Zend\Hydrator\ClassMethods;
 use Zend\Hydrator\HydratorInterface;
+use Zend\ServiceManager\Exception\InvalidServiceException;
 
 /**
  * Class UserDbMapperFactory
@@ -28,6 +29,10 @@ class UserDbMapperFactory
 
     public function __invoke(ContainerInterface $container, $requestedName)
     {
+        if(!class_exists($requestedName)) {
+            throw new InvalidServiceException("Class of type $requestedName could not be found");
+        }
+
         /** @var UserOptions $options */
         $options = $container->get(UserOptions::class);
         $dbAdapter = $container->get($options->getDbOptions()->getDbAdapter());

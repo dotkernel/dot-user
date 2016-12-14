@@ -19,6 +19,7 @@ use Zend\Crypt\Password\PasswordInterface;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
+use Zend\ServiceManager\Exception\InvalidServiceException;
 
 /**
  * Class UserServiceFactory
@@ -36,6 +37,10 @@ class UserServiceFactory
      */
     public function __invoke(ContainerInterface $container, $requestedName)
     {
+        if(!class_exists($requestedName)) {
+            throw new InvalidServiceException("Class of type $requestedName could not be found");
+        }
+
         /** @var UserOptions $options */
         $options = $container->get(UserOptions::class);
         $this->options = $options;

@@ -768,7 +768,6 @@ class UserService extends EntityService implements UserServiceInterface, UserLis
                     $data
                 )
             );
-
         } catch (\Exception $e) {
             error_log("Confirm token generation error: " . $e->getMessage());
 
@@ -822,7 +821,6 @@ class UserService extends EntityService implements UserServiceInterface, UserLis
 
             $this->mapper->commit();
             $this->setAtomicOperations($isAtomic);
-
         } catch (\Exception $e) {
             error_log('Update user error: ' . $e->getMessage());
 

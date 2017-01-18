@@ -121,6 +121,4 @@ class DbOptions extends AbstractOptions
         $this->userRememberTokenTable = $userRememberTokenTable;
         return $this;
     }
-
-
 }

@@ -80,7 +80,7 @@ class UserController extends AbstractActionController
     public function dispatch()
     {
         //set request/response object on user service for each request
-        if($this->userService instanceof HttpMessagesAwareInterface) {
+        if ($this->userService instanceof HttpMessagesAwareInterface) {
             $this->userService->setServerRequest($this->getRequest());
             $this->userService->setResponse($this->getResponse());
         }
@@ -94,8 +94,11 @@ class UserController extends AbstractActionController
     public function confirmAccountAction()
     {
         if (!$this->options->getConfirmAccountOptions()->isEnableAccountConfirmation()) {
-            $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED));
+            $this->addError(
+                $this->options->getMessagesOptions()->getMessage(
+                    MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED
+                )
+            );
 
             return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
         }
@@ -165,13 +168,32 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse($this->template()
-            ->render($this->options->getTemplateOptions()->getChangePasswordTemplate(),
+        return new HtmlResponse(
+            $this->template()->render(
+                $this->options->getTemplateOptions()->getChangePasswordTemplate(),
                 [
                     'form' => $form,
                     'showLabels' => $this->options->isShowFormInputLabels(),
                     'layoutTemplate' => $this->options->getTemplateOptions()->getChangePasswordTemplateLayout()
-                ]));
+                ]
+            )
+        );
+    }
+
+    /**
+     * @param $defaultUri
+     * @param array $queryParams
+     * @return RedirectResponse
+     */
+    protected function redirectTo($defaultUri, $queryParams = [])
+    {
+        if (isset($queryParams['redirect'])) {
+            $uri = new Uri(urldecode($queryParams['redirect']));
+        } else {
+            $uri = $defaultUri;
+        }
+
+        return new RedirectResponse($uri);
     }
 
     /**
@@ -223,8 +245,10 @@ class UserController extends AbstractActionController
                         return $this->autoLoginUser($user, $postData['password']);
                     } else {
                         $this->addSuccess($result->getMessages());
-                        return $this->redirectTo($this->url()->generate(self::LOGIN_ROUTE_NAME),
-                            $request->getQueryParams());
+                        return $this->redirectTo(
+                            $this->url()->generate(self::LOGIN_ROUTE_NAME),
+                            $request->getQueryParams()
+                        );
                     }
                 }
             } else {
@@ -235,13 +259,16 @@ class UserController extends AbstractActionController
         }
 
         return new HtmlResponse(
-            $this->template()->render($this->options->getTemplateOptions()->getRegisterTemplate(),
+            $this->template()->render(
+                $this->options->getTemplateOptions()->getRegisterTemplate(),
                 [
                     'form' => $form,
                     'enableRegistration' => $this->options->getRegisterOptions()->isEnableRegistration(),
                     'showLabels' => $this->options->isShowFormInputLabels(),
                     'layoutTemplate' => $this->options->getTemplateOptions()->getRegisterTemplateLayout()
-                ]));
+                ]
+            )
+        );
     }
 
     /**
@@ -261,7 +288,7 @@ class UserController extends AbstractActionController
         $user->setPassword(null);
 
         //this should never happen, that's why we treat it as exception
-        if(!$user instanceof UserEntityInterface) {
+        if (!$user instanceof UserEntityInterface) {
             throw new RuntimeException('Could not load user entity for identity ID');
         }
 
@@ -320,14 +347,19 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse($this->template()->render(
-            $this->options->getTemplateOptions()->getAccountTemplate(),
-            [
-                'form' => $form,
-                'showLabels' => $this->options->isShowFormInputLabels(),
-                'layoutTemplate' => $this->options->getTemplateOptions()->getAccountTemplateLayout()
-            ]));
+        return new HtmlResponse(
+            $this->template()->render(
+                $this->options->getTemplateOptions()->getAccountTemplate(),
+                [
+                    'form' => $form,
+                    'showLabels' => $this->options->isShowFormInputLabels(),
+                    'layoutTemplate' => $this->options->getTemplateOptions()->getAccountTemplateLayout()
+                ]
+            )
+        );
     }
+
+    /** helpers to add messages into the FlashMessenger */
 
     /**
      * Show the reset password form, validate data
@@ -337,8 +369,11 @@ class UserController extends AbstractActionController
     public function resetPasswordAction()
     {
         if (!$this->options->getPasswordRecoveryOptions()->isEnablePasswordRecovery()) {
-            $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED));
+            $this->addError(
+                $this->options->getMessagesOptions()->getMessage(
+                    MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED
+                )
+            );
 
             return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
         }
@@ -379,8 +414,10 @@ class UserController extends AbstractActionController
                     return new RedirectResponse($request->getUri(), 303);
                 } else {
                     $this->addSuccess($result->getMessages());
-                    return $this->redirectTo($this->url()->generate(self::LOGIN_ROUTE_NAME),
-                        $request->getQueryParams());
+                    return $this->redirectTo(
+                        $this->url()->generate(self::LOGIN_ROUTE_NAME),
+                        $request->getQueryParams()
+                    );
                 }
             } else {
                 $messages = $this->getFormMessages($form->getMessages());
@@ -389,13 +426,16 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse($this->template()->render(
-            $this->options->getTemplateOptions()->getResetPasswordTemplate(),
-            [
-                'form' => $form,
-                'showLabels' => $this->options->isShowFormInputLabels(),
-                'layoutTemplate' => $this->options->getTemplateOptions()->getResetPasswordTemplateLayout()
-            ]));
+        return new HtmlResponse(
+            $this->template()->render(
+                $this->options->getTemplateOptions()->getResetPasswordTemplate(),
+                [
+                    'form' => $form,
+                    'showLabels' => $this->options->isShowFormInputLabels(),
+                    'layoutTemplate' => $this->options->getTemplateOptions()->getResetPasswordTemplateLayout()
+                ]
+            )
+        );
     }
 
     /**
@@ -404,8 +444,11 @@ class UserController extends AbstractActionController
     public function forgotPasswordAction()
     {
         if (!$this->options->getPasswordRecoveryOptions()->isEnablePasswordRecovery()) {
-            $this->addError($this->options->getMessagesOptions()->getMessage(
-                MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED));
+            $this->addError(
+                $this->options->getMessagesOptions()->getMessage(
+                    MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED
+                )
+            );
 
             return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
         }
@@ -438,8 +481,10 @@ class UserController extends AbstractActionController
                 $result = $this->userService->generateResetToken($email);
                 if ($result->isValid()) {
                     $this->addInfo($result->getMessages());
-                    return $this->redirectTo($this->url()->generate(self::LOGIN_ROUTE_NAME),
-                        $request->getQueryParams());
+                    return $this->redirectTo(
+                        $this->url()->generate(self::LOGIN_ROUTE_NAME),
+                        $request->getQueryParams()
+                    );
                 } else {
                     $this->addError($result->getMessages());
                     return new RedirectResponse($request->getUri(), 303);
@@ -451,13 +496,16 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse($this->template()->render(
-            $this->options->getTemplateOptions()->getForgotPasswordTemplate(),
-            [
-                'form' => $form,
-                'showLabels' => false,
-                'layoutTemplate' => $this->options->getTemplateOptions()->getForgotPasswordTemplateLayout()
-            ]));
+        return new HtmlResponse(
+            $this->template()->render(
+                $this->options->getTemplateOptions()->getForgotPasswordTemplate(),
+                [
+                    'form' => $form,
+                    'showLabels' => false,
+                    'layoutTemplate' => $this->options->getTemplateOptions()->getForgotPasswordTemplateLayout()
+                ]
+            )
+        );
     }
 
     /**
@@ -497,24 +545,6 @@ class UserController extends AbstractActionController
     }
 
     /**
-     * @param $defaultUri
-     * @param array $queryParams
-     * @return RedirectResponse
-     */
-    protected function redirectTo($defaultUri, $queryParams = [])
-    {
-        if (isset($queryParams['redirect'])) {
-            $uri = new Uri(urldecode($queryParams['redirect']));
-        } else {
-            $uri = $defaultUri;
-        }
-
-        return new RedirectResponse($uri);
-    }
-
-    /** helpers to add messages into the FlashMessenger */
-
-    /**
      * @param array|string $messages
      */
     public function addError($messages)
@@ -522,6 +552,17 @@ class UserController extends AbstractActionController
         $messages = (array)$messages;
         foreach ($messages as $message) {
             $this->flashMessenger()->addError($message);
+        }
+    }
+
+    /**
+     * @param array|string $messages
+     */
+    public function addSuccess($messages)
+    {
+        $messages = (array)$messages;
+        foreach ($messages as $message) {
+            $this->flashMessenger()->addSuccess($message);
         }
     }
 
@@ -546,16 +587,4 @@ class UserController extends AbstractActionController
             $this->flashMessenger()->addWarning($message);
         }
     }
-
-    /**
-     * @param array|string $messages
-     */
-    public function addSuccess($messages)
-    {
-        $messages = (array)$messages;
-        foreach ($messages as $message) {
-            $this->flashMessenger()->addSuccess($message);
-        }
-    }
-
 }

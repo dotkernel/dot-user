@@ -112,19 +112,31 @@ return [
         ],
 
         //overwrite default templates
-        'template_options' => [
+        /*'template_options' => [
             'login_template' => '',
+
+            'login_layout' => '',
 
             'register_template' => '',
 
+            'register_layout' => '',
+
             'account_template' => '',
+
+            'account_layout' => '',
 
             'change_password_template' => '',
 
+            'change_password_layout' => '',
+
             'forgot_password_template' => '',
 
+            'forgot_password_layout' => '',
+
             'reset_password_template' => '',
-        ],
+
+            'reset_password_layout' => '',
+        ],*/
 
         //default user event listeners
         'user_event_listeners' => [

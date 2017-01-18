@@ -12,6 +12,7 @@ namespace Dot\User\Form;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Zend\EventManager\EventManagerAwareTrait;
+use Zend\Form\ElementInterface;
 use Zend\Form\Fieldset;
 use Zend\Form\FieldsetInterface;
 use Zend\Form\Form;
@@ -31,9 +32,13 @@ class UserForm extends Form
     /** @var  Fieldset */
     protected $userFieldset;
 
-    /** @var array  */
+    /** @var array */
     protected $currentValidationGroup = [
-        'id' => true, 'username' => true, 'email' => true, 'password' => true, 'passwordVerify' => true
+        'id' => true,
+        'username' => true,
+        'email' => true,
+        'password' => true,
+        'passwordVerify' => true
     ];
 
     /**
@@ -45,8 +50,8 @@ class UserForm extends Form
     public function __construct(
         UserOptions $userOptions,
         Fieldset $userFieldset,
-        array $options = [])
-    {
+        array $options = []
+    ) {
         $this->userOptions = $userOptions;
         $this->userFieldset = $userFieldset;
         parent::__construct('user_form', $options);
@@ -65,7 +70,8 @@ class UserForm extends Form
             'options' => [
                 'csrf_options' => [
                     'timeout' => $this->userOptions->getFormCsrfTimeout(),
-                    'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
+                    'message' => $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
                 ]
             ]
         ]);
@@ -83,6 +89,14 @@ class UserForm extends Form
     }
 
     /**
+     * @return array
+     */
+    public function getCurrentValidationGroup()
+    {
+        return $this->currentValidationGroup;
+    }
+
+    /**
      * @param array $currentValidationGroup
      * @return $this
      */
@@ -93,23 +107,24 @@ class UserForm extends Form
     }
 
     /**
-     * @return array
+     * Remove username validation
      */
-    public function getCurrentValidationGroup()
-    {
-        return $this->currentValidationGroup;
-    }
-
     public function removeUsernameValidation()
     {
         $this->currentValidationGroup['username'] = false;
     }
 
+    /**
+     * Remove email validation
+     */
     public function removeEmailValidation()
     {
         $this->currentValidationGroup['email'] = false;
     }
 
+    /**
+     * Reset validation group to default
+     */
     public function resetValidationGroup()
     {
         foreach ($this->currentValidationGroup as $key => $value) {
@@ -118,22 +133,29 @@ class UserForm extends Form
         $this->setValidationGroup(FormInterface::VALIDATE_ALL);
     }
 
+    /**
+     * Apply validation group
+     */
     public function applyValidationGroup()
     {
         $validationGroup = $this->getActiveValidationGroup($this->currentValidationGroup, $this->getBaseFieldset());
         $this->setValidationGroup(['user' => $validationGroup]);
     }
 
-    public function getActiveValidationGroup($groups, FieldsetInterface $prevElement)
+    /**
+     * @param $groups
+     * @param ElementInterface $prevElement
+     * @return array
+     */
+    public function getActiveValidationGroup($groups, ElementInterface $prevElement)
     {
         $validationGroup = [];
         foreach ($groups as $key => $value) {
-            if(is_array($value)) {
-                if($prevElement->has($key)) {
+            if (is_array($value) && $prevElement instanceof FieldsetInterface) {
+                if ($prevElement->has($key)) {
                     $validationGroup[$key] = $this->getActiveValidationGroup($value, $prevElement->get($key));
                 }
-            }
-            elseif($value === true && $prevElement->has($key)) {
+            } elseif ($value === true && $prevElement->has($key)) {
                 $validationGroup[] = $key;
             }
         }

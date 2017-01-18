@@ -11,7 +11,6 @@ namespace Dot\User\Mapper;
 
 use Dot\Ems\Mapper\MapperInterface;
 
-
 /**
  * Interface UserMapperInterface
  * @package Dot\User\Mapper

@@ -37,7 +37,7 @@ use Zend\Math\Rand;
  * Class UserService
  * @package Dot\User\Service
  */
-class UserService extends EntityService  implements UserServiceInterface, UserListenerAwareInterface, HttpMessagesAwareInterface
+class UserService extends EntityService implements UserServiceInterface, UserListenerAwareInterface, HttpMessagesAwareInterface
 {
     use UserListenerAwareTrait;
 
@@ -73,8 +73,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
         UserMapperInterface $mapper,
         UserOptions $options,
         PasswordInterface $password,
-        AuthenticationInterface $authentication)
-    {
+        AuthenticationInterface $authentication
+    ) {
         parent::__construct($mapper);
         $this->options = $options;
         $this->passwordService = $password;
@@ -123,7 +123,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
                 RememberTokenEvent::EVENT_TOKEN_GENERATE_POST,
-                $user, $data
+                $user,
+                $data
             ));
         } catch (\Exception $e) {
             error_log("Remember token generate error: " . $e->getMessage());
@@ -134,11 +135,96 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
                 RememberTokenEvent::EVENT_TOKEN_GENERATE_ERROR,
-                $user, $data, $result
+                $user,
+                $data,
+                $result
             ));
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $name
+     * @param UserEntityInterface|null $user
+     * @param null $data
+     * @param ResultInterface|null $result
+     * @return RememberTokenEvent
+     */
+    protected function createRememberTokenEvent(
+        $name = RememberTokenEvent::EVENT_TOKEN_GENERATE_PRE,
+        UserEntityInterface $user = null,
+        $data = null,
+        ResultInterface $result = null
+    ) {
+        $event = new RememberTokenEvent($this, $name, $user, $result);
+        if ($data) {
+            $event->setData($data);
+        }
+
+        return $this->setupEventPsr7Messages($event);
+    }
+
+    /**
+     * @param Event $event
+     * @return Event
+     */
+    protected function setupEventPsr7Messages(Event $event)
+    {
+        if ($this->request) {
+            $event->setRequest($this->request);
+        }
+        if ($this->response) {
+            $event->setResponse($this->response);
+        }
+
+        return $event;
+    }
+
+    /**
+     * @param \Exception $e
+     * @param null $messages
+     * @param UserEntityInterface|null $user
+     * @return UserOperationResult
+     */
+    protected function createUserOperationResultWithException(
+        \Exception $e,
+        $messages = null,
+        UserEntityInterface $user = null
+    ) {
+        if ($this->isDebug()) {
+            $result = new UserOperationResult(false, $e->getMessage(), $e);
+        } else {
+            if ($messages) {
+                $result = new UserOperationResult(false, $messages, $e);
+            } else {
+                $result = new UserOperationResult(false, $e->getMessage(), $e);
+            }
+        }
+
+        if ($user) {
+            $result->setUser($user);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDebug()
+    {
+        return $this->debug;
+    }
+
+    /**
+     * @param boolean $debug
+     * @return UserService
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+        return $this;
     }
 
     /**
@@ -207,13 +293,14 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
                 RememberTokenEvent::EVENT_TOKEN_REMOVE_ERROR,
-                $user, null, $result
+                $user,
+                null,
+                $result
             ));
         }
 
         return $result;
     }
-
 
     /**
      * Change user status from unconfirmed to active based on an email and valid confirmation token
@@ -248,7 +335,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
                         //trigger pre event
                         $this->getEventManager()->triggerEvent(
-                            $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_PRE, $user));
+                            $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_PRE, $user)
+                        );
 
                         $user->setStatus($this->options->getConfirmAccountOptions()->getActiveUserStatus());
                         $this->save($user);
@@ -259,7 +347,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
                         //post confirm event
                         $this->getEventManager()->triggerEvent(
-                            $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_POST, $user));
+                            $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_POST, $user)
+                        );
                     } else {
                         $result = $this->createUserOperationResultWithMessages(
                             $this->options->getMessagesOptions()
@@ -282,13 +371,50 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             //trigger error event
             $this->getEventManager()->triggerEvent(
-                $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_ERROR, $user, $result));
+                $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_ERROR, $user, $result)
+            );
 
             $this->mapper->rollback();
             return $result;
         }
 
         return $result;
+    }
+
+    /**
+     * @param $messages
+     * @param UserEntityInterface|null $user
+     * @return UserOperationResult
+     */
+    protected function createUserOperationResultWithMessages($messages, UserEntityInterface $user = null)
+    {
+        $result = new UserOperationResult(false, $messages);
+        if ($user) {
+            $result->setUser($user);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $name
+     * @param UserEntityInterface|null $user
+     * @param ResultInterface|null $result
+     * @param mixed $data
+     * @return ConfirmAccountEvent
+     */
+    protected function createConfirmAccountEvent(
+        $name = ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_PRE,
+        UserEntityInterface $user = null,
+        $data = null,
+        ResultInterface $result = null
+    ) {
+        $event = new ConfirmAccountEvent($this, $name, $user, $result);
+        if ($data) {
+            $event->setData($data);
+        }
+
+        return $this->setupEventPsr7Messages($event);
     }
 
     /**
@@ -323,7 +449,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                         PasswordResetEvent::EVENT_PASSWORD_RESET_TOKEN_PRE,
                         $user,
                         $data
-                    ));
+                    )
+                );
 
                 $this->mapper->saveResetToken((array)$data);
 
@@ -343,12 +470,35 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             $this->getEventManager()->triggerEvent(
                 $this->createPasswordResetEvent(
                     PasswordResetEvent::EVENT_PASSWORD_RESET_TOKEN_ERROR,
-                    $user, $data, $result
+                    $user,
+                    $data,
+                    $result
                 )
             );
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $name
+     * @param UserEntityInterface|null $user
+     * @param mixed $data
+     * @param ResultInterface|null $result
+     * @return PasswordResetEvent
+     */
+    protected function createPasswordResetEvent(
+        $name = PasswordResetEvent::EVENT_PASSWORD_RESET_PRE,
+        UserEntityInterface $user = null,
+        $data = null,
+        ResultInterface $result = null
+    ) {
+        $event = new PasswordResetEvent($this, $name, $user, $result);
+        if ($data) {
+            $event->setData($data);
+        }
+
+        return $this->setupEventPsr7Messages($event);
     }
 
     /**
@@ -367,7 +517,6 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
         if (empty($email) || empty($token)) {
             $result = $this->createUserOperationResultWithMessages($this->options->getMessagesOptions()
                 ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_MISSING_PARAMS));
-
         } else {
             try {
                 /** @var UserEntityInterface $user */
@@ -399,12 +548,14 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                         } else {
                             $result = $this->createUserOperationResultWithMessages(
                                 $this->options->getMessagesOptions()
-                                    ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_TOKEN_EXPIRED));
+                                    ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_TOKEN_EXPIRED)
+                            );
                         }
                     } else {
                         $result = $this->createUserOperationResultWithMessages(
                             $this->options->getMessagesOptions()
-                                ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_TOKEN));
+                                ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_TOKEN)
+                        );
                     }
                 }
             } catch (\Exception $e) {
@@ -417,7 +568,9 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                 $this->getEventManager()->triggerEvent(
                     $this->createPasswordResetEvent(
                         PasswordResetEvent::EVENT_PASSWORD_RESET_ERROR,
-                        $user, null, $result
+                        $user,
+                        null,
+                        $result
                     )
                 );
             }
@@ -443,7 +596,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
         if (!$currentUser) {
             return $this->createUserOperationResultWithMessages(
                 $this->options->getMessagesOptions()
-                    ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_USER));
+                    ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_USER)
+            );
         }
 
         try {
@@ -452,18 +606,21 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                 $currentUser->setPassword($this->passwordService->create($newPassword));
 
                 $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
-                    ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE, $currentUser
+                    ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE,
+                    $currentUser
                 ));
 
                 $this->save($currentUser);
 
                 $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
-                    ChangePasswordEvent::EVENT_CHANGE_PASSWORD_POST, $currentUser
+                    ChangePasswordEvent::EVENT_CHANGE_PASSWORD_POST,
+                    $currentUser
                 ));
             } else {
                 $result = $this->createUserOperationResultWithMessages(
                     $this->options->getMessagesOptions()
-                        ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_CURRENT_PASSWORD));
+                        ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_CURRENT_PASSWORD)
+                );
             }
         } catch (\Exception $e) {
             error_log("Change password error: " . $e->getMessage());
@@ -474,13 +631,28 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
                 ChangePasswordEvent::EVENT_CHANGE_PASSWORD_ERROR,
-                $currentUser, $result
+                $currentUser,
+                $result
             ));
         }
 
         return $result;
     }
 
+    /**
+     * @param string $name
+     * @param UserEntityInterface|null $user
+     * @param ResultInterface|null $result
+     * @return Event
+     */
+    protected function createChangePasswordEvent(
+        $name = ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE,
+        UserEntityInterface $user = null,
+        ResultInterface $result = null
+    ) {
+        $event = new ChangePasswordEvent($this, $name, $user, $result);
+        return $this->setupEventPsr7Messages($event);
+    }
 
     /**
      * Store a new user into the db, after it validates the data
@@ -507,7 +679,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             //trigger pre register event
             $this->getEventManager()->triggerEvent(
-                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_PRE, $user));
+                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_PRE, $user)
+            );
 
             $this->save($user);
 
@@ -526,11 +699,11 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             //trigger post register event
             $this->getEventManager()->triggerEvent(
-                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_POST, $user));
+                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_POST, $user)
+            );
 
             $this->mapper->commit();
             $this->setAtomicOperations($isAtomic);
-
         } catch (\Exception $e) {
             error_log("Register error: " . $e->getMessage());
 
@@ -540,13 +713,29 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
 
             //trigger error event
             $this->getEventManager()->triggerEvent(
-                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_ERROR, $user, $result));
+                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_ERROR, $user, $result)
+            );
 
             $this->mapper->rollback();
             $this->setAtomicOperations($isAtomic);
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $name
+     * @param UserEntityInterface|null $user
+     * @param ResultInterface|null $result
+     * @return RegisterEvent
+     */
+    protected function createRegisterEvent(
+        $name = RegisterEvent::EVENT_REGISTER_PRE,
+        UserEntityInterface $user = null,
+        ResultInterface $result = null
+    ) {
+        $event = new RegisterEvent($this, $name, $user, $result);
+        return $this->setupEventPsr7Messages($event);
     }
 
     /**
@@ -567,7 +756,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                     ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_TOKEN_PRE,
                     $user,
                     $data
-                ));
+                )
+            );
 
             $this->mapper->saveConfirmToken((array)$data);
 
@@ -576,7 +766,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                     ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_TOKEN_POST,
                     $user,
                     $data
-                ));
+                )
+            );
 
         } catch (\Exception $e) {
             error_log("Confirm token generation error: " . $e->getMessage());
@@ -586,7 +777,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
                     ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_TOKEN_ERROR,
                     $user,
                     $data
-                ));
+                )
+            );
 
             throw $e;
         }
@@ -605,7 +797,7 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
         try {
             $identity = $this->authentication->getIdentity();
             //last check if identity ID and the user ID to be updated are matching
-            if($user->getId() !== $identity->getId()) {
+            if ($user->getId() !== $identity->getId()) {
                 //trying to update a different account?...
                 throw new RuntimeException('Identity ID and user ID do not match.');
             }
@@ -614,9 +806,10 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             $this->mapper->beginTransaction();
 
             $this->getEventManager()->triggerEvent(
-                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_PRE, $user));
+                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_PRE, $user)
+            );
 
-            if(!empty($user->getPassword())) {
+            if (!empty($user->getPassword())) {
                 $user->setPassword($this->passwordService->create($user->getPassword()));
             }
             $this->save($user);
@@ -624,7 +817,8 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             $result->setUser($user);
 
             $this->getEventManager()->triggerEvent(
-                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_POST, $user));
+                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_POST, $user)
+            );
 
             $this->mapper->commit();
             $this->setAtomicOperations($isAtomic);
@@ -635,17 +829,32 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
             $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
                 ->getMessage(MessagesOptions::MESSAGE_ACCOUNT_UPDATE_ERROR);
 
-            $result = $this->createUserOperationResultWithException(
-                $e, $message, $user);
+            $result = $this->createUserOperationResultWithException($e, $message, $user);
 
             $this->getEventManager()->triggerEvent(
-                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_ERROR, $user, $result));
+                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_ERROR, $user, $result)
+            );
 
             $this->mapper->rollback();
             $this->setAtomicOperations($isAtomic);
         }
 
         return $result;
+    }
+
+    /**
+     * @param $name
+     * @param UserEntityInterface|null $user
+     * @param ResultInterface|null $result
+     * @return Event
+     */
+    protected function createUpdateEvent(
+        $name = UserUpdateEvent::EVENT_UPDATE_PRE,
+        UserEntityInterface $user = null,
+        ResultInterface $result = null
+    ) {
+        $event = new UserUpdateEvent($this, $name, $user, $result);
+        return $this->setupEventPsr7Messages($event);
     }
 
     /**
@@ -700,191 +909,5 @@ class UserService extends EntityService  implements UserServiceInterface, UserLi
     {
         $this->response = $response;
         return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isDebug()
-    {
-        return $this->debug;
-    }
-
-    /**
-     * @param boolean $debug
-     * @return UserService
-     */
-    public function setDebug($debug)
-    {
-        $this->debug = $debug;
-        return $this;
-    }
-
-
-    /**
-     * @param $messages
-     * @param UserEntityInterface|null $user
-     * @return UserOperationResult
-     */
-    protected function createUserOperationResultWithMessages($messages, UserEntityInterface $user = null)
-    {
-        $result = new UserOperationResult(false, $messages);
-        if ($user) {
-            $result->setUser($user);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param \Exception $e
-     * @param null $messages
-     * @param UserEntityInterface|null $user
-     * @return UserOperationResult
-     */
-    protected function createUserOperationResultWithException(
-        \Exception $e,
-        $messages = null,
-        UserEntityInterface $user = null
-    ) {
-        if ($this->isDebug()) {
-            $result = new UserOperationResult(false, $e->getMessage(), $e);
-        } else {
-            if ($messages) {
-                $result = new UserOperationResult(false, $messages, $e);
-            } else {
-                $result = new UserOperationResult(false, $e->getMessage(), $e);
-            }
-        }
-
-        if ($user) {
-            $result->setUser($user);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param Event $event
-     * @return Event
-     */
-    protected function setupEventPsr7Messages(Event $event)
-    {
-        if ($this->request) {
-            $event->setRequest($this->request);
-        }
-        if ($this->response) {
-            $event->setResponse($this->response);
-        }
-
-        return $event;
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param ResultInterface|null $result
-     * @param mixed $data
-     * @return ConfirmAccountEvent
-     */
-    protected function createConfirmAccountEvent(
-        $name = ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_PRE,
-        UserEntityInterface $user = null,
-        $data = null,
-        ResultInterface $result = null
-    ) {
-        $event = new ConfirmAccountEvent($this, $name, $user, $result);
-        if ($data) {
-            $event->setData($data);
-        }
-
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param ResultInterface|null $result
-     * @return RegisterEvent
-     */
-    protected function createRegisterEvent(
-        $name = RegisterEvent::EVENT_REGISTER_PRE,
-        UserEntityInterface $user = null,
-        ResultInterface $result = null
-    ) {
-        $event = new RegisterEvent($this, $name, $user, $result);
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param mixed $data
-     * @param ResultInterface|null $result
-     * @return PasswordResetEvent
-     */
-    protected function createPasswordResetEvent(
-        $name = PasswordResetEvent::EVENT_PASSWORD_RESET_PRE,
-        UserEntityInterface $user = null,
-        $data = null,
-        ResultInterface $result = null
-    ) {
-        $event = new PasswordResetEvent($this, $name, $user, $result);
-        if ($data) {
-            $event->setData($data);
-        }
-
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param null $data
-     * @param ResultInterface|null $result
-     * @return RememberTokenEvent
-     */
-    protected function createRememberTokenEvent(
-        $name = RememberTokenEvent::EVENT_TOKEN_GENERATE_PRE,
-        UserEntityInterface $user = null,
-        $data = null,
-        ResultInterface $result = null
-    ) {
-        $event = new RememberTokenEvent($this, $name, $user, $result);
-        if ($data) {
-            $event->setData($data);
-        }
-
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param ResultInterface|null $result
-     * @return Event
-     */
-    protected function createChangePasswordEvent(
-        $name = ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE,
-        UserEntityInterface $user = null,
-        ResultInterface $result = null
-    ) {
-        $event = new ChangePasswordEvent($this, $name, $user, $result);
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @param $name
-     * @param UserEntityInterface|null $user
-     * @param ResultInterface|null $result
-     * @return Event
-     */
-    protected function createUpdateEvent(
-        $name = UserUpdateEvent::EVENT_UPDATE_PRE,
-        UserEntityInterface $user = null,
-        ResultInterface $result = null
-    ) {
-        $event = new UserUpdateEvent($this, $name, $user, $result);
-        return $this->setupEventPsr7Messages($event);
     }
 }

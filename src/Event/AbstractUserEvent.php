@@ -102,6 +102,4 @@ abstract class AbstractUserEvent extends Event
         $this->result = $result;
         return $this;
     }
-
-
 }

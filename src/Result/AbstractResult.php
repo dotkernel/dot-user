@@ -70,6 +70,4 @@ abstract class AbstractResult implements ResultInterface
     {
         return $this->exception;
     }
-
-
 }

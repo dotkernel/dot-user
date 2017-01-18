@@ -37,7 +37,10 @@ use Zend\Math\Rand;
  * Class UserService
  * @package Dot\User\Service
  */
-class UserService extends EntityService implements UserServiceInterface, UserListenerAwareInterface, HttpMessagesAwareInterface
+class UserService extends EntityService implements
+    UserServiceInterface,
+    UserListenerAwareInterface,
+    HttpMessagesAwareInterface
 {
     use UserListenerAwareTrait;
 

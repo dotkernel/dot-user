@@ -41,7 +41,6 @@ abstract class AbstractUserEvent extends Event
         $name,
         UserEntityInterface $user = null,
         ResultInterface $result = null
-
     ) {
         $this->userService = $userService;
         $this->user = $user;

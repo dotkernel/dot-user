@@ -58,5 +58,4 @@ class ConfirmAccountOptions extends AbstractOptions
         $this->activeUserStatus = $activeUserStatus;
         return $this;
     }
-
 }

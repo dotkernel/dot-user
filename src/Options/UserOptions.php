@@ -277,7 +277,9 @@ class UserOptions extends AbstractOptions
             throw new InvalidArgumentException(sprintf(
                 'PasswordRecoveryOptions should be an array or an %s object. %s provided.',
                 PasswordRecoveryOptions::class,
-                is_object($passwordRecoveryOptions) ? get_class($passwordRecoveryOptions) : gettype($passwordRecoveryOptions)
+                is_object($passwordRecoveryOptions)
+                    ? get_class($passwordRecoveryOptions)
+                    : gettype($passwordRecoveryOptions)
             ));
         }
         return $this;
@@ -413,5 +415,4 @@ class UserOptions extends AbstractOptions
         $this->formCsrfTimeout = $formCsrfTimeout;
         return $this;
     }
-
 }

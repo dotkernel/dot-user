@@ -142,6 +142,4 @@ class LoginOptions extends AbstractOptions
         $this->rememberMeCookieSecure = $rememberMeCookieSecure;
         return $this;
     }
-
-
 }

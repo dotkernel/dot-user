@@ -149,5 +149,4 @@ class RegisterOptions extends AbstractOptions
         $this->loginAfterRegistration = $loginAfterRegistration;
         return $this;
     }
-
 }

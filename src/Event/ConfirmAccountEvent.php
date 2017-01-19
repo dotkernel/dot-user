@@ -43,6 +43,4 @@ class ConfirmAccountEvent extends AbstractUserEvent
         $this->data = $data;
         return $this;
     }
-
-
 }

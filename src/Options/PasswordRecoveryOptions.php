@@ -58,5 +58,4 @@ class PasswordRecoveryOptions extends AbstractOptions
         $this->resetPasswordTokenTimeout = $resetPasswordTokenTimeout;
         return $this;
     }
-
 }

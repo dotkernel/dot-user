@@ -18,5 +18,4 @@ class RegisterEvent extends AbstractUserEvent
     const EVENT_REGISTER_PRE = 'event.user.register.pre';
     const EVENT_REGISTER_POST = 'event.user.register.post';
     const EVENT_REGISTER_ERROR = 'event.user.register.error';
-
 }

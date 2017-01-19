@@ -41,6 +41,13 @@ class AuthenticationListener extends AbstractListenerAggregate
     /** @var  UserOptions */
     protected $options;
 
+    /**
+     * AuthenticationListener constructor.
+     * @param Form $form
+     * @param FlashMessengerInterface $flashMessenger
+     * @param UserServiceInterface $userService
+     * @param UserOptions $options
+     */
     public function __construct(
         Form $form,
         FlashMessengerInterface $flashMessenger,
@@ -67,13 +74,15 @@ class AuthenticationListener extends AbstractListenerAggregate
             LoginAction::class,
             AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
             [$this, 'injectData'],
-            500);
+            500
+        );
 
         $this->listeners[] = $sharedEvents->attach(
             LoginAction::class,
             AuthenticationEvent::EVENT_AUTHENTICATION_AUTHENTICATE,
             [$this, 'preAuthentication'],
-            400);
+            400
+        );
 
         $this->listeners[] = $sharedEvents->attach(
             LoginAction::class,
@@ -170,7 +179,9 @@ class AuthenticationListener extends AbstractListenerAggregate
                 $user = $result->getIdentity();
                 if (!$user instanceof UserEntityInterface) {
                     /** @var UserEntityInterface $user */
-                    $user = $this->userService->find([$this->userService->getMapper()->getIdentifierName() => $user->getId()]);
+                    $user = $this->userService->find(
+                        [$this->userService->getMapper()->getIdentifierName() => $user->getId()]
+                    );
                 }
 
                 //validate account status
@@ -205,6 +216,9 @@ class AuthenticationListener extends AbstractListenerAggregate
         }
     }
 
+    /**
+     * @param AuthenticationEvent $e
+     */
     public function onLogout(AuthenticationEvent $e)
     {
         //clear any remember tokens for this user

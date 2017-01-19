@@ -181,5 +181,4 @@ class UserInputFilter extends InputFilter
             ],
         ]);
     }
-
 }

@@ -203,6 +203,4 @@ class UserEntity implements
     {
         return ['roles', 'name', 'dateCreated'];
     }
-
-
 }

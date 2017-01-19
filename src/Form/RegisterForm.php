@@ -109,6 +109,4 @@ class RegisterForm extends Form
         $this->captcha = $captcha;
         return $this;
     }
-
-
 }

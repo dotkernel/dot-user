@@ -29,7 +29,7 @@ class UserDbMapperFactory
 
     public function __invoke(ContainerInterface $container, $requestedName)
     {
-        if(!class_exists($requestedName)) {
+        if (!class_exists($requestedName)) {
             throw new InvalidServiceException("Class of type $requestedName could not be found");
         }
 
@@ -38,12 +38,12 @@ class UserDbMapperFactory
         $dbAdapter = $container->get($options->getDbOptions()->getDbAdapter());
 
         $prototype = $this->getDependencyObject($container, $options->getUserEntity());
-        if(!$prototype instanceof UserEntityInterface) {
+        if (!$prototype instanceof UserEntityInterface) {
             throw new RuntimeException('User entity prototype not valid');
         }
 
         $hydrator = $this->getDependencyObject($container, $options->getUserEntityHydrator());
-        if(!$hydrator instanceof HydratorInterface) {
+        if (!$hydrator instanceof HydratorInterface) {
             $hydrator = new ClassMethods(false);
         }
 
@@ -58,5 +58,4 @@ class UserDbMapperFactory
 
         return $mapper;
     }
-
 }

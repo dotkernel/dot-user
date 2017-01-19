@@ -37,7 +37,7 @@ class UserServiceFactory
      */
     public function __invoke(ContainerInterface $container, $requestedName)
     {
-        if(!class_exists($requestedName)) {
+        if (!class_exists($requestedName)) {
             throw new InvalidServiceException("Class of type $requestedName could not be found");
         }
 
@@ -85,7 +85,7 @@ class UserServiceFactory
 
             if (!$listener instanceof AbstractListenerAggregate) {
                 throw new InvalidArgumentException(sprintf(
-                    'Provided mail listener of type "%s" is not valid. Expected string or %s',
+                    'Provided user service listener of type "%s" is not valid. Expected string or %s',
                     is_object($listener) ? get_class($listener) : gettype($listener),
                     AbstractListenerAggregate::class
                 ));
@@ -94,5 +94,4 @@ class UserServiceFactory
             $service->attachUserListener($listener);
         }
     }
-
 }

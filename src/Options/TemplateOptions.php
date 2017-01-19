@@ -20,36 +20,37 @@ class TemplateOptions extends AbstractOptions
     /** @var string */
     protected $loginTemplate = 'dot-user::login';
 
+    /** @var string  */
     protected $loginTemplateLayout = '@layout/default.html.twig';
 
     /** @var string */
     protected $registerTemplate = 'dot-user::register';
 
-    /** @var string  */
+    /** @var string */
     protected $registerTemplateLayout = '@layout/default.html.twig';
 
-    /** @var string  */
+    /** @var string */
     protected $accountTemplate = 'dot-user::account';
 
-    /** @var string  */
+    /** @var string */
     protected $accountTemplateLayout = '@layout/default.html.twig';
 
     /** @var string */
     protected $changePasswordTemplate = 'dot-user::change-password';
 
-    /** @var string  */
+    /** @var string */
     protected $changePasswordTemplateLayout = '@layout/default.html.twig';
 
     /** @var string */
     protected $forgotPasswordTemplate = 'dot-user::forgot-password';
 
-    /** @var string  */
+    /** @var string */
     protected $forgotPasswordTemplateLayout = '@layout/default.html.twig';
 
     /** @var string */
     protected $resetPasswordTemplate = 'dot-user::reset-password';
 
-    /** @var string  */
+    /** @var string */
     protected $resetPasswordTemplateLayout = '@layout/default.html.twig';
 
     protected $__strictMode__ = false;
@@ -269,5 +270,4 @@ class TemplateOptions extends AbstractOptions
         $this->resetPasswordTemplateLayout = $resetPasswordTemplateLayout;
         return $this;
     }
-
 }

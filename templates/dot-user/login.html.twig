@@ -19,8 +19,8 @@
     {{ form().closeTag() | raw }}
 
     {% if passwordRecoveryEnabled is defined and passwordRecoveryEnabled %}
-    <div style="margin-top: 5px;">
-        <a href="{{ path('user', {'action':'forgot-password'}) }}" >Forgot Password?</a>
-    </div>
+        <div style="margin-top: 5px;">
+            <a href="{{ path('user', {'action':'forgot-password'}) }}">Forgot Password?</a>
+        </div>
     {% endif %}
 {% endblock %}

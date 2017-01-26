@@ -9,10 +9,10 @@
 
 namespace Dot\User\Factory\InputFilter;
 
-use Dot\Ems\Validator\NoRecordsExists;
 use Dot\User\Form\InputFilter\UserInputFilter;
 use Dot\User\Options\UserOptions;
 use Interop\Container\ContainerInterface;
+use Dot\Validator\Ems\NoRecordExists;
 
 /**
  * Class UserInputFilterFactory
@@ -25,11 +25,11 @@ class UserInputFilterFactory
         $service = $container->get('UserService');
         $inputFilter = new UserInputFilter(
             $container->get(UserOptions::class),
-            new NoRecordsExists([
+            new NoRecordExists([
                 'service' => $service,
                 'key' => 'email'
             ]),
-            new NoRecordsExists([
+            new NoRecordExists([
                 'service' => $service,
                 'key' => 'username'
             ])

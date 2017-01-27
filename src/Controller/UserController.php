@@ -130,8 +130,8 @@ class UserController extends AbstractActionController
         /** @var Form $form */
         $form = $this->formManager->get(ChangePasswordForm::class);
 
-        $data = $this->flashMessenger()->getData('changePasswordFormData') ?: [];
-        $formMessages = $this->flashMessenger()->getData('changePasswordFormMessages') ?: [];
+        $data = $this->messages()->getData('changePasswordFormData') ?: [];
+        $formMessages = $this->messages()->getData('changePasswordFormMessages') ?: [];
 
         //add session form data from previous request(PRG form)
         $form->setData($data);
@@ -145,8 +145,8 @@ class UserController extends AbstractActionController
             $data = $form->getData();
 
             //as we use PRG forms, store form data in session for next page display
-            $this->flashMessenger()->addData('changePasswordFormData', $data);
-            $this->flashMessenger()->addData('changePasswordFormMessages', $form->getMessages());
+            $this->messages()->addData('changePasswordFormData', $data);
+            $this->messages()->addData('changePasswordFormMessages', $form->getMessages());
 
             if ($isValid) {
                 $oldPassword = $data['password'];
@@ -213,8 +213,8 @@ class UserController extends AbstractActionController
         /** @var RegisterForm $form */
         $form = $this->formManager->get(RegisterForm::class);
 
-        $data = $this->flashMessenger()->getData('registerFormData') ?: [];
-        $formMessages = $this->flashMessenger()->getData('registerFormMessages') ?: [];
+        $data = $this->messages()->getData('registerFormData') ?: [];
+        $formMessages = $this->messages()->getData('registerFormMessages') ?: [];
 
         //add session form data from previous request(PRG form)
         $form->setData($data);
@@ -230,8 +230,8 @@ class UserController extends AbstractActionController
             $data = $form->getData();
 
             //as we use PRG forms, store form data in session for next page display
-            $this->flashMessenger()->addData('registerFormData', $postData);
-            $this->flashMessenger()->addData('registerFormMessages', $form->getMessages());
+            $this->messages()->addData('registerFormData', $postData);
+            $this->messages()->addData('registerFormMessages', $form->getMessages());
 
             if ($isValid) {
                 /** @var UserOperationResult $result */
@@ -297,8 +297,8 @@ class UserController extends AbstractActionController
         /**
          * Get previous form data stored in session, to re-display the information and/or errors
          */
-        $userFormData = $this->flashMessenger()->getData('userFormData') ?: [];
-        $userFormMessages = $this->flashMessenger()->getData('userFormMessages') ?: [];
+        $userFormData = $this->messages()->getData('userFormData') ?: [];
+        $userFormMessages = $this->messages()->getData('userFormMessages') ?: [];
 
         $form->setData($userFormData);
         $form->setMessages($userFormMessages);
@@ -324,8 +324,8 @@ class UserController extends AbstractActionController
             $isValid = $form->isValid();
 
             //add form data and messages to the session, in case we do a PRG redirect
-            $this->flashMessenger()->addData('userFormData', $data);
-            $this->flashMessenger()->addData('userFormMessages', $form->getMessages());
+            $this->messages()->addData('userFormData', $data);
+            $this->messages()->addData('userFormMessages', $form->getMessages());
 
             if ($isValid) {
                 /** @var UserEntityInterface $user */
@@ -387,8 +387,8 @@ class UserController extends AbstractActionController
         /** @var Form $form */
         $form = $this->formManager->get(ResetPasswordForm::class);
 
-        $data = $this->flashMessenger()->getData('resetPasswordFormData') ?: [];
-        $formMessages = $this->flashMessenger()->getData('resetPasswordFormMessages') ?: [];
+        $data = $this->messages()->getData('resetPasswordFormData') ?: [];
+        $formMessages = $this->messages()->getData('resetPasswordFormMessages') ?: [];
 
         $form->setData($data);
         $form->setMessages($formMessages);
@@ -400,8 +400,8 @@ class UserController extends AbstractActionController
             $isValid = $form->isValid();
             $data = $form->getData();
 
-            $this->flashMessenger()->addData('resetPasswordFormData', $data);
-            $this->flashMessenger()->addData('resetPasswordFormMessages', $form->getMessages());
+            $this->messages()->addData('resetPasswordFormData', $data);
+            $this->messages()->addData('resetPasswordFormMessages', $form->getMessages());
 
             if ($isValid) {
                 $newPassword = $data['newPassword'];
@@ -458,8 +458,8 @@ class UserController extends AbstractActionController
         /** @var Form $form */
         $form = $this->formManager->get(ForgotPasswordForm::class);
 
-        $data = $this->flashMessenger()->getData('forgotPasswordFormData') ?: [];
-        $formMessages = $this->flashMessenger()->getData('forgotPasswordFormMessages') ?: [];
+        $data = $this->messages()->getData('forgotPasswordFormData') ?: [];
+        $formMessages = $this->messages()->getData('forgotPasswordFormMessages') ?: [];
 
         $form->setData($data);
         $form->setMessages($formMessages);
@@ -471,8 +471,8 @@ class UserController extends AbstractActionController
             $isValid = $form->isValid();
             $data = $form->getData();
 
-            $this->flashMessenger()->addData('forgotPasswordFormData', $data);
-            $this->flashMessenger()->addData('forgotPasswordFormMessages', $form->getMessages());
+            $this->messages()->addData('forgotPasswordFormData', $data);
+            $this->messages()->addData('forgotPasswordFormMessages', $form->getMessages());
 
             if ($isValid) {
                 $email = $data['email'];
@@ -551,7 +551,7 @@ class UserController extends AbstractActionController
     {
         $messages = (array)$messages;
         foreach ($messages as $message) {
-            $this->flashMessenger()->addError($message);
+            $this->messages()->addError($message);
         }
     }
 
@@ -562,7 +562,7 @@ class UserController extends AbstractActionController
     {
         $messages = (array)$messages;
         foreach ($messages as $message) {
-            $this->flashMessenger()->addSuccess($message);
+            $this->messages()->addSuccess($message);
         }
     }
 
@@ -573,7 +573,7 @@ class UserController extends AbstractActionController
     {
         $messages = (array)$messages;
         foreach ($messages as $message) {
-            $this->flashMessenger()->addInfo($message);
+            $this->messages()->addInfo($message);
         }
     }
 
@@ -584,7 +584,7 @@ class UserController extends AbstractActionController
     {
         $messages = (array)$messages;
         foreach ($messages as $message) {
-            $this->flashMessenger()->addWarning($message);
+            $this->messages()->addWarning($message);
         }
     }
 }

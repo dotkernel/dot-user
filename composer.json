@@ -30,7 +30,7 @@
     "dotkernel/dot-event": "0.6.x-dev",
     "dotkernel/dot-flashmessenger": "0.6.x-dev",
     "dotkernel/dot-controller": "0.6.x-dev",
-    "dotkernel/dot-controller-plugin-flashmessenger": "0.6.x-dev",
+    "dotkernel/dot-controller-plugin-flashmessenger": "dev-develop as 0.6.x-dev",
     "dotkernel/dot-controller-plugin-authentication": "0.6.x-dev",
     "dotkernel/dot-controller-plugin-authorization": "0.6.x-dev",
     "dotkernel/dot-controller-plugin-forms": "0.6.x-dev",

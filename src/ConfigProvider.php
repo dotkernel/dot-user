@@ -49,6 +49,17 @@ class ConfigProvider
 
             'dependencies' => $this->getDependencyConfig(),
 
+            'dot_forms' => [
+
+                'forms' => [
+
+                ],
+
+                'form_manager' => [
+
+                ],
+            ],
+
             'middleware_pipeline' => [
                 [
                     'middleware' => [
@@ -111,10 +122,7 @@ class ConfigProvider
                 'user_route' => [
                     'name' => 'user',
                     'path' => '/user[/{action}]',
-                    'middleware' => [
-                        //we keep this as array so that other controllers can be inserted to the same path
-                        UserController::class
-                    ],
+                    'middleware' => UserController::class,
                 ],
             ],
 

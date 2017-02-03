@@ -13,7 +13,7 @@ use Dot\Authentication\AuthenticationInterface;
 use Dot\Ems\Service\EntityService;
 use Dot\Event\Event;
 use Dot\Helpers\Psr7\HttpMessagesAwareInterface;
-use Dot\User\Entity\UserEntityInterface;
+use Dot\User\Entity\UserEntity;
 use Dot\User\Event\ChangePasswordEvent;
 use Dot\User\Event\ConfirmAccountEvent;
 use Dot\User\Event\Listener\UserListenerAwareInterface;
@@ -39,8 +39,7 @@ use Zend\Math\Rand;
  */
 class UserService extends EntityService implements
     UserServiceInterface,
-    UserListenerAwareInterface,
-    HttpMessagesAwareInterface
+    UserListenerAwareInterface
 {
     use UserListenerAwareTrait;
 
@@ -58,9 +57,6 @@ class UserService extends EntityService implements
 
     /** @var  ServerRequestInterface */
     protected $request;
-
-    /** @var  ResponseInterface */
-    protected $response;
 
     /** @var  bool */
     protected $debug = false;
@@ -87,10 +83,10 @@ class UserService extends EntityService implements
     /**
      * Generates an auto-login token for the user, stores it in the backend and sets a login cookie
      *
-     * @param UserEntityInterface $user
+     * @param UserEntity $user
      * @return UserOperationResult
      */
-    public function generateRememberToken(UserEntityInterface $user)
+    public function generateRememberToken(UserEntity $user)
     {
         $result = new UserOperationResult(true);
         $data = null;
@@ -130,8 +126,6 @@ class UserService extends EntityService implements
                 $data
             ));
         } catch (\Exception $e) {
-            error_log("Remember token generate error: " . $e->getMessage());
-
             $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
                 ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR);
             $result = $this->createUserOperationResultWithException($e, $message, $user);

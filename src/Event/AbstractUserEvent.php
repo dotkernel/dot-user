@@ -10,7 +10,7 @@
 namespace Dot\User\Event;
 
 use Dot\Event\Event;
-use Dot\User\Entity\UserEntityInterface;
+use Dot\User\Entity\UserEntity;
 use Dot\User\Result\ResultInterface;
 use Dot\User\Service\UserServiceInterface;
 
@@ -23,7 +23,7 @@ abstract class AbstractUserEvent extends Event
     /** @var UserServiceInterface */
     protected $userService;
 
-    /** @var UserEntityInterface */
+    /** @var UserEntity */
     protected $user;
 
     /** @var ResultInterface|null */
@@ -32,14 +32,14 @@ abstract class AbstractUserEvent extends Event
     /**
      * AbstractUserEvent constructor.
      * @param UserServiceInterface $userService
-     * @param null|object|string $name
+     * @param string $name
      * @param null|ResultInterface $result
-     * @param UserEntityInterface|null $user
+     * @param UserEntity|null $user
      */
     public function __construct(
         UserServiceInterface $userService,
-        $name,
-        UserEntityInterface $user = null,
+        string $name,
+        UserEntity $user = null,
         ResultInterface $result = null
     ) {
         $this->userService = $userService;
@@ -51,54 +51,48 @@ abstract class AbstractUserEvent extends Event
     /**
      * @return UserServiceInterface
      */
-    public function getUserService()
+    public function getUserService(): UserServiceInterface
     {
         return $this->userService;
     }
 
     /**
      * @param UserServiceInterface $userService
-     * @return AbstractUserEvent
      */
-    public function setUserService($userService)
+    public function setUserService(UserServiceInterface $userService)
     {
         $this->userService = $userService;
-        return $this;
     }
 
     /**
-     * @return UserEntityInterface
+     * @return UserEntity
      */
-    public function getUser()
+    public function getUser(): ?UserEntity
     {
         return $this->user;
     }
 
     /**
-     * @param UserEntityInterface $user
-     * @return AbstractUserEvent
+     * @param UserEntity $user
      */
-    public function setUser($user)
+    public function setUser(UserEntity $user)
     {
         $this->user = $user;
-        return $this;
     }
 
     /**
      * @return ResultInterface|null
      */
-    public function getResult()
+    public function getResult(): ?ResultInterface
     {
         return $this->result;
     }
 
     /**
      * @param ResultInterface|null $result
-     * @return AbstractUserEvent
      */
-    public function setResult($result)
+    public function setResult(ResultInterface $result)
     {
         $this->result = $result;
-        return $this;
     }
 }

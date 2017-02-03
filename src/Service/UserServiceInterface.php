@@ -7,10 +7,12 @@
  * Time: 11:08 PM
  */
 
+declare(strict_types=1);
+
 namespace Dot\User\Service;
 
 use Dot\Ems\Service\ServiceInterface;
-use Dot\User\Entity\UserEntityInterface;
+use Dot\User\Entity\UserEntity;
 
 /**
  * Interface UserServiceInterface
@@ -55,22 +57,22 @@ interface UserServiceInterface extends ServiceInterface
      * Store a new user into the db, after it validates the data
      * trigger register events
      *
-     * @param UserEntityInterface $user
-     * @return bool|UserEntityInterface
+     * @param UserEntity $user
+     * @return bool|UserEntity
      */
-    public function register(UserEntityInterface $user);
+    public function register(UserEntity $user);
 
     /**
-     * @param UserEntityInterface $user
+     * @param UserEntity $user
      * @return mixed
      */
-    public function updateAccount(UserEntityInterface $user);
+    public function updateAccount(UserEntity $user);
 
     /**
-     * @param UserEntityInterface $user
+     * @param UserEntity $user
      * @return mixed
      */
-    public function generateRememberToken(UserEntityInterface $user);
+    public function generateRememberToken(UserEntity $user);
 
     /**
      * Validates the remember me cookie data
@@ -84,8 +86,8 @@ interface UserServiceInterface extends ServiceInterface
     /**
      * Removes all remember tokens for a given user
      *
-     * @param UserEntityInterface $user
+     * @param UserEntity $user
      * @return mixed
      */
-    public function removeRememberToken(UserEntityInterface $user);
+    public function removeRememberToken(UserEntity $user);
 }

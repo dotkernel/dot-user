@@ -7,6 +7,8 @@
  * Time: 9:03 PM
  */
 
+declare(strict_types=1);
+
 namespace Dot\User\Exception;
 
 /**

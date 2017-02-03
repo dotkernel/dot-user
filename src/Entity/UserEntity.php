@@ -18,13 +18,12 @@ use Dot\Ems\Entity\IgnorePropertyProvider;
  * @package Dot\User\Entity
  */
 class UserEntity implements
-    UserEntityInterface,
     AuthenticationIdentityInterface,
     AuthorizationIdentityInterface,
     \JsonSerializable,
     IgnorePropertyProvider
 {
-    /** @var  string|int */
+    /** @var  string */
     protected $id;
 
     /** @var  string */
@@ -36,19 +35,19 @@ class UserEntity implements
     /** @var  string */
     protected $password;
 
-    /** @var  string */
-    protected $role = 'user';
+    /** @var  array */
+    protected $roles = ['user'];
 
     /** @var  string */
     protected $status = 'pending';
 
-    /** @var  string|int */
+    /** @var  string */
     protected $dateCreated;
 
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         if ($this->username) {
             return $this->username;
@@ -58,134 +57,112 @@ class UserEntity implements
     }
 
     /**
-     * @return int|string
+     * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
     /**
-     * @param int|string $id
-     * @return UserEntity
+     * @param string $id
      */
-    public function setId($id)
+    public function setId(string $id)
     {
         $this->id = $id;
-        return $this;
     }
 
     /**
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
 
     /**
      * @param string $username
-     * @return UserEntity
      */
-    public function setUsername($username)
+    public function setUsername(string $username)
     {
         $this->username = $username;
-        return $this;
     }
 
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
     /**
      * @param string $email
-     * @return UserEntity
      */
-    public function setEmail($email)
+    public function setEmail(string $email)
     {
         $this->email = $email;
-        return $this;
     }
 
     /**
      * @return string
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
     /**
      * @param string $password
-     * @return UserEntity
      */
-    public function setPassword($password)
+    public function setPassword(string $password)
     {
         $this->password = $password;
-        return $this;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getDateCreated()
-    {
-        return $this->dateCreated;
-    }
-
-    /**
-     * @param int|string $dateCreated
-     * @return UserEntity
-     */
-    public function setDateCreated($dateCreated)
-    {
-        $this->dateCreated = $dateCreated;
-        return $this;
     }
 
     /**
      * @return string
      */
-    public function getStatus()
+    public function getDateCreated(): string
+    {
+        return $this->dateCreated;
+    }
+
+    /**
+     * @param string $dateCreated
+     */
+    public function setDateCreated(string $dateCreated)
+    {
+        $this->dateCreated = $dateCreated;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
     {
         return $this->status;
     }
 
     /**
      * @param string $status
-     * @return UserEntity
      */
-    public function setStatus($status)
+    public function setStatus(string $status)
     {
         $this->status = $status;
-        return $this;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
-        return $this->role;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRole()
-    {
-        return $this->role;
+        return $this->roles;
     }
 
     /**
-     * @param string $role
-     * @return UserEntity
+     * @param array $roles
      */
-    public function setRole($role)
+    public function setRoles(array $roles)
     {
-        $this->role = $role;
-        return $this;
+        $this->roles = $roles;
     }
 
     /**
@@ -201,6 +178,6 @@ class UserEntity implements
      */
     public function ignoredProperties()
     {
-        return ['roles', 'name', 'dateCreated'];
+        return ['name', 'dateCreated'];
     }
 }

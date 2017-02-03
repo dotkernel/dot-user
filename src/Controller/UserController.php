@@ -7,11 +7,12 @@
  * Time: 10:11 PM
  */
 
+declare(strict_types=1);
+
 namespace Dot\User\Controller;
 
 use Dot\Authentication\Web\Action\LoginAction;
 use Dot\Controller\AbstractActionController;
-use Dot\Helpers\FormMessagesHelperTrait;
 use Dot\Helpers\Psr7\HttpMessagesAwareInterface;
 use Dot\User\Entity\UserEntityInterface;
 use Dot\User\Exception\RuntimeException;
@@ -21,26 +22,38 @@ use Dot\User\Form\LoginForm;
 use Dot\User\Form\RegisterForm;
 use Dot\User\Form\ResetPasswordForm;
 use Dot\User\Form\UserForm;
-use Dot\User\Form\UserFormManager;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Dot\User\Result\ResultInterface;
 use Dot\User\Result\UserOperationResult;
 use Dot\User\Service\UserServiceInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Uri;
 use Zend\Form\Form;
+use Dot\Controller\Plugin\UrlHelperPlugin;
+use Dot\Controller\Plugin\FlashMessenger\FlashMessengerPlugin;
+use Dot\Controller\Plugin\Forms\FormsPlugin;
+use Dot\Controller\Plugin\TemplatePlugin;
+use Dot\Controller\Plugin\Authentication\AuthenticationPlugin;
+use Dot\Controller\Plugin\Authorization\AuthorizationPlugin;
 
 /**
  * Class UserController
  * @package Dot\User\Controller
+ *
+ * @method UrlHelperPlugin|UriInterface url(string $route = null, array $params = [])
+ * @method FlashMessengerPlugin messenger()
+ * @method FormsPlugin|Form forms(string $name = null)
+ * @method TemplatePlugin|string template(string $template = null, array $params = [])
+ * @method AuthenticationPlugin authentication()
+ * @method AuthorizationPlugin isGranted(string $permission, array $roles = [], mixed $context = null)
  */
 class UserController extends AbstractActionController
 {
-    use FormMessagesHelperTrait;
-
     const LOGIN_ROUTE_NAME = 'login';
 
     /** @var  UserOptions */
@@ -52,32 +65,26 @@ class UserController extends AbstractActionController
     /** @var  UserServiceInterface */
     protected $userService;
 
-    /** @var  UserFormManager */
-    protected $formManager;
-
     /**
      * UserController constructor.
      * @param UserServiceInterface $userService
      * @param LoginAction $loginAction
      * @param UserOptions $options
-     * @param UserFormManager $formManager
      */
     public function __construct(
         UserServiceInterface $userService,
         LoginAction $loginAction,
-        UserOptions $options,
-        UserFormManager $formManager
+        UserOptions $options
     ) {
         $this->userService = $userService;
         $this->options = $options;
         $this->loginAction = $loginAction;
-        $this->formManager = $formManager;
     }
 
     /**
      * @return mixed
      */
-    public function dispatch()
+    public function dispatch(): ResponseInterface
     {
         //set request/response object on user service for each request
         if ($this->userService instanceof HttpMessagesAwareInterface) {
@@ -89,87 +96,74 @@ class UserController extends AbstractActionController
     }
 
     /**
-     * @return RedirectResponse
+     * @return ResponseInterface
      */
-    public function confirmAccountAction()
+    public function confirmAccountAction(): ResponseInterface
     {
         if (!$this->options->getConfirmAccountOptions()->isEnableAccountConfirmation()) {
-            $this->addError(
-                $this->options->getMessagesOptions()->getMessage(
-                    MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED
-                )
-            );
+            $this->messenger()->addError($this->options->getMessagesOptions()->getMessage(
+                MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED
+            ));
 
-            return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->url(self::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();
         $params = $request->getQueryParams();
 
-        $email = isset($params['email']) ? $params['email'] : '';
-        $token = isset($params['token']) ? $params['token'] : '';
+        $email = $params['email'] ?? '';
+        $token = $params['token'] ?? '';
 
         /** @var ResultInterface $result */
         $result = $this->userService->confirmAccount($email, $token);
         if (!$result->isValid()) {
-            $this->addError($result->getMessages());
+            $this->messenger()->addError($result->getMessages());
         } else {
-            $this->addSuccess($result->getMessages());
+            $this->messenger()->addSuccess($result->getMessages());
         }
 
-        return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
+        return new RedirectResponse($this->url(self::LOGIN_ROUTE_NAME));
     }
 
     /**
-     * @return HtmlResponse|RedirectResponse
+     * @return ResponseInterface
      */
-    public function changePasswordAction()
+    public function changePasswordAction(): ResponseInterface
     {
         $request = $this->getRequest();
 
         /** @var Form $form */
-        $form = $this->formManager->get(ChangePasswordForm::class);
-
-        $data = $this->messages()->getData('changePasswordFormData') ?: [];
-        $formMessages = $this->messages()->getData('changePasswordFormMessages') ?: [];
-
-        //add session form data from previous request(PRG form)
-        $form->setData($data);
-        $form->setMessages($formMessages);
+        $form = $this->forms(ChangePasswordForm::class);
 
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
 
             $form->setData($data);
-            $isValid = $form->isValid();
-            $data = $form->getData();
+            if ($form->isValid()) {
+                $data = $form->getData();
 
-            //as we use PRG forms, store form data in session for next page display
-            $this->messages()->addData('changePasswordFormData', $data);
-            $this->messages()->addData('changePasswordFormMessages', $form->getMessages());
-
-            if ($isValid) {
                 $oldPassword = $data['password'];
                 $newPassword = $data['newPassword'];
 
                 /** @var UserOperationResult $result */
                 $result = $this->userService->changePassword($oldPassword, $newPassword);
                 if ($result->isValid()) {
-                    $this->addSuccess($result->getMessages());
+                    $this->messenger()->addSuccess($result->getMessages());
                     return $this->redirectTo($request->getUri(), $request->getQueryParams());
                 } else {
-                    $this->addError($result->getMessages());
+                    $this->messenger()->addError($result->getMessages());
+                    $this->forms()->saveState($form);
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $messages = $this->getFormMessages($form->getMessages());
-                $this->addError($messages);
+                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->forms()->saveState($form);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
 
         return new HtmlResponse(
-            $this->template()->render(
+            $this->template(
                 $this->options->getTemplateOptions()->getChangePasswordTemplate(),
                 [
                     'form' => $form,
@@ -181,11 +175,11 @@ class UserController extends AbstractActionController
     }
 
     /**
-     * @param $defaultUri
+     * @param UriInterface $defaultUri
      * @param array $queryParams
-     * @return RedirectResponse
+     * @return ResponseInterface
      */
-    protected function redirectTo($defaultUri, $queryParams = [])
+    protected function redirectTo(UriInterface $defaultUri, array $queryParams = []): ResponseInterface
     {
         if (isset($queryParams['redirect'])) {
             $uri = new Uri(urldecode($queryParams['redirect']));
@@ -197,69 +191,58 @@ class UserController extends AbstractActionController
     }
 
     /**
-     * @return HtmlResponse|RedirectResponse
+     * @return ResponseInterface
      */
-    public function registerAction()
+    public function registerAction(): ResponseInterface
     {
         $request = $this->getRequest();
 
         if (!$this->options->getRegisterOptions()->isEnableRegistration()) {
-            $this->addError($this->options->getMessagesOptions()
+            $this->messenger()->addError($this->options->getMessagesOptions()
                 ->getMessage(MessagesOptions::MESSAGE_REGISTER_DISABLED));
 
-            return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->url(self::LOGIN_ROUTE_NAME));
         }
 
         /** @var RegisterForm $form */
-        $form = $this->formManager->get(RegisterForm::class);
-
-        $data = $this->messages()->getData('registerFormData') ?: [];
-        $formMessages = $this->messages()->getData('registerFormMessages') ?: [];
-
-        //add session form data from previous request(PRG form)
-        $form->setData($data);
-        $form->setMessages($formMessages);
+        $form = $this->forms(RegisterForm::class);
 
         if ($request->getMethod() === 'POST') {
-            $postData = $request->getParsedBody();
+            $data = $request->getParsedBody();
+
             $form->bind($this->userService->getMapper()->getPrototype());
-            $form->setData($postData);
+            $form->setData($data);
+            if ($form->isValid()) {
+                /** @var UserEntityInterface $entity */
+                $entity = $form->getData();
 
-            $isValid = $form->isValid();
-            /** @var UserEntityInterface $data */
-            $data = $form->getData();
-
-            //as we use PRG forms, store form data in session for next page display
-            $this->messages()->addData('registerFormData', $postData);
-            $this->messages()->addData('registerFormMessages', $form->getMessages());
-
-            if ($isValid) {
                 /** @var UserOperationResult $result */
-                $result = $this->userService->register($data);
+                $result = $this->userService->register($entity);
                 if (!$result->isValid()) {
-                    $this->addError($result->getMessages());
+                    $this->messenger()->addError($result->getMessages());
+                    $this->forms()->saveState($form);
                     return new RedirectResponse($request->getUri(), 303);
                 } else {
                     $user = $result->getUser();
                     if ($this->options->getRegisterOptions()->isLoginAfterRegistration()) {
-                        return $this->autoLoginUser($user, $postData['password']);
+                        return $this->autoLoginUser($user, $data['password']);
                     } else {
-                        $this->addSuccess($result->getMessages());
+                        $this->messenger()->addSuccess($result->getMessages());
                         return $this->redirectTo(
-                            $this->url()->generate(self::LOGIN_ROUTE_NAME),
+                            $this->url(self::LOGIN_ROUTE_NAME),
                             $request->getQueryParams()
                         );
                     }
                 }
             } else {
-                $messages = $this->getFormMessages($form->getMessages());
-                $this->addError($messages);
+                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->forms()->saveState($form);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
 
         return new HtmlResponse(
-            $this->template()->render(
+            $this->template(
                 $this->options->getTemplateOptions()->getRegisterTemplate(),
                 [
                     'form' => $form,
@@ -272,15 +255,15 @@ class UserController extends AbstractActionController
     }
 
     /**
-     * @return HtmlResponse|RedirectResponse
+     * @return ResponseInterface
      * @throws \Exception
      */
-    public function accountAction()
+    public function accountAction(): ResponseInterface
     {
         $request = $this->getRequest();
 
         /** @var UserForm $form */
-        $form = $this->formManager->get(UserForm::class);
+        $form = $this->forms(UserForm::class);
 
         /** @var UserEntityInterface $identity */
         $identity = $this->authentication()->getIdentity();
@@ -293,16 +276,6 @@ class UserController extends AbstractActionController
         }
 
         $form->bind($user);
-
-        /**
-         * Get previous form data stored in session, to re-display the information and/or errors
-         */
-        $userFormData = $this->messages()->getData('userFormData') ?: [];
-        $userFormMessages = $this->messages()->getData('userFormMessages') ?: [];
-
-        $form->setData($userFormData);
-        $form->setMessages($userFormMessages);
-
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
 
@@ -312,7 +285,6 @@ class UserController extends AbstractActionController
                 //consider we don't want to change username, remove the uniqueness check
                 $form->removeUsernameValidation();
             }
-
             if (isset($data['user']['email']) && $data['user']['email'] === $user->getEmail()) {
                 //consider we don't want to change email, remove the uniqueness check
                 $form->removeEmailValidation();
@@ -320,14 +292,7 @@ class UserController extends AbstractActionController
 
             $form->applyValidationGroup();
             $form->setData($data);
-
-            $isValid = $form->isValid();
-
-            //add form data and messages to the session, in case we do a PRG redirect
-            $this->messages()->addData('userFormData', $data);
-            $this->messages()->addData('userFormMessages', $form->getMessages());
-
-            if ($isValid) {
+            if ($form->isValid()) {
                 /** @var UserEntityInterface $user */
                 $user = $form->getData();
 
@@ -335,20 +300,22 @@ class UserController extends AbstractActionController
                 $result = $this->userService->updateAccount($user);
 
                 if ($result->isValid()) {
-                    $this->addSuccess($result->getMessages());
+                    $this->messenger()->addSuccess($result->getMessages());
                     return new RedirectResponse($request->getUri());
                 } else {
-                    $this->addError($result->getMessages());
+                    $this->messenger()->addError($result->getMessages());
+                    $this->forms()->saveState($form);
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $this->addError($this->getFormMessages($form->getMessages()));
+                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->forms()->saveState($form);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
 
         return new HtmlResponse(
-            $this->template()->render(
+            $this->template(
                 $this->options->getTemplateOptions()->getAccountTemplate(),
                 [
                     'form' => $form,
@@ -359,23 +326,21 @@ class UserController extends AbstractActionController
         );
     }
 
-    /** helpers to add messages into the FlashMessenger */
-
     /**
      * Show the reset password form, validate data
      *
-     * @return HtmlResponse|RedirectResponse
+     * @return ResponseInterface
      */
-    public function resetPasswordAction()
+    public function resetPasswordAction(): ResponseInterface
     {
         if (!$this->options->getPasswordRecoveryOptions()->isEnablePasswordRecovery()) {
-            $this->addError(
+            $this->messenger()->addError(
                 $this->options->getMessagesOptions()->getMessage(
                     MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED
                 )
             );
 
-            return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->url(self::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();
@@ -385,49 +350,38 @@ class UserController extends AbstractActionController
         $token = isset($params['token']) ? $params['token'] : '';
 
         /** @var Form $form */
-        $form = $this->formManager->get(ResetPasswordForm::class);
-
-        $data = $this->messages()->getData('resetPasswordFormData') ?: [];
-        $formMessages = $this->messages()->getData('resetPasswordFormMessages') ?: [];
-
-        $form->setData($data);
-        $form->setMessages($formMessages);
+        $form = $this->forms(ResetPasswordForm::class);
 
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
 
             $form->setData($data);
-            $isValid = $form->isValid();
-            $data = $form->getData();
-
-            $this->messages()->addData('resetPasswordFormData', $data);
-            $this->messages()->addData('resetPasswordFormMessages', $form->getMessages());
-
-            if ($isValid) {
+            if ($form->isValid()) {
                 $newPassword = $data['newPassword'];
 
                 /** @var UserOperationResult $result */
                 $result = $this->userService->resetPassword($email, $token, $newPassword);
 
                 if (!$result->isValid()) {
-                    $this->addError($result->getMessages());
+                    $this->messenger()->addError($result->getMessages());
+                    $this->forms()->saveState($form);
                     return new RedirectResponse($request->getUri(), 303);
                 } else {
-                    $this->addSuccess($result->getMessages());
+                    $this->messenger()->addSuccess($result->getMessages());
                     return $this->redirectTo(
-                        $this->url()->generate(self::LOGIN_ROUTE_NAME),
+                        $this->url(self::LOGIN_ROUTE_NAME),
                         $request->getQueryParams()
                     );
                 }
             } else {
-                $messages = $this->getFormMessages($form->getMessages());
-                $this->addError($messages);
+                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->forms()->saveState($form);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
 
         return new HtmlResponse(
-            $this->template()->render(
+            $this->template(
                 $this->options->getTemplateOptions()->getResetPasswordTemplate(),
                 [
                     'form' => $form,
@@ -439,65 +393,55 @@ class UserController extends AbstractActionController
     }
 
     /**
-     * @return HtmlResponse|RedirectResponse
+     * @return ResponseInterface
      */
-    public function forgotPasswordAction()
+    public function forgotPasswordAction(): ResponseInterface
     {
         if (!$this->options->getPasswordRecoveryOptions()->isEnablePasswordRecovery()) {
-            $this->addError(
+            $this->messenger()->addError(
                 $this->options->getMessagesOptions()->getMessage(
                     MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED
                 )
             );
 
-            return new RedirectResponse($this->url()->generate(self::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->url(self::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();
 
         /** @var Form $form */
-        $form = $this->formManager->get(ForgotPasswordForm::class);
-
-        $data = $this->messages()->getData('forgotPasswordFormData') ?: [];
-        $formMessages = $this->messages()->getData('forgotPasswordFormMessages') ?: [];
-
-        $form->setData($data);
-        $form->setMessages($formMessages);
+        $form = $this->forms(ForgotPasswordForm::class);
 
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
 
             $form->setData($data);
-            $isValid = $form->isValid();
-            $data = $form->getData();
-
-            $this->messages()->addData('forgotPasswordFormData', $data);
-            $this->messages()->addData('forgotPasswordFormMessages', $form->getMessages());
-
-            if ($isValid) {
+            if ($form->isValid()) {
+                $data = $form->getData();
                 $email = $data['email'];
 
                 /** @var UserOperationResult $result */
                 $result = $this->userService->generateResetToken($email);
                 if ($result->isValid()) {
-                    $this->addInfo($result->getMessages());
+                    $this->messenger()->addInfo($result->getMessages());
                     return $this->redirectTo(
-                        $this->url()->generate(self::LOGIN_ROUTE_NAME),
+                        $this->url(self::LOGIN_ROUTE_NAME),
                         $request->getQueryParams()
                     );
                 } else {
-                    $this->addError($result->getMessages());
+                    $this->messenger()->addError($result->getMessages());
+                    $this->forms()->saveState($form);
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $messages = $this->getFormMessages($form->getMessages());
-                $this->addError($messages);
+                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->forms()->saveState($form);
                 return new RedirectResponse($request->getUri(), 303);
             }
         }
 
         return new HtmlResponse(
-            $this->template()->render(
+            $this->template(
                 $this->options->getTemplateOptions()->getForgotPasswordTemplate(),
                 [
                     'form' => $form,
@@ -512,17 +456,16 @@ class UserController extends AbstractActionController
      * Force an auth event using the LoginAction to automatically login the user after registration
      *
      * @param UserEntityInterface $user
-     * @param $password
+     * @param string $password
      * @return mixed
      */
-    protected function autoLoginUser(UserEntityInterface $user, $password)
+    protected function autoLoginUser(UserEntityInterface $user, string $password)
     {
         /** @var ServerRequestInterface $request */
         $request = $this->getRequest();
-        $response = $this->getResponse();
 
         /** @var Form $form */
-        $form = $this->formManager->get(LoginForm::class);
+        $form = $this->forms(LoginForm::class);
         $csrf = $form->get('login_csrf');
 
         $loginData = [
@@ -539,52 +482,8 @@ class UserController extends AbstractActionController
         $form->isValid();
 
         $request = $request->withParsedBody($form->getData())
-            ->withUri(new Uri($this->url()->generate(self::LOGIN_ROUTE_NAME)));
+            ->withUri(new Uri($this->url(self::LOGIN_ROUTE_NAME)));
 
-        return $this->loginAction->triggerAuthenticateEvent($request, $response, $request->getParsedBody());
-    }
-
-    /**
-     * @param array|string $messages
-     */
-    public function addError($messages)
-    {
-        $messages = (array)$messages;
-        foreach ($messages as $message) {
-            $this->messages()->addError($message);
-        }
-    }
-
-    /**
-     * @param array|string $messages
-     */
-    public function addSuccess($messages)
-    {
-        $messages = (array)$messages;
-        foreach ($messages as $message) {
-            $this->messages()->addSuccess($message);
-        }
-    }
-
-    /**
-     * @param array|string $messages
-     */
-    public function addInfo($messages)
-    {
-        $messages = (array)$messages;
-        foreach ($messages as $message) {
-            $this->messages()->addInfo($message);
-        }
-    }
-
-    /**
-     * @param array|string $messages
-     */
-    public function addWarning($messages)
-    {
-        $messages = (array)$messages;
-        foreach ($messages as $message) {
-            $this->messages()->addWarning($message);
-        }
+        return $this->loginAction->triggerAuthenticateEvent($request, $request->getParsedBody());
     }
 }

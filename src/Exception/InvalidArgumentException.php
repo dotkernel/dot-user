@@ -1,13 +1,13 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 6/23/2016
- * Time: 9:04 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 1/27/2017
+ * Time: 3:04 PM
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Dot\User\Exception;
 

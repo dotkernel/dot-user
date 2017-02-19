@@ -1,85 +1,73 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 6/26/2016
- * Time: 8:48 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 2/5/2017
+ * Time: 4:26 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Form;
 
 use Dot\User\Options\MessagesOptions;
-use Dot\User\Options\UserOptions;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\Form\Element\Csrf;
+use Dot\User\Options\UserOptionsAwareInterface;
+use Dot\User\Options\UserOptionsAwareTrait;
 use Zend\Form\Form;
+use Zend\InputFilter\InputFilter;
 
 /**
  * Class ResetPasswordForm
  * @package Dot\User\Form
  */
-class ResetPasswordForm extends Form
+class ResetPasswordForm extends Form implements UserOptionsAwareInterface
 {
-    use EventManagerAwareTrait;
+    use UserOptionsAwareTrait;
 
-    /** @var  UserOptions */
-    protected $userOptions;
-
-    /**
-     * ResetPasswordForm constructor.
-     * @param UserOptions $userOptions
-     * @param string $name
-     * @param array $options
-     */
-    public function __construct(UserOptions $userOptions, $name = 'reset-password', array $options = [])
+    public function __construct()
     {
-        $this->userOptions = $userOptions;
-        parent::__construct($name, $options);
+        parent::__construct('resetPasswordForm');
+
+        $this->setAttribute('method', 'post');
+        $this->setInputFilter(new InputFilter());
     }
 
     public function init()
     {
-        $this->add(array(
-            'type' => 'password',
-            'name' => 'newPassword',
+        $this->add([
+            'type' => 'UserFieldset',
             'options' => [
-                'label' => 'Password',
-            ],
-            'attributes' => array(
-                'placeholder' => 'New Password',
-                //'required' => true,
-            ),
-        ));
-
-        $this->add(array(
-            'type' => 'password',
-            'name' => 'newPasswordVerify',
-            'options' => [
-                'label' => 'Confirm Password',
-            ],
-            'attributes' => array(
-                'placeholder' => 'Confirm Password',
-                //'required' => true,
-            ),
-        ));
-
-        $this->add(array(
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => array(
-                'value' => 'Reset password',
-            ),
-        ), ['priority' => -100]);
-
-        $csrf = new Csrf('reset_password_csrf', [
-            'csrf_options' => [
-                'timeout' => $this->userOptions->getFormCsrfTimeout(),
-                'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
+                'use_as_base_fieldset' => true,
             ]
         ]);
-        $this->add($csrf);
 
-        $this->getEventManager()->trigger('init', $this);
+        $this->add([
+            'name' => 'reset_password_csrf',
+            'type' => 'Csrf',
+            'options' => [
+                'csrf_options' => [
+                    'timeout' => 3600,
+                    'message' => $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::FORM_EXPIRED)
+                ]
+            ]
+        ]);
+
+        $this->add([
+            'name' => 'submit',
+            'attributes' => [
+                'type' => 'submit',
+                'value' => 'Update password'
+            ]
+        ]);
+
+        $this->setValidationGroup([
+            'reset_password_csrf',
+            'user' => [
+                'password',
+                'passwordConfirm'
+            ]
+        ]);
     }
 }

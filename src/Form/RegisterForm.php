@@ -1,112 +1,85 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 6/20/2016
- * Time: 8:05 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 2/5/2017
+ * Time: 2:57 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Form;
 
 use Dot\User\Options\MessagesOptions;
-use Dot\User\Options\UserOptions;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\Form\Element\Captcha;
-use Zend\Form\Element\Csrf;
-use Zend\Form\Fieldset;
+use Dot\User\Options\UserOptionsAwareInterface;
+use Dot\User\Options\UserOptionsAwareTrait;
 use Zend\Form\Form;
+use Zend\InputFilter\InputFilter;
 
 /**
  * Class RegisterForm
  * @package Dot\User\Form
  */
-class RegisterForm extends Form
+class RegisterForm extends Form implements UserOptionsAwareInterface
 {
-    use EventManagerAwareTrait;
+    use UserOptionsAwareTrait;
 
-    /** @var  UserOptions */
-    protected $userOptions;
+    public function __construct()
+    {
+        parent::__construct('registerForm');
 
-    /** @var  Fieldset */
-    protected $userFieldset;
-
-    /** @var  Captcha */
-    protected $captcha;
-
-    /**
-     * RegisterForm constructor.
-     * @param UserOptions $userOptions
-     * @param Fieldset $userFieldset
-     * @param array $options
-     */
-    public function __construct(
-        UserOptions $userOptions,
-        Fieldset $userFieldset,
-        $options = array()
-    ) {
-        $this->userOptions = $userOptions;
-        $this->userFieldset = $userFieldset;
-        parent::__construct('user_register_form', $options);
+        $this->setAttribute('method', 'post');
+        $this->setInputFilter(new InputFilter());
     }
 
     public function init()
     {
-        $this->userFieldset->setName('user');
-        $this->userFieldset->setUseAsBaseFieldset(true);
-
-        $this->add($this->userFieldset);
-
-        if ($this->userOptions->getRegisterOptions()->isUseRegistrationFormCaptcha()) {
-            //add captcha element
-            $this->add([
-                'type' => 'Captcha',
-                'name' => 'captcha',
-                'options' => [
-                    'label' => 'Please verify you are human',
-                    'captcha' => $this->userOptions->getRegisterOptions()->getFormCaptchaOptions()
-                ]
-            ], ['priority' => -99]);
-        }
-
-        $csrf = new Csrf('register_csrf', [
-            'csrf_options' => [
-                'timeout' => $this->userOptions->getFormCsrfTimeout(),
-                'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
+        $this->add([
+            'type' => 'UserFieldset',
+            'options' => [
+                'use_as_base_fieldset' => true,
             ]
         ]);
-        $this->add($csrf);
 
-        $this->add(array(
-            'type' => 'submit',
+        $this->add([
+            'name' => 'captcha',
+            'type' => 'Captcha',
+            'options' => [
+                'label' => 'Please verify you are human',
+                'captcha' => [],
+            ]
+        ], ['priority' => -100]);
+
+        $this->add([
+            'type' => 'Csrf',
+            'name' => 'register_csrf',
+            'options' => [
+                'csrf_options' => [
+                    'timeout' => 3600,
+                    'message' => $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::FORM_EXPIRED)
+                ]
+            ]
+        ]);
+
+        $this->add([
             'name' => 'submit',
-            'attributes' => array(
-                'value' => 'Sign Up',
-            ),
-        ), ['priority' => -100]);
+            'attributes' => [
+                'type' => 'submit',
+                'value' => 'Create account'
+            ]
+        ], ['priority' => -105]);
 
-        if ($this->userOptions->getRegisterOptions()->isUseRegistrationFormCaptcha() && $this->captcha) {
-            $this->add($this->captcha, ['name' => 'captcha']);
-        }
-
-        $this->getEventManager()->trigger('init', $this);
-    }
-
-    /**
-     * @return Captcha
-     */
-    public function getCaptchaElement()
-    {
-        return $this->captcha;
-    }
-
-    /**
-     * @param Captcha $captcha
-     * @return RegisterForm
-     */
-    public function setCaptchaElement(Captcha $captcha)
-    {
-        $this->captcha = $captcha;
-        return $this;
+        $this->setValidationGroup([
+            'register_csrf',
+            'captcha',
+            'user' => [
+                'username',
+                'email',
+                'password',
+                'passwordConfirm',
+            ]
+        ]);
     }
 }

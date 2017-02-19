@@ -1,152 +1,146 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 6/20/2016
- * Time: 7:55 PM
+ * Date: 2/8/2017
+ * Time: 4:56 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Mapper;
 
-use Dot\Ems\Mapper\RelationalDbMapper;
-use Dot\User\Options\DbOptions;
-use Zend\Db\Sql\Sql;
+use Dot\Ems\Event\MapperEvent;
+use Dot\Ems\Mapper\AbstractDbMapper;
+use Dot\Ems\Mapper\MapperInterface;
+use Dot\Ems\Mapper\MapperManager;
+use Dot\User\Entity\RoleEntity;
+use Dot\User\Entity\UserEntity;
+use Dot\User\Exception\RuntimeException;
+use Dot\User\Options\UserOptions;
+use Zend\Db\Adapter\Driver\ResultInterface;
+use Zend\Db\ResultSet\ResultSet;
 
 /**
  * Class UserDbMapper
  * @package Dot\User\Mapper
  */
-class UserDbMapper extends RelationalDbMapper implements UserMapperInterface
+class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
 {
-    /** @var  DbOptions */
-    protected $dbOptions;
+    /** @var string */
+    protected $table = 'user';
+
+    /** @var string */
+    protected $rolesIntersectionTable = 'user_roles';
+
+    /** @var  UserOptions */
+    protected $userOptions;
 
     /**
-     * @param $data
-     * @return \Zend\Db\Adapter\Driver\ResultInterface
+     * UserDbMapper constructor.
+     * @param MapperManager $mapperManager
+     * @param array $options
      */
-    public function saveResetToken($data)
+    public function __construct(MapperManager $mapperManager, array $options = [])
     {
-        $sql = new Sql($this->getTableGateway()->getAdapter(), $this->dbOptions->getUserResetTokenTable());
-        $insert = $sql->insert();
-        $insert->columns(array_keys($data))->values($data);
+        if (isset($options['user_options']) && $options['user_options'] instanceof UserOptions) {
+            $this->userOptions = $options['user_options'];
+        }
 
-        $stmt = $sql->prepareStatementForSqlObject($insert);
-        return $stmt->execute();
+        parent::__construct($mapperManager, $options);
     }
 
     /**
-     * @param $userId
-     * @param $token
-     * @return mixed
+     * @param MapperEvent $e
      */
-    public function findResetToken($userId, $token)
+    public function onAfterLoad(MapperEvent $e)
     {
-        $sql = new Sql($this->getTableGateway()->getAdapter(), $this->dbOptions->getUserResetTokenTable());
-        $select = $sql->select()->where(['userId' => $userId, 'token' => $token]);
+        /** @var UserEntity $entity */
+        $user = $e->getParam('entity');
 
-        $stmt = $sql->prepareStatementForSqlObject($select);
-        return $stmt->execute()->current();
+        //maybe we can skip roles queries, if entity already has roles set
+        if (empty($user->getRoles())) {
+            $select = $this->getSlaveSql()->select()->from($this->rolesIntersectionTable)
+                ->where(['userId' => $user->getId()]);
+
+            $stmt = $this->getSlaveSql()->prepareStatementForSqlObject($select);
+            $result = $stmt->execute();
+            if ($result instanceof ResultInterface && $result->isQueryResult()) {
+                $resultSet = new ResultSet(ResultSet::TYPE_ARRAY);
+                $resultSet->initialize($result);
+
+                $roleIds = [];
+                foreach ($resultSet as $row) {
+                    $roleIds[] = $row['roleId'];
+                }
+
+                /** @var MapperInterface $rolesMapper */
+                $rolesMapper = $this->mapperManager->get($this->userOptions->getRoleEntity());
+                $roles = $rolesMapper->find('all', [
+                    'conditions' => ['id' => $roleIds]
+                ]);
+
+                $user->setRoles($roles);
+            }
+        }
     }
 
     /**
-     * @param $data
-     * @return \Zend\Db\Adapter\Driver\ResultInterface
+     * @param MapperEvent $e
      */
-    public function saveConfirmToken($data)
+    public function onAfterSave(MapperEvent $e)
     {
-        $sql = new Sql($this->getTableGateway()->getAdapter(), $this->dbOptions->getUserConfirmTokenTable());
-        $insert = $sql->insert();
-        $insert->columns(array_keys($data))->values($data);
+        // by default, all this code happens in a transaction
+        /** @var UserEntity $entity */
+        $user = $e->getParam('entity');
+        if (empty($user->getRoles())) {
+            // set the user with the default role as set in config
+            $defaultRoles = $this->userOptions->getDefaultRole();
 
-        $stmt = $sql->prepareStatementForSqlObject($insert);
-        return $stmt->execute();
+            /** @var MapperInterface $rolesMapper */
+            $rolesMapper = $this->mapperManager->get($this->userOptions->getRoleEntity());
+
+            $roles = $rolesMapper->find('all', ['conditions' => ['name' => $defaultRoles]]);
+            if (!empty($roles)) {
+                $user->setRoles($roles);
+            }
+        }
+
+        // save user roles too
+        // 1. delete all from intersection table
+        // 2. repopulate user to roles intersection table
+        $delete = $this->getSql()->delete($this->rolesIntersectionTable)->where(['userId' => $user->getId()]);
+        $this->getSql()->prepareStatementForSqlObject($delete)->execute();
+
+        $roles = $user->getRoles();
+        $stmt = $this->getAdapter()->createStatement(
+            'INSERT INTO `' . $this->rolesIntersectionTable . '` VALUES (?, ?)'
+        );
+
+        /** @var RoleEntity $role */
+        foreach ($roles as $role) {
+            $result = $stmt->execute([$user->getId(), $role->getId()]);
+            if ($result->getAffectedRows() < 1) {
+                throw new RuntimeException('Failed to insert user to role association');
+            }
+        }
     }
 
     /**
-     * @param $userId
-     * @param $token
-     * @return mixed
+     * @param string $email
+     * @param array $options
+     * @return UserEntity|null
      */
-    public function findConfirmToken($userId, $token)
+    public function getByEmail(string $email, array $options = []): ?UserEntity
     {
-        $sql = new Sql($this->getTableGateway()->getAdapter(), $this->dbOptions->getUserConfirmTokenTable());
-        $select = $sql->select()->where(['userId' => $userId, 'token' => $token]);
+        $options['conditions'] = ['email' => $email];
+        $finder = (string)($options['finder'] ?? 'all');
+        $result = $this->find($finder, $options);
+        if (!empty($result) && isset($result[0])) {
+            return $result[0];
+        }
 
-        $stmt = $sql->prepareStatementForSqlObject($select);
-        return $stmt->execute()->current();
-    }
-
-    /**
-     * @param $userId
-     * @param $token
-     * @return \Zend\Db\Adapter\Driver\ResultInterface
-     */
-    public function removeConfirmToken($userId, $token)
-    {
-        $sql = new Sql($this->getTableGateway()->getAdapter(), $this->dbOptions->getUserConfirmTokenTable());
-        $delete = $sql->delete()->where(['userId' => $userId, 'token' => $token]);
-
-        $stmt = $sql->prepareStatementForSqlObject($delete);
-        return $stmt->execute();
-    }
-
-    /**
-     * @param $data
-     * @return \Zend\Db\Adapter\Driver\ResultInterface
-     */
-    public function saveRememberToken($data)
-    {
-        $sql = new Sql($this->getTableGateway()->getAdapter(), $this->dbOptions->getUserRememberTokenTable());
-        $insert = $sql->insert();
-        $insert->columns(array_keys($data))->values($data);
-
-        $stmt = $sql->prepareStatementForSqlObject($insert);
-        return $stmt->execute();
-    }
-
-    /**
-     * @param $selector
-     * @return mixed
-     */
-    public function findRememberToken($selector)
-    {
-        $sql = new Sql($this->getTableGateway()->getAdapter(), $this->dbOptions->getUserRememberTokenTable());
-        $select = $sql->select()->where(['selector' => $selector]);
-
-        $stmt = $sql->prepareStatementForSqlObject($select);
-        return $stmt->execute()->current();
-    }
-
-    /**
-     * @param $userId
-     * @return \Zend\Db\Adapter\Driver\ResultInterface
-     */
-    public function removeRememberToken($userId)
-    {
-        $sql = new Sql($this->getTableGateway()->getAdapter(), $this->dbOptions->getUserRememberTokenTable());
-        $delete = $sql->delete()->where(['userId' => $userId]);
-
-        $stmt = $sql->prepareStatementForSqlObject($delete);
-        return $stmt->execute();
-    }
-
-    /**
-     * @return DbOptions
-     */
-    public function getDbOptions()
-    {
-        return $this->dbOptions;
-    }
-
-    /**
-     * @param DbOptions $dbOptions
-     * @return UserDbMapper
-     */
-    public function setDbOptions(DbOptions $dbOptions)
-    {
-        $this->dbOptions = $dbOptions;
-        return $this;
+        return null;
     }
 }

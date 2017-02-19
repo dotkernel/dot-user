@@ -1,11 +1,13 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-admin
+ * @library: dk-user
  * @author: n3vrax
- * Date: 11/23/2016
- * Time: 10:33 PM
+ * Date: 2/15/2017
+ * Time: 2:26 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Service;
 
@@ -13,28 +15,24 @@ use Zend\Crypt\Password\PasswordInterface;
 
 /**
  * Class PasswordCheck
- * @package Dot\Admin\Authentication
+ * @package Dot\User\Service
  */
 class PasswordCheck
 {
     /** @var  PasswordInterface */
     protected $passwordService;
 
-    /**
-     * PasswordCheck constructor.
-     * @param PasswordInterface $passwordService
-     */
     public function __construct(PasswordInterface $passwordService)
     {
         $this->passwordService = $passwordService;
     }
 
     /**
-     * @param $hash
-     * @param $password
+     * @param string $hash
+     * @param string $password
      * @return bool
      */
-    public function __invoke($hash, $password)
+    public function __invoke(string $hash, string $password): bool
     {
         return $this->passwordService->verify($password, $hash);
     }

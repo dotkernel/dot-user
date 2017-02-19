@@ -1,18 +1,19 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 6/23/2016
- * Time: 8:44 PM
+ * Date: 2/16/2017
+ * Time: 9:03 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Factory;
 
 use Dot\Authentication\Web\Action\LoginAction;
-use Dot\User\Controller\UserController;
-use Dot\User\Form\UserFormManager;
 use Dot\User\Options\UserOptions;
+use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -21,19 +22,18 @@ use Interop\Container\ContainerInterface;
  */
 class UserControllerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    /**
+     * @param ContainerInterface $container
+     * @param $requestedName
+     * @return mixed
+     */
+    public function __invoke(ContainerInterface $container, $requestedName)
     {
-        /** @var UserOptions $options */
-        $options = $container->get(UserOptions::class);
+        $options = [];
+        $options['user_options'] = $container->get(UserOptions::class);
+        $options['user_service'] = $container->get(UserServiceInterface::class);
+        $options['login_action'] = $container->get(LoginAction::class);
 
-        $userService = $container->get('UserService');
-        $controller = new UserController(
-            $userService,
-            $container->get(LoginAction::class),
-            $options,
-            $container->get(UserFormManager::class)
-        );
-
-        return $controller;
+        return new $requestedName($options);
     }
 }

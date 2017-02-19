@@ -1,27 +1,25 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 6/20/2016
- * Time: 7:55 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 1/27/2017
+ * Time: 2:52 PM
  */
 
 namespace Dot\User\Entity;
 
-use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentityInterface;
-use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentityInterface;
-use Dot\Ems\Entity\IgnorePropertyProvider;
+use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentity;
+use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentity;
+use Dot\Ems\Entity\Entity;
 
 /**
  * Class UserEntity
  * @package Dot\User\Entity
  */
-class UserEntity implements
-    AuthenticationIdentityInterface,
-    AuthorizationIdentityInterface,
-    \JsonSerializable,
-    IgnorePropertyProvider
+class UserEntity extends Entity implements
+    AuthenticationIdentity,
+    AuthorizationIdentity
 {
     /** @var  string */
     protected $id;
@@ -35,26 +33,14 @@ class UserEntity implements
     /** @var  string */
     protected $password;
 
-    /** @var  array */
-    protected $roles = ['user'];
+    /** @var array */
+    protected $roles = [];
 
-    /** @var  string */
+    /** @var string */
     protected $status = 'pending';
 
     /** @var  string */
     protected $dateCreated;
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        if ($this->username) {
-            return $this->username;
-        }
-
-        return $this->email;
-    }
 
     /**
      * @return string
@@ -121,19 +107,19 @@ class UserEntity implements
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getDateCreated(): string
+    public function getRoles(): array
     {
-        return $this->dateCreated;
+        return $this->roles ?? [];
     }
 
     /**
-     * @param string $dateCreated
+     * @param array $roles
      */
-    public function setDateCreated(string $dateCreated)
+    public function setRoles(array $roles)
     {
-        $this->dateCreated = $dateCreated;
+        $this->roles = $roles;
     }
 
     /**
@@ -152,32 +138,30 @@ class UserEntity implements
         $this->status = $status;
     }
 
-    public function getRoles(): array
+    /**
+     * @return string
+     */
+    public function getDateCreated(): string
     {
-        return $this->roles;
+        return $this->dateCreated;
     }
 
     /**
-     * @param array $roles
+     * @param string $dateCreated
      */
-    public function setRoles(array $roles)
+    public function setDateCreated(string $dateCreated)
     {
-        $this->roles = $roles;
+        $this->dateCreated = $dateCreated;
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function jsonSerialize()
+    public function getName(): string
     {
-        return get_object_vars($this);
-    }
-
-    /**
-     * @return array
-     */
-    public function ignoredProperties()
-    {
-        return ['name', 'dateCreated'];
+        if ($this->username) {
+            return $this->username;
+        }
+        return $this->email;
     }
 }

@@ -21,7 +21,7 @@
     "zendframework/zend-crypt": "^3.1",
 
     "dotkernel/dot-helpers": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-ems": "dev-develop as 0.6.x-dev",
+    "dotkernel/dot-ems": "dev-reworked as 0.6.x-dev",
     "dotkernel/dot-filter": "0.6.x-dev",
     "dotkernel/dot-validator": "0.6.x-dev",
     "dotkernel/dot-inputfilter": "0.6.x-dev",

@@ -1,37 +1,56 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 6/20/2016
- * Time: 7:54 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 1/27/2017
+ * Time: 2:39 PM
  */
 
-namespace Dot\User;
+namespace Dk\User;
 
+use Dot\Authentication\Web\Event\AuthenticationEvent;
+use Dot\Ems\Factory\DbMapperFactory;
+use Dot\User\Authentication\AfterAuthenticationListener;
+use Dot\User\Authentication\BeforeAuthenticationListener;
+use Dot\User\Authentication\BeforeLogoutListener;
+use Dot\User\Authentication\InjectLoginFormListener;
 use Dot\User\Controller\UserController;
-use Dot\User\Factory\AuthenticationListenerFactory;
+use Dot\User\Entity\ConfirmTokenEntity;
+use Dot\User\Entity\RememberTokenEntity;
+use Dot\User\Entity\ResetTokenEntity;
+use Dot\User\Entity\RoleEntity;
+use Dot\User\Entity\UserEntity;
+use Dot\User\Factory\AfterAuthenticationListenerFactory;
 use Dot\User\Factory\AutoLoginFactory;
-use Dot\User\Factory\BcryptPasswordFactory;
-use Dot\User\Factory\BootstrapFactory;
-use Dot\User\Factory\Fieldset\UserFieldsetFactory;
-use Dot\User\Factory\Form\UserFormManagerFactory;
-use Dot\User\Factory\InputFilter\UserInputFilterFactory;
+use Dot\User\Factory\BcryptFactory;
+use Dot\User\Factory\BeforeAuthenticationListenerFactory;
+use Dot\User\Factory\BeforeLogoutListenerFactory;
+use Dot\User\Factory\FormElementFactory;
+use Dot\User\Factory\InjectLoginFormListenerFactory;
 use Dot\User\Factory\PasswordCheckFactory;
+use Dot\User\Factory\TokenServiceFactory;
 use Dot\User\Factory\UserControllerFactory;
 use Dot\User\Factory\UserDbMapperFactory;
 use Dot\User\Factory\UserOptionsFactory;
 use Dot\User\Factory\UserServiceFactory;
-use Dot\User\Form\Fieldset\UserFieldset;
-use Dot\User\Form\InputFilter\UserInputFilter;
-use Dot\User\Form\UserFormManager;
-use Dot\User\Listener\AuthenticationListener;
+use Dot\User\Form\AccountForm;
+use Dot\User\Form\ChangePasswordForm;
+use Dot\User\Form\ForgotPasswordForm;
+use Dot\User\Form\LoginForm;
+use Dot\User\Form\RegisterForm;
+use Dot\User\Form\ResetPasswordForm;
+use Dot\User\Form\UserFieldset;
+use Dot\User\Mapper\RoleDbMapper;
+use Dot\User\Mapper\TokenDbMapper;
 use Dot\User\Mapper\UserDbMapper;
 use Dot\User\Middleware\AutoLogin;
-use Dot\User\Middleware\Bootstrap;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\PasswordCheck;
+use Dot\User\Service\TokenService;
+use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserService;
+use Dot\User\Service\UserServiceInterface;
 use Zend\Crypt\Password\PasswordInterface;
 
 /**
@@ -40,74 +59,16 @@ use Zend\Crypt\Password\PasswordInterface;
  */
 class ConfigProvider
 {
-    /**
-     * @return array
-     */
     public function __invoke()
     {
         return [
-
-            'dependencies' => $this->getDependencyConfig(),
-
-            'dot_forms' => [
-
-                'forms' => [
-
-                ],
-
-                'form_manager' => [
-
-                ],
-            ],
+            'dependencies' => $this->getDependenciesConfig(),
 
             'middleware_pipeline' => [
                 [
-                    'middleware' => [
-                        Bootstrap::class,
-                        AutoLogin::class,
-                    ],
+                    'middleware' => AutoLogin::class,
                     'priority' => 9999,
                 ]
-            ],
-
-            'dot_user' => [
-
-                'user_listeners' => [],
-
-                'db_options' => [],
-
-                'register_options' => [],
-
-                'login_options' => [],
-
-                'password_recovery_options' => [],
-
-                'confirm_account_options' => [],
-
-                'messages_options' => [
-                    'messages' => []
-                ],
-
-                'template_options' => [],
-
-                'form_manager' => [],
-            ],
-
-            'dot_authentication' => [
-
-                'web' => [
-                    'login_route' => 'login',
-                    'logout_route' => 'logout',
-
-                    'login_template' => 'dot-user::login',
-
-                    'after_logout_route' => 'login',
-                    'after_login_route' => 'home',
-
-                    'allow_redirect_param' => true,
-                    'redirect_param_name' => 'redirect',
-                ]
-
             ],
 
             'routes' => [
@@ -129,39 +90,122 @@ class ConfigProvider
             'templates' => [
                 'paths' => [
                     'dot-user' => [realpath(__DIR__ . '/../templates/dot-user')],
+                ],
+            ],
+
+            'dot_authentication' => [
+                'web' => [
+                    'login_route' => ['route_name' => 'login'],
+                    'logout_route' => ['route_name' => 'logout'],
+
+                    'login_template' => 'dot-user::login',
+
+                    'after_login_route' => ['route_name' => 'user', 'route_params' => ['action' => 'account']],
+                    'after_logout_route' => ['route_name' => 'login'],
+
+                    'event_listeners' => [
+                        AuthenticationEvent::EVENT_AUTHENTICATE => [
+                            'injectForm' => [
+                                'type' => InjectLoginFormListener::class,
+                                'priority' => 1000
+                            ],
+                            'beforeAuthentication' => [
+                                'type' => BeforeAuthenticationListener::class,
+                                'priority' => 500
+                            ],
+                            'afterAuthentication' => [
+                                'type' => AfterAuthenticationListener::class,
+                                'priority' => -500
+                            ]
+                        ],
+                        AuthenticationEvent::EVENT_LOGOUT => [
+                            'beforeLogout' => [
+                                'type' => BeforeLogoutListener::class,
+                                'priority' => 100
+                            ]
+                        ]
+                    ]
                 ]
             ],
+
+            'dot_user' => [
+                'login_options' => [],
+                'messages_options' => [
+                    'messages' => []
+                ],
+                'password_recovery_options' => [],
+                'register_options' => [],
+                'template_options' => [],
+            ],
+
+            'dot_ems' => [
+                'default_adapter' => 'database',
+
+                'mapper_manager' => [
+                    'factories' => [
+                        RoleDbMapper::class => DbMapperFactory::class,
+                        UserDbMapper::class => UserDbMapperFactory::class,
+                        TokenDbMapper::class => DbMapperFactory::class,
+                    ],
+                    'aliases' => [
+                        RoleEntity::class => RoleDbMapper::class,
+                        UserEntity::class => UserDbMapper::class,
+
+                        ConfirmTokenEntity::class => TokenDbMapper::class,
+                        RememberTokenEntity::class => TokenDbMapper::class,
+                        ResetTokenEntity::class => TokenDbMapper::class,
+                    ]
+                ],
+            ],
+
+            'dot_form' => [
+                'form_manager' => [
+                    'factories' => [
+                        UserFieldset::class => FormElementFactory::class,
+                        RegisterForm::class => FormElementFactory::class,
+                        AccountForm::class => FormElementFactory::class,
+                        ChangePasswordForm::class => FormElementFactory::class,
+                        ForgotPasswordForm::class => FormElementFactory::class,
+                        LoginForm::class => FormElementFactory::class,
+                        ResetPasswordForm::class => FormElementFactory::class,
+                    ],
+                    'aliases' => [
+                        'UserFieldset' => UserFieldset::class,
+                        'Register' => RegisterForm::class,
+                        'Account' => AccountForm::class,
+                        'ChangePassword' => ChangePasswordForm::class,
+                        'ForgotPassword' => ForgotPasswordForm::class,
+                        'Login' => LoginForm::class,
+                        'ResetPassword' => ResetPasswordForm::class,
+                    ]
+                ]
+            ]
         ];
     }
 
-    public function getDependencyConfig()
+    public function getDependenciesConfig()
     {
         return [
             'factories' => [
-                UserOptions::class => UserOptionsFactory::class,
-
-                UserController::class => UserControllerFactory::class,
-
-                UserDbMapper::class => UserDbMapperFactory::class,
-                UserService::class => UserServiceFactory::class,
-
-                UserFormManager::class => UserFormManagerFactory::class,
-
-                AuthenticationListener::class => AuthenticationListenerFactory::class,
-
-                Bootstrap::class => BootstrapFactory::class,
-                AutoLogin::class => AutoLoginFactory::class,
-
-                PasswordInterface::class => BcryptPasswordFactory::class,
+                PasswordInterface::class => BcryptFactory::class,
                 PasswordCheck::class => PasswordCheckFactory::class,
 
-                UserFieldset::class => UserFieldsetFactory::class,
-                UserInputFilter::class => UserInputFilterFactory::class,
-            ],
+                UserOptions::class => UserOptionsFactory::class,
+                UserController::class => UserControllerFactory::class,
+                UserService::class => UserServiceFactory::class,
+                TokenService::class => TokenServiceFactory::class,
 
+                AutoLogin::class => AutoLoginFactory::class,
+                InjectLoginFormListener::class => InjectLoginFormListenerFactory::class,
+                BeforeAuthenticationListener::class => BeforeAuthenticationListenerFactory::class,
+                AfterAuthenticationListener::class => AfterAuthenticationListenerFactory::class,
+                BeforeLogoutListener::class => BeforeLogoutListenerFactory::class,
+            ],
             'aliases' => [
-                'UserService' => UserService::class,
-                'UserMapper' => UserDbMapper::class,
+                UserServiceInterface::class => UserService::class,
+                'UserService' => UserServiceInterface::class,
+                TokenServiceInterface::class => TokenService::class,
+                'TokenService' => TokenServiceInterface::class,
             ]
         ];
     }

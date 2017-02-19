@@ -1,11 +1,13 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 6/20/2016
- * Time: 8:38 PM
+ * Date: 2/16/2017
+ * Time: 9:42 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Factory;
 
@@ -20,10 +22,11 @@ class UserOptionsFactory
 {
     /**
      * @param ContainerInterface $container
+     * @param $requestedName
      * @return UserOptions
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, $requestedName)
     {
-        return new UserOptions($container->get('config')['dot_user']);
+        return new $requestedName($container->get('config')['dot_user']);
     }
 }

@@ -1,70 +1,96 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 7/14/2016
- * Time: 8:35 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 2/5/2017
+ * Time: 3:56 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Form;
 
 use Dot\User\Options\MessagesOptions;
-use Dot\User\Options\UserOptions;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\Form\Element\Csrf;
+use Dot\User\Options\UserOptionsAwareInterface;
+use Dot\User\Options\UserOptionsAwareTrait;
 use Zend\Form\Form;
+use Zend\InputFilter\InputFilterProviderInterface;
 
 /**
  * Class ForgotPasswordForm
  * @package Dot\User\Form
  */
-class ForgotPasswordForm extends Form
+class ForgotPasswordForm extends Form implements InputFilterProviderInterface, UserOptionsAwareInterface
 {
-    use EventManagerAwareTrait;
+    use UserOptionsAwareTrait;
 
-    /** @var  UserOptions */
-    protected $userOptions;
-
-    /**
-     * ForgotPasswordForm constructor.
-     * @param UserOptions $userOptions
-     * @param string $name
-     * @param array $options
-     */
-    public function __construct(UserOptions $userOptions, $name = 'forgot-password', array $options = [])
+    public function __construct()
     {
-        $this->userOptions = $userOptions;
-        parent::__construct($name, $options);
+        parent::__construct('forgotPasswordForm');
+        $this->setAttribute('method', 'post');
     }
 
     public function init()
     {
-        $this->add(array(
-            'type' => 'text',
+        $this->add([
             'name' => 'email',
-            'attributes' => array(
-                'placeholder' => 'Your email address',
-                //'required' => true,
-            ),
-        ));
-
-        $this->add(array(
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => array(
-                'value' => 'Request reset',
-            ),
-        ), ['priority' => -100]);
-
-        $csrf = new Csrf('forgot_password_csrf', [
-            'csrf_options' => [
-                'timeout' => $this->userOptions->getFormCsrfTimeout(),
-                'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
+            'type' => 'email',
+            'options' => [
+                'label' => 'Email associated with your account',
+            ],
+            'attributes' => [
+                'placeholder' => 'Account e-mail...',
+                //'required' => 'required',
             ]
         ]);
-        $this->add($csrf);
 
-        $this->getEventManager()->trigger('init', $this);
+        $this->add([
+            'name' => 'forgot_password_csrf',
+            'type' => 'Csrf',
+            'options' => [
+                'csrf_options' => [
+                    'timeout' => 3600,
+                    'message' => $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::FORM_EXPIRED)
+                ]
+            ]
+        ]);
+
+        $this->add([
+            'name' => 'submit',
+            'attributes' => [
+                'type' => 'submit',
+                'value' => 'Reset password'
+            ]
+        ]);
+    }
+
+    public function getInputFilterSpecification()
+    {
+        return [
+            'email' => [
+                'filters' => [
+                    ['name' => 'StringTrim']
+                ],
+                'validators' => [
+                    [
+                        'name' => 'NotEmpty',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'message' => $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::EMAIL_EMPTY)
+                        ]
+                    ],
+                    [
+                        'name' => 'EmailAddress',
+                        'options' => [
+                            'message' => $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::EMAIL_INVALID)
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 }

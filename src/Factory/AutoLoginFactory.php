@@ -1,20 +1,22 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 7/14/2016
- * Time: 12:03 AM
+ * Date: 2/18/2017
+ * Time: 9:18 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Factory;
 
 use Dot\Authentication\AuthenticationInterface;
-use Dot\FlashMessenger\FlashMessengerInterface;
 use Dot\User\Middleware\AutoLogin;
 use Dot\User\Options\UserOptions;
+use Dot\User\Service\TokenServiceInterface;
+use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
-use Zend\Expressive\Helper\UrlHelper;
 
 /**
  * Class AutoLoginFactory
@@ -30,9 +32,8 @@ class AutoLoginFactory
     {
         return new AutoLogin(
             $container->get(AuthenticationInterface::class),
-            $container->get('UserService'),
-            $container->get(UrlHelper::class),
-            $container->get(FlashMessengerInterface::class),
+            $container->get(UserServiceInterface::class),
+            $container->get(TokenServiceInterface::class),
             $container->get(UserOptions::class)
         );
     }

@@ -43,6 +43,12 @@ interface UserEventListenerInterface extends ListenerAggregateInterface
 
     public function onAccountUpdateError(UserEvent $e);
 
+    public function onBeforeChangePassword(UserEvent $e);
+
+    public function onAfterChangePassword(UserEvent $e);
+
+    public function onChangePasswordError(UserEvent $e);
+
     public function onBeforeDelete(UserEvent $e);
 
     public function onAfterDelete(UserEvent $e);

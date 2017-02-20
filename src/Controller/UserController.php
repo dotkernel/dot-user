@@ -384,7 +384,7 @@ class UserController extends AbstractActionController
             if ($form->isValid()) {
                 $data = $form->getData(FormInterface::VALUES_AS_ARRAY);
 
-                $result = $this->userService->generateResetToken($data);
+                $result = $this->userService->resetPasswordRequest($data);
                 if ($result->isValid()) {
                     $this->messenger()->addInfo($this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::FORGOT_PASSWORD_SUCCESS));

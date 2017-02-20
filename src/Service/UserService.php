@@ -202,8 +202,11 @@ class UserService implements
                     'mapper' => $mapper,
                     'error' => ErrorCode::TOKEN_NOT_FOUND
                 ]);
-                return new Result(['user' => $user, 'mapper' => $mapper], $this->userOptions->getMessagesOptions()
-                    ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_INVALID_TOKEN));
+                return new Result(
+                    ['user' => $user, 'mapper' => $mapper, 'token' => $token],
+                    $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_INVALID_TOKEN)
+                );
             }
             $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_CONFIRMATION_ERROR, [
                 'email' => $email,
@@ -348,7 +351,7 @@ class UserService implements
             if ($this->passwordService->verify($currentPassword, $user->getPassword())) {
                 $user->setPassword($this->passwordService->create($newPassword));
 
-                $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_ACCOUNT_UPDATE, [
+                $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_CHANGE_PASSWORD, [
                     'user' => $user,
                     'currentPassword' => $currentPassword,
                     'newPassword' => $newPassword,
@@ -360,15 +363,13 @@ class UserService implements
 
                 $r = $mapper->save($user);
                 if ($r) {
-                    $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_ACCOUNT_UPDATE, [
+                    $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_CHANGE_PASSWORD, [
                         'user' => $user,
-                        'currentPassword' => $currentPassword,
-                        'newPassword' => $newPassword,
                         'mapper' => $mapper
                     ]);
                     return new Result(['user' => $user, 'mapper' => $mapper]);
                 }
-                $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_UPDATE_ERROR, [
+                $this->dispatchEvent(UserEvent::EVENT_USER_CHANGE_PASSWORD_ERROR, [
                     'user' => $user,
                     'mapper' => $mapper,
                     'currentPassword' => $currentPassword,
@@ -376,11 +377,12 @@ class UserService implements
                     'error' => ErrorCode::USER_SAVE_ERROR
                 ]);
                 return new Result(
-                    ['user' => $user, 'mapper' => $mapper],
+                    ['user' => $user, 'mapper' => $mapper,
+                        'currentPassword' => $currentPassword, 'newPassword' => $newPassword],
                     $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::CHANGE_PASSWORD_ERROR)
                 );
             }
-            $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_UPDATE_ERROR, [
+            $this->dispatchEvent(UserEvent::EVENT_USER_CHANGE_PASSWORD_ERROR, [
                 'user' => $user,
                 'mapper' => $mapper,
                 'currentPassword' => $currentPassword,
@@ -388,18 +390,23 @@ class UserService implements
                 'error' => ErrorCode::USER_PASSWORD_INVALID
             ]);
             return new Result(
-                ['user' => $user, 'mapper' => $mapper],
+                ['user' => $user, 'mapper' => $mapper,
+                    'currentPassword' => $currentPassword, 'newPassword' => $newPassword],
                 $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::CURRENT_PASSWORD_INVALID)
             );
         } catch (\Exception $e) {
-            $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_UPDATE_ERROR, [
+            $this->dispatchEvent(UserEvent::EVENT_USER_CHANGE_PASSWORD_ERROR, [
                 'user' => $user,
                 'mapper' => $mapper,
                 'currentPassword' => $currentPassword,
                 'newPassword' => $newPassword,
                 'error' => $e
             ]);
-            return new Result(['user' => $user, 'mapper' => $mapper], $e);
+            return new Result(
+                ['user' => $user, 'mapper' => $mapper,
+                    'currentPassword' => $currentPassword, 'newPassword' => $newPassword],
+                $e
+            );
         }
     }
 
@@ -437,10 +444,10 @@ class UserService implements
                         $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_REGISTRATION, [
                             'user' => $user,
                             'mapper' => $mapper,
-                            'confirmToken' => $t->getParam('token')
+                            'token' => $t->getParam('token')
                         ]);
                         return new Result(
-                            ['user' => $user, 'confirmToken' => $t->getParam('token'), 'mapper' => $mapper]
+                            ['user' => $user, 'token' => $t->getParam('token'), 'mapper' => $mapper]
                         );
                     }
                     // here is fail confirm token create
@@ -531,7 +538,7 @@ class UserService implements
      * @param array $data
      * @return Result
      */
-    public function generateResetToken(array $data): Result
+    public function resetPasswordRequest(array $data): Result
     {
         $email = $data['email'] ?? '';
 

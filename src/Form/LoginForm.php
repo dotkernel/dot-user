@@ -86,6 +86,7 @@ class LoginForm extends Form implements InputFilterProviderInterface, UserOption
 
         $this->add([
             'name' => 'submit',
+            'type' => 'Submit',
             'attributes' => [
                 'type' => 'submit',
                 'value' => 'Sign In'

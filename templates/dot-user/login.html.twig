@@ -1,0 +1,37 @@
+{% set dummy = form.prepare() %}
+{{ form().openTag(form) | raw }}
+
+    {% set identity = form.get('identity') %}
+    <div class="form-group {% if identity.getMessages() %}has-error{% endif %}">
+        {% set dummy = identity.setAttribute('class', 'form-control') %}
+        {{ formLabel(identity) }}
+        {{ formElement(identity) }}
+    </div>
+
+    {% set password = form.get('password') %}
+    <div class="form-group {% if password.getMessages() %}has-error{% endif %}">
+        {% set dummy = password.setAttribute('class', 'form-control') %}
+        {{ formLabel(password) }}
+        {{ formElement(password) }}
+    </div>
+
+    <div class="checkbox">
+        <label>
+            {{ formCheckbox(form.get('remember')) }} {{ form.get('remember').getLabel() }}
+        </label>
+    </div>
+
+    {{ formElement(form.get('login_csrf')) }}
+
+    {% set submit = form.get('submit') %}
+    {% set dummy = submit.setAttribute('class', 'btn btn-lg btn-primary btn-block') %}
+    {{ formSubmit(submit) }}
+
+{{ form().closeTag() | raw }}
+
+{% if passwordRecoveryEnabled is defined and passwordRecoveryEnabled %}
+    <div style="margin-top: 5px;">
+        <a href="{{ path('user', {'action':'forgot-password'}) }}">Forgot Password?</a>
+    </div>
+{% endif %}
+

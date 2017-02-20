@@ -99,6 +99,21 @@ trait UserEventListenerTrait
             [$this, 'onDeleteError'],
             $priority
         );
+        $this->listeners[] = $events->attach(
+            UserEvent::EVENT_USER_BEFORE_CHANGE_PASSWORD,
+            [$this, 'onBeforeChangePassword'],
+            $priority
+        );
+        $this->listeners[] = $events->attach(
+            UserEvent::EVENT_USER_AFTER_CHANGE_PASSWORD,
+            [$this, 'onAfterChangePassword'],
+            $priority
+        );
+        $this->listeners[] = $events->attach(
+            UserEvent::EVENT_USER_CHANGE_PASSWORD_ERROR,
+            [$this, 'onChangePasswordError'],
+            $priority
+        );
     }
 
     public function onBeforeRegistration(UserEvent $e)
@@ -157,6 +172,21 @@ trait UserEventListenerTrait
     }
 
     public function onAccountUpdateError(UserEvent $e)
+    {
+        // no-op
+    }
+
+    public function onBeforeChangePassword(UserEvent $e)
+    {
+        // no-op
+    }
+
+    public function onAfterChangePassword(UserEvent $e)
+    {
+        // no-op
+    }
+
+    public function onChangePasswordError(UserEvent $e)
     {
         // no-op
     }

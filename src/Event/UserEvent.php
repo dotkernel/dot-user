@@ -31,6 +31,10 @@ class UserEvent extends Event
     const EVENT_USER_AFTER_PASSWORD_RESET = 'event.user.afterPasswordReset';
     const EVENT_USER_RESET_PASSWORD_ERROR = 'event.user.resetPasswordError';
 
+    const EVENT_USER_BEFORE_CHANGE_PASSWORD = 'event.user.beforeChangePassword';
+    const EVENT_USER_AFTER_CHANGE_PASSWORD = 'event.user.afterChangePassword';
+    const EVENT_USER_CHANGE_PASSWORD_ERROR = 'event.user.changePasswordError';
+
     const EVENT_USER_BEFORE_ACCOUNT_UPDATE = 'event.user.beforeAccountUpdate';
     const EVENT_USER_AFTER_ACCOUNT_UPDATE = 'event.user.afterAccountUpdate';
     const EVENT_USER_ACCOUNT_UPDATE_ERROR = 'event.user.accountUpdateError';

@@ -154,13 +154,12 @@ class TokenService implements
                     ->getMessage(MessagesOptions::CONFIRM_TOKEN_SAVE_ERROR)
             );
         } catch (\Exception $e) {
-            $this->dispatchEvent(TokenEvent::EVENT_TOKEN_CONFIRM_TOKEN_SAVE_ERROR, [
-                'token' => $token,
-                'user' => $user,
-                'mapper' => $mapper,
-                'error' => $e
-            ]);
-            return new Result(['token' => $token, 'user' => $user, 'mapper' => $mapper], $e);
+            $errorData = ['mapper' => $mapper, 'user' => $user];
+            if ($token) {
+                $errorData['token'] = $token;
+            }
+            $this->dispatchEvent(TokenEvent::EVENT_TOKEN_CONFIRM_TOKEN_SAVE_ERROR, $errorData + ['error' => $e]);
+            return new Result($errorData, $e);
         }
     }
 
@@ -194,7 +193,7 @@ class TokenService implements
             }
 
             $tokenValue = $token->getToken();
-
+            // hash the token value just before we save it
             $token->setToken(md5($token->getToken()));
             $r = $mapper->save($token);
 
@@ -289,6 +288,9 @@ class TokenService implements
                         ]
                     );
                 } else {
+                    //clear any remember tokens as a security measure
+                    $this->deleteRememberTokens(['userId' => $token->getUserId()]);
+
                     $this->dispatchEvent(TokenEvent::EVENT_TOKEN_REMEMBER_TOKEN_VALIDATION_ERROR, [
                         'token' => $token,
                         'userToken' => $clearToken,
@@ -296,8 +298,6 @@ class TokenService implements
                         'mapper' => $mapper,
                         'error' => ErrorCode::TOKEN_INVALID
                     ]);
-                    //clear any remember tokens as a security measure
-                    $this->deleteRememberTokens(['userId' => $token->getUserId()]);
                     return new Result(
                         ['token' => $token, 'userToken' => $clearToken, 'selector' => $selector, 'mapper' => $mapper],
                         $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::REMEMBER_TOKEN_INVALID)
@@ -305,7 +305,6 @@ class TokenService implements
                 }
             }
             $this->dispatchEvent(TokenEvent::EVENT_TOKEN_REMEMBER_TOKEN_VALIDATION_ERROR, [
-                'token' => $token,
                 'userToken' => $clearToken,
                 'selector' => $selector,
                 'mapper' => $mapper,
@@ -317,17 +316,12 @@ class TokenService implements
                     ->getMessage(MessagesOptions::REMEMBER_TOKEN_INVALID)
             );
         } catch (\Exception $e) {
-            $this->dispatchEvent(TokenEvent::EVENT_TOKEN_REMEMBER_TOKEN_VALIDATION_ERROR, [
-                'token' => $token,
-                'userToken' => $clearToken,
-                'selector' => $selector,
-                'mapper' => $mapper,
-                'error' => $e
-            ]);
-            return new Result(
-                ['token' => $token, 'userToken' => $clearToken, 'selector' => $selector, 'mapper' => $mapper],
-                $e
-            );
+            $errorData = ['mapper' => $mapper, 'selector' => $selector, 'userToken' => $clearToken];
+            if ($token) {
+                $errorData['token'] = $token;
+            }
+            $this->dispatchEvent(TokenEvent::EVENT_TOKEN_REMEMBER_TOKEN_VALIDATION_ERROR, $errorData + ['error' => $e]);
+            return new Result($errorData, $e);
         }
     }
 
@@ -429,12 +423,11 @@ class TokenService implements
                     ->getMessage(MessagesOptions::RESET_TOKEN_SAVE_ERROR)
             );
         } catch (\Exception $e) {
-            $this->dispatchEvent(TokenEvent::EVENT_TOKEN_RESET_TOKEN_SAVE_ERROR, [
-                'token' => $token,
-                'user' => $user,
-                'mapper' => $mapper,
-                'error' => $e
-            ]);
+            $errorData = ['user' => $user, 'mapper' => $mapper];
+            if ($token) {
+                $errorData['token'] = $token;
+            }
+            $this->dispatchEvent(TokenEvent::EVENT_TOKEN_RESET_TOKEN_SAVE_ERROR, $errorData + ['error' => $e]);
             return new Result(['token' => $token, 'user' => $user, 'mapper' => $mapper], $e);
         }
     }

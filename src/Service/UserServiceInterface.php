@@ -68,7 +68,7 @@ interface UserServiceInterface
      * @param array $data
      * @return Result
      */
-    public function generateResetToken(array $data): Result;
+    public function resetPasswordRequest(array $data): Result;
 
     /**
      * @return UserEntity

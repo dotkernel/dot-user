@@ -59,6 +59,7 @@ class ForgotPasswordForm extends Form implements InputFilterProviderInterface, U
 
         $this->add([
             'name' => 'submit',
+            'type' => 'Submit',
             'attributes' => [
                 'type' => 'submit',
                 'value' => 'Reset password'

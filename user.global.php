@@ -7,8 +7,6 @@ return [
 
         'default_roles' => ['user'],
 
-        'show_form_labels' => true,
-
         'enable_account_confirmation' => true,
         'confirmed_account_status' => \Dot\User\Entity\UserEntity::STATUS_ACTIVE,
 
@@ -18,8 +16,10 @@ return [
             'user' => [
 
             ],
-
             'token' => [
+
+            ],
+            'controller' => [
 
             ]
         ],
@@ -42,10 +42,12 @@ return [
             'reset_token_timeout' => 3600,
         ],
         'template_options' => [
-            // change default template file references or the base layout(for example)
-            'register_template' => 'your-app::register_template',
-            'register_template_layout' => 'your-app::layout',
-            // for a full list see documentation, or check out TemplateOptions class
+            'login_template' => '',
+            'register_template' => '',
+            'account_template' => '',
+            'change_password_template' => '',
+            'forgot_password_template' => '',
+            'reset_password_template' => ''
         ],
         'messages_options' => [
             'messages' => [

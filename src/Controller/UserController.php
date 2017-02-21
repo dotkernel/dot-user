@@ -20,6 +20,10 @@ use Dot\Controller\Plugin\Forms\FormsPlugin;
 use Dot\Controller\Plugin\TemplatePlugin;
 use Dot\Controller\Plugin\UrlHelperPlugin;
 use Dot\User\Entity\UserEntity;
+use Dot\User\Event\ControllerEvent;
+use Dot\User\Event\ControllerEventListenerInterface;
+use Dot\User\Event\ControllerEventListenerTrait;
+use Dot\User\Event\DispatchControllerEventsTrait;
 use Dot\User\Exception\InvalidArgumentException;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
@@ -45,8 +49,11 @@ use Zend\Form\FormInterface;
  * @method AuthenticationPlugin authentication()
  * @method AuthorizationPlugin isGranted(string $permission, array $roles = [], mixed $context = null)
  */
-class UserController extends AbstractActionController
+class UserController extends AbstractActionController implements ControllerEventListenerInterface
 {
+    use DispatchControllerEventsTrait;
+    use ControllerEventListenerTrait;
+
     const LOGIN_ROUTE_NAME = 'login';
     const USER_ROUTE_NAME = 'user';
 
@@ -164,16 +171,21 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse(
-            $this->template(
-                $this->userOptions->getTemplateOptions()->getChangePasswordTemplate(),
-                [
-                    'form' => $form,
-                    'showLabels' => $this->userOptions->isShowFormLabels(),
-                    'layoutTemplate' => $this->userOptions->getTemplateOptions()->getChangePasswordTemplateLayout()
-                ]
-            )
-        );
+        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_CHANGE_PASSWORD_RENDER, [
+            'form' => $form,
+            'request' => $this->getRequest(),
+            'template' => $this->userOptions->getTemplateOptions()->getChangePasswordTemplate()
+        ]);
+        if ($r instanceof ResponseInterface) {
+            return $r;
+        }
+
+        $params = $r->getParams();
+        $template = $params['template'] ?? '';
+        unset($params['template']);
+        $data = $params;
+
+        return new HtmlResponse($this->template($template, $data));
     }
 
     /**
@@ -232,17 +244,21 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse(
-            $this->template(
-                $this->userOptions->getTemplateOptions()->getRegisterTemplate(),
-                [
-                    'form' => $form,
-                    'enableRegistration' => $this->userOptions->getRegisterOptions()->isEnableRegistration(),
-                    'showLabels' => $this->userOptions->isShowFormLabels(),
-                    'layoutTemplate' => $this->userOptions->getTemplateOptions()->getRegisterTemplateLayout()
-                ]
-            )
-        );
+        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_REGISTER_RENDER, [
+            'form' => $form,
+            'request' => $this->getRequest(),
+            'template' => $this->userOptions->getTemplateOptions()->getRegisterTemplate()
+        ]);
+        if ($r instanceof ResponseInterface) {
+            return $r;
+        }
+
+        $params = $r->getParams();
+        $template = $params['template'] ?? '';
+        unset($params['template']);
+        $data = $params;
+
+        return new HtmlResponse($this->template($template, $data));
     }
 
     /**
@@ -264,8 +280,12 @@ class UserController extends AbstractActionController
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
 
-            // dynamically change form validation groups, according to form data
-            $this->onBeforeAccountFormValidation($user, $form, $data);
+            $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_ACCOUNT_UPDATE_FORM_VALIDATION, [
+                'user' => $user,
+                'form' => $form,
+                'data' => $data,
+                'request' => $this->getRequest()
+            ]);
 
             $form->setData($data);
             if ($form->isValid()) {
@@ -293,14 +313,21 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse(
-            $this->userOptions->getTemplateOptions()->getAccountTemplate(),
-            [
-                'form' => $form,
-                'showLabels' => $this->userOptions->isShowFormLabels(),
-                'layoutTemplate' => $this->userOptions->getTemplateOptions()->getAccountTemplateLayout()
-            ]
-        );
+        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_ACCOUNT_RENDER, [
+            'form' => $form,
+            'request' => $this->getRequest(),
+            'template' => $this->userOptions->getTemplateOptions()->getAccountTemplate()
+        ]);
+        if ($r instanceof ResponseInterface) {
+            return $r;
+        }
+
+        $params = $r->getParams();
+        $template = $params['template'] ?? '';
+        unset($params['template']);
+        $data = $params;
+
+        return new HtmlResponse($this->template($template, $data));
     }
 
     /**
@@ -353,16 +380,21 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse(
-            $this->template(
-                $this->userOptions->getTemplateOptions()->getResetPasswordTemplate(),
-                [
-                    'form' => $form,
-                    'showLabels' => $this->userOptions->isShowFormLabels(),
-                    'layoutTemplate' => $this->userOptions->getTemplateOptions()->getResetPasswordTemplateLayout()
-                ]
-            )
-        );
+        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_RESET_PASSWORD_RENDER, [
+            'form' => $form,
+            'request' => $this->getRequest(),
+            'template' => $this->userOptions->getTemplateOptions()->getResetPasswordTemplate()
+        ]);
+        if ($r instanceof ResponseInterface) {
+            return $r;
+        }
+
+        $params = $r->getParams();
+        $template = $params['template'] ?? '';
+        unset($params['template']);
+        $data = $params;
+
+        return new HtmlResponse($this->template($template, $data));
     }
 
     /**
@@ -412,16 +444,21 @@ class UserController extends AbstractActionController
             }
         }
 
-        return new HtmlResponse(
-            $this->template(
-                $this->userOptions->getTemplateOptions()->getForgotPasswordTemplate(),
-                [
-                    'form' => $form,
-                    'showLabels' => false,
-                    'layoutTemplate' => $this->userOptions->getTemplateOptions()->getForgotPasswordTemplateLayout()
-                ]
-            )
-        );
+        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_FORGOT_PASSWORD_RENDER, [
+            'form' => $form,
+            'request' => $this->getRequest(),
+            'template' => $this->userOptions->getTemplateOptions()->getForgotPasswordTemplate()
+        ]);
+        if ($r instanceof ResponseInterface) {
+            return $r;
+        }
+
+        $params = $r->getParams();
+        $template = $params['template'] ?? '';
+        unset($params['template']);
+        $data = $params;
+
+        return new HtmlResponse($this->template($template, $data));
     }
 
     /**
@@ -441,13 +478,14 @@ class UserController extends AbstractActionController
     }
 
     /**
-     * You can override this method to change the form validation on the go, for account update
-     * @param UserEntity $user
-     * @param Form $form
-     * @param array $data
+     * @param ControllerEvent $e
      */
-    protected function onBeforeAccountFormValidation(UserEntity $user, Form $form, array $data)
+    public function onBeforeAccountUpdateFormValidation(ControllerEvent $e)
     {
+        $data = $e->getParam('data', []);
+        $form = $e->getParam('form');
+        $user = $e->getParam('user');
+
         if ($data['user']['username'] === $user->getUsername()) {
             $validationGroup = $form->getValidationGroup();
             unset($validationGroup['user']['username']);

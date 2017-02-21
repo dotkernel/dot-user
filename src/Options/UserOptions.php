@@ -54,9 +54,6 @@ class UserOptions extends AbstractOptions
     /** @var array */
     protected $eventListeners = [];
 
-    /** @var bool */
-    protected $showFormLabels = false;
-
     /** @var  LoginOptions */
     protected $loginOptions;
 
@@ -134,22 +131,6 @@ class UserOptions extends AbstractOptions
     public function setEventListeners(array $eventListeners)
     {
         $this->eventListeners = $eventListeners;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShowFormLabels(): bool
-    {
-        return $this->showFormLabels;
-    }
-
-    /**
-     * @param bool $showFormLabels
-     */
-    public function setShowFormLabels(bool $showFormLabels)
-    {
-        $this->showFormLabels = $showFormLabels;
     }
 
     /**

@@ -13,9 +13,13 @@ namespace Dot\User\Factory;
 
 use Dot\Authentication\Web\Action\LoginAction;
 use Dot\User\Controller\UserController;
+use Dot\User\Event\ControllerEventListenerInterface;
+use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
+use Zend\EventManager\EventManager;
+use Zend\EventManager\EventManagerInterface;
 
 /**
  * Class UserControllerFactory
@@ -30,10 +34,74 @@ class UserControllerFactory
      */
     public function __invoke(ContainerInterface $container, $requestedName): UserController
     {
-        return new $requestedName(
+        /** @var UserOptions $options */
+        $options = $container->get(UserOptions::class);
+
+        /** @var UserController $controller */
+        $controller = new $requestedName(
             $container->get(UserServiceInterface::class),
-            $container->get(UserOptions::class),
+            $options,
             $container->get(LoginAction::class)
         );
+
+        $em = $container->has(EventManagerInterface::class)
+            ? $container->get(EventManagerInterface::class)
+            : new EventManager();
+        $controller->setEventManager($em);
+        $controller->attach($em, 1000);
+
+        if (isset($options->getEventListeners()['controller'])
+            && is_array($options->getEventListeners()['controller'])
+        ) {
+            $this->attachListeners($container, $options->getEventListeners()['controller'], $em);
+        }
+
+        return $controller;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param array $listeners
+     * @param EventManagerInterface $em
+     */
+    protected function attachListeners(ContainerInterface $container, array $listeners, EventManagerInterface $em)
+    {
+        foreach ($listeners as $listener) {
+            if (is_string($listeners)) {
+                $l = $this->getListenerObject($container, $listener);
+                $p = 1;
+                $l->attach($em, $p);
+            } elseif (is_array($listener)) {
+                $l = $listener['type'] ?? '';
+                $p = $listener['priority'] ?? 1;
+                $l = $this->getListenerObject($container, $l);
+                $l->attach($em, $p);
+            }
+        }
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param string $listener
+     * @return ControllerEventListenerInterface
+     */
+    protected function getListenerObject(
+        ContainerInterface $container,
+        string $listener
+    ): ControllerEventListenerInterface {
+        if ($container->has($listener)) {
+            $listener = $container->get($listener);
+        }
+
+        if (is_string($listener) && class_exists($listener)) {
+            $listener = new $listener();
+        }
+
+        if (!$listener instanceof ControllerEventListenerInterface) {
+            throw new RuntimeException('Controller event listener is not an instance of '
+                . ControllerEventListenerInterface::class);
+        }
+
+        return $listener;
     }
 }

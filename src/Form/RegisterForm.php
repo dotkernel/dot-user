@@ -53,7 +53,8 @@ class RegisterForm extends Form implements UserOptionsAwareInterface
         ]);
 
         if ($this->userOptions->getRegisterOptions()->isUseRegistrationCaptcha()
-            && !empty($this->userOptions->getRegisterOptions()->getCaptchaOptions())) {
+            && !empty($this->userOptions->getRegisterOptions()->getCaptchaOptions())
+        ) {
             $this->add([
                 'name' => 'captcha',
                 'type' => 'Captcha',

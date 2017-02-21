@@ -29,7 +29,7 @@ class RegisterOptions extends AbstractOptions
     /** @var bool */
     protected $useRegistrationCaptcha = true;
 
-    /** @var array  */
+    /** @var array */
     protected $captchaOptions = [];
 
     /** @var bool */

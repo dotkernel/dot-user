@@ -266,8 +266,10 @@ class TokenService implements
                     ]);
                     return new Result(
                         [
-                            'token' => $token, 'userToken' => $clearToken,
-                            'selector' => $selector, 'mapper' => $mapper
+                            'token' => $token,
+                            'userToken' => $clearToken,
+                            'selector' => $selector,
+                            'mapper' => $mapper
                         ]
                     );
                 } else {

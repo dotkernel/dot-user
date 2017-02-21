@@ -60,7 +60,5 @@ class InjectLoginForm extends AbstractAuthenticationEventListener
 
         $e->setParam('form', $form);
         $e->setParam('passwordRecoveryEnabled', $this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery());
-        $e->setParam('showLabels', $this->userOptions->isShowFormLabels());
-        $e->setParam('layoutTemplate', $this->userOptions->getTemplateOptions()->getLoginTemplateLayout());
     }
 }

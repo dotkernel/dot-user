@@ -110,7 +110,9 @@ class UserService implements
             );
         } catch (\Exception $e) {
             $this->dispatchEvent(UserEvent::EVENT_USER_DELETE_ERROR, [
-                'user' => $user, 'mapper' => $mapper, 'error' => $e
+                'user' => $user,
+                'mapper' => $mapper,
+                'error' => $e
             ]);
             return new Result(['user' => $user, 'mapper' => $mapper], $e);
         }
@@ -351,8 +353,12 @@ class UserService implements
                     'error' => ErrorCode::USER_SAVE_ERROR
                 ]);
                 return new Result(
-                    ['user' => $user, 'mapper' => $mapper,
-                        'currentPassword' => $currentPassword, 'newPassword' => $newPassword],
+                    [
+                        'user' => $user,
+                        'mapper' => $mapper,
+                        'currentPassword' => $currentPassword,
+                        'newPassword' => $newPassword
+                    ],
                     $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::CHANGE_PASSWORD_ERROR)
                 );
             }
@@ -364,8 +370,12 @@ class UserService implements
                 'error' => ErrorCode::USER_PASSWORD_INVALID
             ]);
             return new Result(
-                ['user' => $user, 'mapper' => $mapper,
-                    'currentPassword' => $currentPassword, 'newPassword' => $newPassword],
+                [
+                    'user' => $user,
+                    'mapper' => $mapper,
+                    'currentPassword' => $currentPassword,
+                    'newPassword' => $newPassword
+                ],
                 $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::CURRENT_PASSWORD_INVALID)
             );
         } catch (\Exception $e) {
@@ -377,8 +387,12 @@ class UserService implements
                 'error' => $e
             ]);
             return new Result(
-                ['user' => $user, 'mapper' => $mapper,
-                    'currentPassword' => $currentPassword, 'newPassword' => $newPassword],
+                [
+                    'user' => $user,
+                    'mapper' => $mapper,
+                    'currentPassword' => $currentPassword,
+                    'newPassword' => $newPassword
+                ],
                 $e
             );
         }

@@ -18,40 +18,22 @@ namespace Dot\User\Options;
 class TemplateOptions
 {
     /** @var string */
-    protected $loginTemplate = 'dot-user::login';
+    protected $loginTemplate = '';
 
     /** @var string */
-    protected $loginTemplateLayout = '@layout/default.html.twig';
+    protected $registerTemplate = '';
 
     /** @var string */
-    protected $registerTemplate = 'dot-user::register';
+    protected $accountTemplate = '';
 
     /** @var string */
-    protected $registerTemplateLayout = '@layout/default.html.twig';
+    protected $changePasswordTemplate = '';
 
     /** @var string */
-    protected $accountTemplate = 'dot-user::account';
+    protected $forgotPasswordTemplate = '';
 
     /** @var string */
-    protected $accountTemplateLayout = '@layout/default.html.twig';
-
-    /** @var string */
-    protected $changePasswordTemplate = 'dot-user::change-password';
-
-    /** @var string */
-    protected $changePasswordTemplateLayout = '@layout/default.html.twig';
-
-    /** @var string */
-    protected $forgotPasswordTemplate = 'dot-user::forgot-password';
-
-    /** @var string */
-    protected $forgotPasswordTemplateLayout = '@layout/default.html.twig';
-
-    /** @var string */
-    protected $resetPasswordTemplate = 'dot-user::reset-password';
-
-    /** @var string */
-    protected $resetPasswordTemplateLayout = '@layout/default.html.twig';
+    protected $resetPasswordTemplate = '';
 
     /**
      * @return string
@@ -67,22 +49,6 @@ class TemplateOptions
     public function setLoginTemplate(string $loginTemplate)
     {
         $this->loginTemplate = $loginTemplate;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLoginTemplateLayout(): string
-    {
-        return $this->loginTemplateLayout;
-    }
-
-    /**
-     * @param string $loginTemplateLayout
-     */
-    public function setLoginTemplateLayout(string $loginTemplateLayout)
-    {
-        $this->loginTemplateLayout = $loginTemplateLayout;
     }
 
     /**
@@ -104,22 +70,6 @@ class TemplateOptions
     /**
      * @return string
      */
-    public function getRegisterTemplateLayout(): string
-    {
-        return $this->registerTemplateLayout;
-    }
-
-    /**
-     * @param string $registerTemplateLayout
-     */
-    public function setRegisterTemplateLayout(string $registerTemplateLayout)
-    {
-        $this->registerTemplateLayout = $registerTemplateLayout;
-    }
-
-    /**
-     * @return string
-     */
     public function getAccountTemplate(): string
     {
         return $this->accountTemplate;
@@ -131,22 +81,6 @@ class TemplateOptions
     public function setAccountTemplate(string $accountTemplate)
     {
         $this->accountTemplate = $accountTemplate;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAccountTemplateLayout(): string
-    {
-        return $this->accountTemplateLayout;
-    }
-
-    /**
-     * @param string $accountTemplateLayout
-     */
-    public function setAccountTemplateLayout(string $accountTemplateLayout)
-    {
-        $this->accountTemplateLayout = $accountTemplateLayout;
     }
 
     /**
@@ -168,22 +102,6 @@ class TemplateOptions
     /**
      * @return string
      */
-    public function getChangePasswordTemplateLayout(): string
-    {
-        return $this->changePasswordTemplateLayout;
-    }
-
-    /**
-     * @param string $changePasswordTemplateLayout
-     */
-    public function setChangePasswordTemplateLayout(string $changePasswordTemplateLayout)
-    {
-        $this->changePasswordTemplateLayout = $changePasswordTemplateLayout;
-    }
-
-    /**
-     * @return string
-     */
     public function getForgotPasswordTemplate(): string
     {
         return $this->forgotPasswordTemplate;
@@ -200,22 +118,6 @@ class TemplateOptions
     /**
      * @return string
      */
-    public function getForgotPasswordTemplateLayout(): string
-    {
-        return $this->forgotPasswordTemplateLayout;
-    }
-
-    /**
-     * @param string $forgotPasswordTemplateLayout
-     */
-    public function setForgotPasswordTemplateLayout(string $forgotPasswordTemplateLayout)
-    {
-        $this->forgotPasswordTemplateLayout = $forgotPasswordTemplateLayout;
-    }
-
-    /**
-     * @return string
-     */
     public function getResetPasswordTemplate(): string
     {
         return $this->resetPasswordTemplate;
@@ -227,21 +129,5 @@ class TemplateOptions
     public function setResetPasswordTemplate(string $resetPasswordTemplate)
     {
         $this->resetPasswordTemplate = $resetPasswordTemplate;
-    }
-
-    /**
-     * @return string
-     */
-    public function getResetPasswordTemplateLayout(): string
-    {
-        return $this->resetPasswordTemplateLayout;
-    }
-
-    /**
-     * @param string $resetPasswordTemplateLayout
-     */
-    public function setResetPasswordTemplateLayout(string $resetPasswordTemplateLayout)
-    {
-        $this->resetPasswordTemplateLayout = $resetPasswordTemplateLayout;
     }
 }

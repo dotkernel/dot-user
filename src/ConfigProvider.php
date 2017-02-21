@@ -84,7 +84,7 @@ class ConfigProvider
 
             'templates' => [
                 'paths' => [
-                    'dot-user' => [realpath(__DIR__ . '/../templates/dot-user')],
+                    'dot-user-form' => [realpath(__DIR__ . '/../templates/dot-user-form')],
                 ],
             ],
 
@@ -93,7 +93,7 @@ class ConfigProvider
                     'login_route' => ['route_name' => 'login'],
                     'logout_route' => ['route_name' => 'logout'],
 
-                    'login_template' => 'dot-user::login',
+                    'login_template' => 'dot-user-form::login',
 
                     'after_login_route' => ['route_name' => 'user', 'route_params' => ['action' => 'account']],
                     'after_logout_route' => ['route_name' => 'login'],

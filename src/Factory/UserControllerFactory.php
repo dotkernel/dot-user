@@ -12,8 +12,8 @@ declare(strict_types = 1);
 namespace Dot\User\Factory;
 
 use Dot\Authentication\Web\Action\LoginAction;
-use Dot\User\Controller\UserController;
-use Dot\User\Event\ControllerEventListenerInterface;
+use Dot\User\Controller\UserUserController;
+use Dot\User\Event\UserControllerEventListenerInterface;
 use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserServiceInterface;
@@ -32,12 +32,12 @@ class UserControllerFactory
      * @param $requestedName
      * @return mixed
      */
-    public function __invoke(ContainerInterface $container, $requestedName): UserController
+    public function __invoke(ContainerInterface $container, $requestedName): UserUserController
     {
         /** @var UserOptions $options */
         $options = $container->get(UserOptions::class);
 
-        /** @var UserController $controller */
+        /** @var UserUserController $controller */
         $controller = new $requestedName(
             $container->get(UserServiceInterface::class),
             $options,
@@ -83,12 +83,12 @@ class UserControllerFactory
     /**
      * @param ContainerInterface $container
      * @param string $listener
-     * @return ControllerEventListenerInterface
+     * @return UserControllerEventListenerInterface
      */
     protected function getListenerObject(
         ContainerInterface $container,
         string $listener
-    ): ControllerEventListenerInterface {
+    ): UserControllerEventListenerInterface {
         if ($container->has($listener)) {
             $listener = $container->get($listener);
         }
@@ -97,9 +97,9 @@ class UserControllerFactory
             $listener = new $listener();
         }
 
-        if (!$listener instanceof ControllerEventListenerInterface) {
+        if (!$listener instanceof UserControllerEventListenerInterface) {
             throw new RuntimeException('Controller event listener is not an instance of '
-                . ControllerEventListenerInterface::class);
+                . UserControllerEventListenerInterface::class);
         }
 
         return $listener;

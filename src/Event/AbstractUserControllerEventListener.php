@@ -17,8 +17,8 @@ use Zend\EventManager\AbstractListenerAggregate;
  * Class AbstractControllerEventListener
  * @package Dot\User\Event
  */
-abstract class AbstractControllerEventListener extends AbstractListenerAggregate implements
-    ControllerEventListenerInterface
+abstract class AbstractUserControllerEventListener extends AbstractListenerAggregate implements
+    UserControllerEventListenerInterface
 {
-    use ControllerEventListenerTrait;
+    use UserControllerEventListenerTrait;
 }

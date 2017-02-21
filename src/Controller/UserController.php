@@ -20,10 +20,10 @@ use Dot\Controller\Plugin\Forms\FormsPlugin;
 use Dot\Controller\Plugin\TemplatePlugin;
 use Dot\Controller\Plugin\UrlHelperPlugin;
 use Dot\User\Entity\UserEntity;
-use Dot\User\Event\ControllerEvent;
-use Dot\User\Event\ControllerEventListenerInterface;
-use Dot\User\Event\ControllerEventListenerTrait;
-use Dot\User\Event\DispatchControllerEventsTrait;
+use Dot\User\Event\UserControllerEvent;
+use Dot\User\Event\UserControllerEventListenerInterface;
+use Dot\User\Event\UserControllerEventListenerTrait;
+use Dot\User\Event\DispatchUserControllerEventsTrait;
 use Dot\User\Exception\InvalidArgumentException;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
@@ -49,10 +49,10 @@ use Zend\Form\FormInterface;
  * @method AuthenticationPlugin authentication()
  * @method AuthorizationPlugin isGranted(string $permission, array $roles = [], mixed $context = null)
  */
-class UserController extends AbstractActionController implements ControllerEventListenerInterface
+class UserUserController extends AbstractActionController implements UserControllerEventListenerInterface
 {
-    use DispatchControllerEventsTrait;
-    use ControllerEventListenerTrait;
+    use DispatchUserControllerEventsTrait;
+    use UserControllerEventListenerTrait;
 
     const LOGIN_ROUTE_NAME = 'login';
     const USER_ROUTE_NAME = 'user';
@@ -171,7 +171,7 @@ class UserController extends AbstractActionController implements ControllerEvent
             }
         }
 
-        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_CHANGE_PASSWORD_RENDER, [
+        $r = $this->dispatchEvent(UserControllerEvent::EVENT_CONTROLLER_BEFORE_CHANGE_PASSWORD_RENDER, [
             'form' => $form,
             'request' => $this->getRequest(),
             'template' => $this->userOptions->getTemplateOptions()->getChangePasswordTemplate()
@@ -244,7 +244,7 @@ class UserController extends AbstractActionController implements ControllerEvent
             }
         }
 
-        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_REGISTER_RENDER, [
+        $r = $this->dispatchEvent(UserControllerEvent::EVENT_CONTROLLER_BEFORE_REGISTER_RENDER, [
             'form' => $form,
             'request' => $this->getRequest(),
             'template' => $this->userOptions->getTemplateOptions()->getRegisterTemplate()
@@ -280,7 +280,7 @@ class UserController extends AbstractActionController implements ControllerEvent
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
 
-            $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_ACCOUNT_UPDATE_FORM_VALIDATION, [
+            $this->dispatchEvent(UserControllerEvent::EVENT_CONTROLLER_BEFORE_ACCOUNT_UPDATE_FORM_VALIDATION, [
                 'user' => $user,
                 'form' => $form,
                 'data' => $data,
@@ -313,7 +313,7 @@ class UserController extends AbstractActionController implements ControllerEvent
             }
         }
 
-        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_ACCOUNT_RENDER, [
+        $r = $this->dispatchEvent(UserControllerEvent::EVENT_CONTROLLER_BEFORE_ACCOUNT_RENDER, [
             'form' => $form,
             'request' => $this->getRequest(),
             'template' => $this->userOptions->getTemplateOptions()->getAccountTemplate()
@@ -380,7 +380,7 @@ class UserController extends AbstractActionController implements ControllerEvent
             }
         }
 
-        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_RESET_PASSWORD_RENDER, [
+        $r = $this->dispatchEvent(UserControllerEvent::EVENT_CONTROLLER_BEFORE_RESET_PASSWORD_RENDER, [
             'form' => $form,
             'request' => $this->getRequest(),
             'template' => $this->userOptions->getTemplateOptions()->getResetPasswordTemplate()
@@ -444,7 +444,7 @@ class UserController extends AbstractActionController implements ControllerEvent
             }
         }
 
-        $r = $this->dispatchEvent(ControllerEvent::EVENT_CONTROLLER_BEFORE_FORGOT_PASSWORD_RENDER, [
+        $r = $this->dispatchEvent(UserControllerEvent::EVENT_CONTROLLER_BEFORE_FORGOT_PASSWORD_RENDER, [
             'form' => $form,
             'request' => $this->getRequest(),
             'template' => $this->userOptions->getTemplateOptions()->getForgotPasswordTemplate()
@@ -478,9 +478,9 @@ class UserController extends AbstractActionController implements ControllerEvent
     }
 
     /**
-     * @param ControllerEvent $e
+     * @param UserControllerEvent $e
      */
-    public function onBeforeAccountUpdateFormValidation(ControllerEvent $e)
+    public function onBeforeAccountUpdateFormValidation(UserControllerEvent $e)
     {
         $data = $e->getParam('data', []);
         $form = $e->getParam('form');

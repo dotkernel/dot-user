@@ -17,7 +17,7 @@ use Dot\Event\Event;
  * Class ControllerEvent
  * @package Dot\User\Event
  */
-class ControllerEvent extends Event
+class UserControllerEvent extends Event
 {
     const EVENT_CONTROLLER_BEFORE_CHANGE_PASSWORD_RENDER = 'event.controller.beforeChangePasswordRender';
     const EVENT_CONTROLLER_BEFORE_REGISTER_RENDER = 'event.controller.beforeRegisterRender';

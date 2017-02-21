@@ -12,7 +12,7 @@ namespace Dk\User;
 use Dot\Ems\Factory\DbMapperFactory;
 use Dot\User\Authentication\AuthenticationListener;
 use Dot\User\Authentication\InjectLoginForm;
-use Dot\User\Controller\UserController;
+use Dot\User\Controller\UserUserController;
 use Dot\User\Entity\ConfirmTokenEntity;
 use Dot\User\Entity\RememberTokenEntity;
 use Dot\User\Entity\ResetTokenEntity;
@@ -78,7 +78,7 @@ class ConfigProvider
                 'user_route' => [
                     'name' => 'user',
                     'path' => '/user[/{action}]',
-                    'middleware' => UserController::class,
+                    'middleware' => UserUserController::class,
                 ],
             ],
 
@@ -174,7 +174,7 @@ class ConfigProvider
                 PasswordCheck::class => PasswordCheckFactory::class,
 
                 UserOptions::class => UserOptionsFactory::class,
-                UserController::class => UserControllerFactory::class,
+                UserUserController::class => UserControllerFactory::class,
                 UserService::class => UserServiceFactory::class,
                 TokenService::class => TokenServiceFactory::class,
 

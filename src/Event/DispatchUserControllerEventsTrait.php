@@ -19,7 +19,7 @@ use Zend\EventManager\ResponseCollection;
  * Trait DispatchControllerEventsTrait
  * @package Dot\User\Event
  */
-trait DispatchControllerEventsTrait
+trait DispatchUserControllerEventsTrait
 {
     use EventManagerAwareTrait;
 
@@ -27,7 +27,7 @@ trait DispatchControllerEventsTrait
      * @param string $name
      * @param array $data
      * @param null $target
-     * @return ControllerEvent|ResponseCollection
+     * @return UserControllerEvent|ResponseCollection
      */
     public function dispatchEvent(string $name, array $data = [], $target = null)
     {
@@ -35,7 +35,7 @@ trait DispatchControllerEventsTrait
             $target = $this;
         }
 
-        $event = new ControllerEvent($name, $target, $data);
+        $event = new UserControllerEvent($name, $target, $data);
         $result = $this->getEventManager()->triggerEventUntil(function ($r) {
             return ($r instanceof ResponseInterface);
         }, $event);

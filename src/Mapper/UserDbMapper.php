@@ -96,7 +96,7 @@ class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
         $user = $e->getParam('entity');
         if (empty($user->getRoles())) {
             // set the user with the default role as set in config
-            $defaultRoles = $this->userOptions->getDefaultRole();
+            $defaultRoles = $this->userOptions->getDefaultRoles();
 
             /** @var MapperInterface $rolesMapper */
             $rolesMapper = $this->mapperManager->get($this->userOptions->getRoleEntity());

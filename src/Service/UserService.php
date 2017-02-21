@@ -20,14 +20,12 @@ use Dot\User\Event\TokenEventListenerTrait;
 use Dot\User\Event\UserEvent;
 use Dot\User\Event\UserEventListenerInterface;
 use Dot\User\Event\UserEventListenerTrait;
-use Dot\User\Exception\InvalidArgumentException;
 use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Dot\User\Result\ErrorCode;
 use Dot\User\Result\Result;
 use Zend\Crypt\Password\PasswordInterface;
-use Zend\EventManager\EventManagerInterface;
 
 /**
  * Class UserService
@@ -55,40 +53,18 @@ class UserService implements
 
     /**
      * UserService constructor.
-     * @param array $options
+     * @param TokenServiceInterface $tokenService
+     * @param PasswordInterface $passwordService
+     * @param UserOptions $userOptions
      */
-    public function __construct(array $options = [])
-    {
-        if (isset($options['user_options']) && $options['user_options'] instanceof UserOptions) {
-            $this->userOptions = $options['user_options'];
-        }
-
-        if (isset($options['token_service']) && $options['token_service'] instanceof TokenServiceInterface) {
-            $this->tokenService = $options['token_service'];
-        }
-
-        if (isset($options['password_service']) && $options['password_service'] instanceof PasswordInterface) {
-            $this->passwordService = $options['password_service'];
-        }
-
-        if (isset($options['event_manager']) && $options['event_manager'] instanceof EventManagerInterface) {
-            $this->setEventManager($options['event_manager']);
-        }
-
-        if (!$this->userOptions instanceof UserOptions) {
-            throw new InvalidArgumentException('UserOptions is required and was not set');
-        }
-
-        if (!$this->tokenService instanceof TokenService) {
-            throw new InvalidArgumentException('Token service is required and was not set');
-        }
-
-        if (!$this->passwordService instanceof PasswordInterface) {
-            throw new InvalidArgumentException('Password service is required and was not set');
-        }
-
-        $this->attach($this->getEventManager(), 1000);
-        $this->attach($this->tokenService->getEventManager(), 1000);
+    public function __construct(
+        TokenServiceInterface $tokenService,
+        PasswordInterface $passwordService,
+        UserOptions $userOptions
+    ) {
+        $this->tokenService = $tokenService;
+        $this->userOptions = $userOptions;
+        $this->passwordService = $passwordService;
     }
 
     /**
@@ -254,17 +230,16 @@ class UserService implements
                 if ($token) {
                     //check validity
                     if ($token->getExpire() >= time()) {
-                        $user->setPassword($this->passwordService->create($newPassword));
-
                         $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_PASSWORD_RESET, [
                             'user' => $user,
                             'token' => $token,
                             'mapper' => $mapper
                         ]);
                         if ($event->stopped()) {
-                            $event->last();
+                            return $event->last();
                         }
 
+                        $user->setPassword($this->passwordService->create($newPassword));
                         $r = $mapper->save($user);
                         if ($r) {
                             $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_PASSWORD_RESET, [
@@ -349,8 +324,6 @@ class UserService implements
 
         try {
             if ($this->passwordService->verify($currentPassword, $user->getPassword())) {
-                $user->setPassword($this->passwordService->create($newPassword));
-
                 $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_CHANGE_PASSWORD, [
                     'user' => $user,
                     'currentPassword' => $currentPassword,
@@ -361,6 +334,7 @@ class UserService implements
                     return $event->last();
                 }
 
+                $user->setPassword($this->passwordService->create($newPassword));
                 $r = $mapper->save($user);
                 if ($r) {
                     $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_CHANGE_PASSWORD, [
@@ -420,12 +394,6 @@ class UserService implements
         $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
 
         try {
-            $mapper->beginTransaction();
-
-            $user->setPassword($this->passwordService->create($user->getPassword()));
-            if ($this->userOptions->isEnableUserStatus()) {
-                $user->setStatus($this->userOptions->getRegisterOptions()->getDefaultUserStatus());
-            }
             $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_REGISTRATION, [
                 'user' => $user,
                 'mapper' => $mapper,
@@ -433,6 +401,11 @@ class UserService implements
             if ($event->stopped()) {
                 return $event->last();
             }
+
+            $mapper->beginTransaction();
+
+            $user->setPassword($this->passwordService->create($user->getPassword()));
+            $user->setStatus($this->userOptions->getRegisterOptions()->getDefaultUserStatus());
 
             $r = $mapper->save($user);
             if ($r) {
@@ -450,7 +423,7 @@ class UserService implements
                             ['user' => $user, 'token' => $t->getParam('token'), 'mapper' => $mapper]
                         );
                     }
-                    // here is fail confirm token create
+                    // if reach here, failed confirm token create
                     $mapper->rollback();
                     $this->dispatchEvent(UserEvent::EVENT_USER_REGISTRATION_ERROR, [
                         'user' => $user,
@@ -498,8 +471,6 @@ class UserService implements
         $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
 
         try {
-            $user->setPassword($this->passwordService->create($user->getPassword()));
-
             $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_ACCOUNT_UPDATE, [
                 'user' => $user,
                 'mapper' => $mapper,
@@ -508,6 +479,7 @@ class UserService implements
                 return $event->last();
             }
 
+            $user->setPassword($this->passwordService->create($user->getPassword()));
             $r = $mapper->save($user);
             if ($r) {
                 $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_ACCOUNT_UPDATE, [

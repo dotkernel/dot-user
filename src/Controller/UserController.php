@@ -48,6 +48,7 @@ use Zend\Form\FormInterface;
 class UserController extends AbstractActionController
 {
     const LOGIN_ROUTE_NAME = 'login';
+    const USER_ROUTE_NAME = 'user';
 
     /** @var  UserOptions */
     protected $userOptions;
@@ -60,29 +61,18 @@ class UserController extends AbstractActionController
 
     /**
      * UserController constructor.
-     * @param array $options
+     * @param UserServiceInterface $userService
+     * @param UserOptions $userOptions
+     * @param LoginAction|null $loginAction
      */
-    public function __construct(array $options = [])
-    {
-        if (isset($options['user_options']) && $options['user_options'] instanceof UserOptions) {
-            $this->userOptions = $options['user_options'];
-        }
-
-        if (isset($options['user_service']) && $options['user_service'] instanceof UserServiceInterface) {
-            $this->userService = $options['user_service'];
-        }
-
-        if (isset($options['login_action']) && $options['login_action'] instanceof LoginAction) {
-            $this->loginAction = $options['login_action'];
-        }
-
-        if (!$this->userService instanceof UserServiceInterface) {
-            throw new InvalidArgumentException('User service is required and was not set');
-        }
-
-        if (!$this->userOptions instanceof UserOptions) {
-            throw new InvalidArgumentException('UserOptions is required and was not set');
-        }
+    public function __construct(
+        UserServiceInterface $userService,
+        UserOptions $userOptions,
+        LoginAction $loginAction = null
+    ) {
+        $this->userService = $userService;
+        $this->userOptions = $userOptions;
+        $this->loginAction = $loginAction;
 
         if ($this->userOptions->getRegisterOptions()->isLoginAfterRegistration()
             && !$this->loginAction instanceof LoginAction
@@ -96,7 +86,11 @@ class UserController extends AbstractActionController
      */
     public function confirmAccountAction(): ResponseInterface
     {
-        if ($this->userOptions->isEnableAccountConfirmation()) {
+        if ($this->authentication()->hasIdentity()) {
+            return new RedirectResponse($this->url(static::USER_ROUTE_NAME, ['action' => 'account']));
+        }
+
+        if (!$this->userOptions->isEnableAccountConfirmation()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_DISABLED));
             return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
@@ -187,13 +181,17 @@ class UserController extends AbstractActionController
      */
     public function registerAction(): ResponseInterface
     {
-        $request = $this->getRequest();
-        if ($this->userOptions->getRegisterOptions()->isEnableRegistration()) {
+        if ($this->authentication()->hasIdentity()) {
+            return new RedirectResponse($this->url(static::USER_ROUTE_NAME, ['action' => 'account']));
+        }
+
+        if (!$this->userOptions->getRegisterOptions()->isEnableRegistration()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::REGISTER_DISABLED));
             return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
         }
 
+        $request = $this->getRequest();
         $form = $this->forms('Register');
 
         if ($request->getMethod() === 'POST') {
@@ -310,6 +308,10 @@ class UserController extends AbstractActionController
      */
     public function resetPasswordAction(): ResponseInterface
     {
+        if ($this->authentication()->hasIdentity()) {
+            return new RedirectResponse($this->url(static::USER_ROUTE_NAME, ['action' => 'account']));
+        }
+
         if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::RESET_PASSWORD_DISABLED));
@@ -368,6 +370,10 @@ class UserController extends AbstractActionController
      */
     public function forgotPasswordAction(): ResponseInterface
     {
+        if ($this->authentication()->hasIdentity()) {
+            return new RedirectResponse($this->url(static::USER_ROUTE_NAME, ['action' => 'account']));
+        }
+
         if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::RESET_PASSWORD_DISABLED));
@@ -470,14 +476,12 @@ class UserController extends AbstractActionController
             $loginData[$csrf->getName()] = $csrf->getValue();
         }
 
-        $form->setData($loginData);
-        $form->isValid();
-
         /** @var ServerRequestInterface $request */
-        $request = $request->withParsedBody($form->getData())
-            ->withUri(new Uri($this->url(static::LOGIN_ROUTE_NAME)));
+        $request = $request->withMethod('POST');
+        $request = $request->withParsedBody($loginData);
+        $request = $request->withUri(new Uri($this->url(static::LOGIN_ROUTE_NAME)));
 
-        return $this->loginAction->triggerAuthenticateEvent($request, $request->getParsedBody());
+        return $this->loginAction->__invoke($request, $this->response);
     }
 
     /**

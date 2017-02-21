@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace Dot\User\Factory;
 
 use Dot\Authentication\Web\Action\LoginAction;
+use Dot\User\Controller\UserController;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
@@ -27,13 +28,12 @@ class UserControllerFactory
      * @param $requestedName
      * @return mixed
      */
-    public function __invoke(ContainerInterface $container, $requestedName)
+    public function __invoke(ContainerInterface $container, $requestedName): UserController
     {
-        $options = [];
-        $options['user_options'] = $container->get(UserOptions::class);
-        $options['user_service'] = $container->get(UserServiceInterface::class);
-        $options['login_action'] = $container->get(LoginAction::class);
-
-        return new $requestedName($options);
+        return new $requestedName(
+            $container->get(UserServiceInterface::class),
+            $container->get(UserOptions::class),
+            $container->get(LoginAction::class)
+        );
     }
 }

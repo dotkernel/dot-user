@@ -22,13 +22,11 @@ use Dot\User\Event\DispatchTokenEventsTrait;
 use Dot\User\Event\TokenEvent;
 use Dot\User\Event\TokenEventListenerInterface;
 use Dot\User\Event\TokenEventListenerTrait;
-use Dot\User\Exception\InvalidArgumentException;
 use Dot\User\Mapper\TokenMapperInterface;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Dot\User\Result\ErrorCode;
 use Dot\User\Result\Result;
-use Zend\EventManager\EventManagerInterface;
 use Zend\Math\Rand;
 
 /**
@@ -49,23 +47,11 @@ class TokenService implements
 
     /**
      * TokenService constructor.
-     * @param array $options
+     * @param UserOptions $userOptions
      */
-    public function __construct(array $options = [])
+    public function __construct(UserOptions $userOptions)
     {
-        if (isset($options['user_options']) && $options['user_options'] instanceof UserOptions) {
-            $this->userOptions = $options['user_options'];
-        }
-
-        if (isset($options['event_manager']) && $options['event_manager'] instanceof EventManagerInterface) {
-            $this->setEventManager($options['event_manager']);
-        }
-
-        if (!$this->userOptions instanceof UserOptions) {
-            throw new InvalidArgumentException('UserOptions is required and is not set');
-        }
-
-        $this->attach($this->getEventManager(), 1100);
+        $this->userOptions = $userOptions;
     }
 
     /**
@@ -127,7 +113,6 @@ class TokenService implements
                 'user' => $user,
                 'mapper' => $mapper
             ]);
-
             if ($event->stopped()) {
                 return $event->last();
             }
@@ -187,7 +172,6 @@ class TokenService implements
                 'user' => $user,
                 'mapper' => $mapper
             ]);
-
             if ($event->stopped()) {
                 return $event->last();
             }
@@ -269,7 +253,6 @@ class TokenService implements
                     'userToken' => $clearToken,
                     'mapper' => $mapper
                 ]);
-
                 if ($event->stopped()) {
                     return $event->last();
                 }

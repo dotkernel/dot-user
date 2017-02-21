@@ -35,6 +35,16 @@ class RegisterForm extends Form implements UserOptionsAwareInterface
 
     public function init()
     {
+        $validationGroup = [
+            'register_csrf',
+            'user' => [
+                'username',
+                'email',
+                'password',
+                'passwordConfirm',
+            ]
+        ];
+
         $this->add([
             'type' => 'UserFieldset',
             'options' => [
@@ -42,14 +52,19 @@ class RegisterForm extends Form implements UserOptionsAwareInterface
             ]
         ]);
 
-        $this->add([
-            'name' => 'captcha',
-            'type' => 'Captcha',
-            'options' => [
-                'label' => 'Please verify you are human',
-                'captcha' => [],
-            ]
-        ], ['priority' => -100]);
+        if ($this->userOptions->getRegisterOptions()->isUseRegistrationCaptcha()
+            && !empty($this->userOptions->getRegisterOptions()->getCaptchaOptions())) {
+            $this->add([
+                'name' => 'captcha',
+                'type' => 'Captcha',
+                'options' => [
+                    'label' => 'Please verify you are human',
+                    'captcha' => $this->userOptions->getRegisterOptions()->getCaptchaOptions(),
+                ]
+            ], ['priority' => -100]);
+
+            array_push($validationGroup, 'captcha');
+        }
 
         $this->add([
             'type' => 'Csrf',
@@ -71,15 +86,6 @@ class RegisterForm extends Form implements UserOptionsAwareInterface
             ]
         ], ['priority' => -105]);
 
-        $this->setValidationGroup([
-            'register_csrf',
-            'captcha',
-            'user' => [
-                'username',
-                'email',
-                'password',
-                'passwordConfirm',
-            ]
-        ]);
+        $this->setValidationGroup($validationGroup);
     }
 }

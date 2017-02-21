@@ -11,6 +11,7 @@ declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
+use Dot\User\Entity\UserEntity;
 use Zend\Stdlib\AbstractOptions;
 
 /**
@@ -23,10 +24,13 @@ class RegisterOptions extends AbstractOptions
     protected $enableRegistration = false;
 
     /** @var string */
-    protected $defaultUserStatus = 'pending';
+    protected $defaultUserStatus = UserEntity::STATUS_PENDING;
 
     /** @var bool */
     protected $useRegistrationCaptcha = true;
+
+    /** @var array  */
+    protected $captchaOptions = [];
 
     /** @var bool */
     protected $loginAfterRegistration = false;
@@ -93,5 +97,21 @@ class RegisterOptions extends AbstractOptions
     public function setLoginAfterRegistration(bool $loginAfterRegistration)
     {
         $this->loginAfterRegistration = $loginAfterRegistration;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCaptchaOptions(): array
+    {
+        return $this->captchaOptions;
+    }
+
+    /**
+     * @param array $captchaOptions
+     */
+    public function setCaptchaOptions(array $captchaOptions)
+    {
+        $this->captchaOptions = $captchaOptions;
     }
 }

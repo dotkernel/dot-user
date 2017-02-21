@@ -40,7 +40,7 @@ class ForgotPasswordForm extends Form implements InputFilterProviderInterface, U
                 'label' => 'Email associated with your account',
             ],
             'attributes' => [
-                'placeholder' => 'Account e-mail...',
+                'placeholder' => 'Your e-mail address...',
                 //'required' => 'required',
             ]
         ]);

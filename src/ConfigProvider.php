@@ -9,25 +9,20 @@
 
 namespace Dk\User;
 
-use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Ems\Factory\DbMapperFactory;
-use Dot\User\Authentication\AfterAuthenticationListener;
-use Dot\User\Authentication\BeforeAuthenticationListener;
-use Dot\User\Authentication\BeforeLogoutListener;
-use Dot\User\Authentication\InjectLoginFormListener;
+use Dot\User\Authentication\AuthenticationListener;
+use Dot\User\Authentication\InjectLoginForm;
 use Dot\User\Controller\UserController;
 use Dot\User\Entity\ConfirmTokenEntity;
 use Dot\User\Entity\RememberTokenEntity;
 use Dot\User\Entity\ResetTokenEntity;
 use Dot\User\Entity\RoleEntity;
 use Dot\User\Entity\UserEntity;
-use Dot\User\Factory\AfterAuthenticationListenerFactory;
+use Dot\User\Factory\AuthenticationListenerFactory;
 use Dot\User\Factory\AutoLoginFactory;
 use Dot\User\Factory\BcryptFactory;
-use Dot\User\Factory\BeforeAuthenticationListenerFactory;
-use Dot\User\Factory\BeforeLogoutListenerFactory;
 use Dot\User\Factory\FormElementFactory;
-use Dot\User\Factory\InjectLoginFormListenerFactory;
+use Dot\User\Factory\InjectLoginFormFactory;
 use Dot\User\Factory\PasswordCheckFactory;
 use Dot\User\Factory\TokenServiceFactory;
 use Dot\User\Factory\UserControllerFactory;
@@ -104,27 +99,15 @@ class ConfigProvider
                     'after_logout_route' => ['route_name' => 'login'],
 
                     'event_listeners' => [
-                        AuthenticationEvent::EVENT_AUTHENTICATE => [
-                            'injectForm' => [
-                                'type' => InjectLoginFormListener::class,
-                                'priority' => 1000
-                            ],
-                            'beforeAuthentication' => [
-                                'type' => BeforeAuthenticationListener::class,
-                                'priority' => 500
-                            ],
-                            'afterAuthentication' => [
-                                'type' => AfterAuthenticationListener::class,
-                                'priority' => -500
-                            ]
+                        [
+                            'type' => InjectLoginForm::class,
+                            'priority' => 600
                         ],
-                        AuthenticationEvent::EVENT_LOGOUT => [
-                            'beforeLogout' => [
-                                'type' => BeforeLogoutListener::class,
-                                'priority' => 100
-                            ]
-                        ]
-                    ]
+                        [
+                            'type' => AuthenticationListener::class,
+                            'priority' => 500
+                        ],
+                    ],
                 ]
             ],
 
@@ -196,10 +179,8 @@ class ConfigProvider
                 TokenService::class => TokenServiceFactory::class,
 
                 AutoLogin::class => AutoLoginFactory::class,
-                InjectLoginFormListener::class => InjectLoginFormListenerFactory::class,
-                BeforeAuthenticationListener::class => BeforeAuthenticationListenerFactory::class,
-                AfterAuthenticationListener::class => AfterAuthenticationListenerFactory::class,
-                BeforeLogoutListener::class => BeforeLogoutListenerFactory::class,
+                InjectLoginForm::class => InjectLoginFormFactory::class,
+                AuthenticationListener::class => AuthenticationListenerFactory::class,
             ],
             'aliases' => [
                 UserServiceInterface::class => UserService::class,

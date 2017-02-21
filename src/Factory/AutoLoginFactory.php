@@ -26,11 +26,12 @@ class AutoLoginFactory
 {
     /**
      * @param ContainerInterface $container
+     * @param string $requestedName
      * @return AutoLogin
      */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName): AutoLogin
     {
-        return new AutoLogin(
+        return new $requestedName(
             $container->get(AuthenticationInterface::class),
             $container->get(UserServiceInterface::class),
             $container->get(TokenServiceInterface::class),

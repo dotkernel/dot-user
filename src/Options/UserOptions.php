@@ -39,20 +39,17 @@ class UserOptions extends AbstractOptions
     /** @var  string */
     protected $rememberTokenEntity = RememberTokenEntity::class;
 
-    /** @var string */
+    /** @var array */
     protected $defaultRoles = ['user'];
 
     /** @var int */
     protected $passwordCost = 11;
 
     /** @var bool */
-    protected $enableUserStatus = true;
-
-    /** @var bool */
     protected $enableAccountConfirmation = true;
 
     /** @var string */
-    protected $confirmedAccountStatus = 'active';
+    protected $confirmedAccountStatus = UserEntity::STATUS_ACTIVE;
 
     /** @var array */
     protected $eventListeners = [];
@@ -92,19 +89,19 @@ class UserOptions extends AbstractOptions
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getDefaultRole(): string
+    public function getDefaultRoles(): array
     {
-        return $this->defaultRole;
+        return $this->defaultRoles;
     }
 
     /**
-     * @param string $defaultRole
+     * @param array $defaultRoles
      */
-    public function setDefaultRole(string $defaultRole)
+    public function setDefaultRoles(array $defaultRoles)
     {
-        $this->defaultRole = $defaultRole;
+        $this->defaultRoles = $defaultRoles;
     }
 
     /**
@@ -121,22 +118,6 @@ class UserOptions extends AbstractOptions
     public function setPasswordCost(int $passwordCost)
     {
         $this->passwordCost = $passwordCost;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEnableUserStatus(): bool
-    {
-        return $this->enableUserStatus;
-    }
-
-    /**
-     * @param bool $enableUserStatus
-     */
-    public function setEnableUserStatus(bool $enableUserStatus)
-    {
-        $this->enableUserStatus = $enableUserStatus;
     }
 
     /**

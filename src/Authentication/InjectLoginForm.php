@@ -20,7 +20,7 @@ use Dot\User\Options\UserOptions;
  * Class InjectLoginFormListener
  * @package Dot\User\Authentication
  */
-class InjectLoginFormListener extends AbstractAuthenticationEventListener
+class InjectLoginForm extends AbstractAuthenticationEventListener
 {
     /** @var  FormsPlugin */
     protected $formsPlugin;
@@ -42,7 +42,18 @@ class InjectLoginFormListener extends AbstractAuthenticationEventListener
     /**
      * @param AuthenticationEvent $e
      */
-    public function onAuthenticate(AuthenticationEvent $e)
+    public function onBeforeAuthentication(AuthenticationEvent $e)
+    {
+        $formsPlugin = $this->formsPlugin;
+        $form = $formsPlugin('Login');
+
+        $e->setParam('form', $form);
+    }
+
+    /**
+     * @param AuthenticationEvent $e
+     */
+    public function onAuthenticationBeforeRender(AuthenticationEvent $e)
     {
         $formsPlugin = $this->formsPlugin;
         $form = $formsPlugin('Login');

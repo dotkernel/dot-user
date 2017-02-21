@@ -12,7 +12,7 @@ declare(strict_types = 1);
 namespace Dot\User\Factory;
 
 use Dot\Controller\Plugin\PluginManager;
-use Dot\User\Authentication\InjectLoginFormListener;
+use Dot\User\Authentication\InjectLoginForm;
 use Dot\User\Options\UserOptions;
 use Interop\Container\ContainerInterface;
 
@@ -20,15 +20,15 @@ use Interop\Container\ContainerInterface;
  * Class InjectLoginFormListenerFactory
  * @package Dot\User\Factory
  */
-class InjectLoginFormListenerFactory
+class InjectLoginFormFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName): InjectLoginForm
     {
         /** @var PluginManager $controllerPluginManager */
         $controllerPluginManager = $container->get(PluginManager::class);
         $formsPlugin = $controllerPluginManager->get('forms');
         $userOptions = $container->get(UserOptions::class);
 
-        return new InjectLoginFormListener($formsPlugin, $userOptions);
+        return new $requestedName($formsPlugin, $userOptions);
     }
 }

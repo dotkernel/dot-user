@@ -21,6 +21,11 @@ class UserEntity extends Entity implements
     AuthenticationIdentity,
     AuthorizationIdentity
 {
+    const STATUS_PENDING = 'pending';
+    const STATUS_ACTIVE = 'active';
+    const STATUS_INACTIVE = 'inactive';
+    const STATUS_DELETED = 'deleted';
+
     /** @var  string */
     protected $id;
 
@@ -37,7 +42,7 @@ class UserEntity extends Entity implements
     protected $roles = [];
 
     /** @var string */
-    protected $status = 'pending';
+    protected $status = UserEntity::STATUS_PENDING;
 
     /** @var  string */
     protected $dateCreated;

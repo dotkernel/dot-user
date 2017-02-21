@@ -32,7 +32,7 @@ class LoginOptions extends AbstractOptions
     protected $rememberCookieSecure = false;
 
     /** @var array */
-    protected $allowedLoginStatus = ['active'];
+    protected $allowedStatus = ['active'];
 
     /**
      * @return bool
@@ -101,16 +101,16 @@ class LoginOptions extends AbstractOptions
     /**
      * @return array
      */
-    public function getAllowedLoginStatus(): array
+    public function getAllowedStatus(): array
     {
-        return $this->allowedLoginStatus;
+        return $this->allowedStatus;
     }
 
     /**
-     * @param array $allowedLoginStatus
+     * @param array $allowedStatus
      */
-    public function setAllowedLoginStatus(array $allowedLoginStatus)
+    public function setAllowedStatus(array $allowedStatus)
     {
-        $this->allowedLoginStatus = $allowedLoginStatus;
+        $this->allowedStatus = $allowedStatus;
     }
 }

@@ -131,15 +131,6 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
                                 ->getMessage(MessagesOptions::USERNAME_INVALID),
                         ]
                     ],
-                    [
-                        'name' => 'EmsNoRecordExists',
-                        'options' => [
-                            'key' => 'username',
-                            'service' => '',
-                            'message' => $this->userOptions->getMessagesOptions()
-                                ->getMessage(MessagesOptions::USERNAME_TAKEN),
-                        ]
-                    ]
                 ],
             ],
             'email' => [
@@ -162,15 +153,6 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
                                 ->getMessage(MessagesOptions::EMAIL_INVALID),
                         ]
                     ],
-                    [
-                        'name' => 'EmsNoRecordExists',
-                        'options' => [
-                            'key' => 'email',
-                            'service' => '',
-                            'message' => $this->userOptions->getMessagesOptions()
-                                ->getMessage(MessagesOptions::EMAIL_TAKEN),
-                        ]
-                    ]
                 ]
             ],
             'password' => [

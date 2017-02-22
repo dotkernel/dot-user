@@ -11,8 +11,6 @@ declare(strict_types = 1);
 
 namespace Dot\User\Form;
 
-use Dot\Hydrator\ClassMethodsCamelCase;
-use Dot\User\Entity\UserEntity;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptionsAwareInterface;
 use Dot\User\Options\UserOptionsAwareTrait;
@@ -37,14 +35,6 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
 
     public function init()
     {
-        $this->setObject(new UserEntity());
-        $this->setHydrator(new ClassMethodsCamelCase());
-
-        $this->add([
-            'name' => 'id',
-            'type' => 'hidden'
-        ]);
-
         $this->add([
             'name' => 'username',
             'type' => 'text',
@@ -98,9 +88,6 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
     public function getInputFilterSpecification()
     {
         return [
-            'id' => [
-                'required' => false,
-            ],
             'username' => [
                 'filters' => [
                     ['name' => 'StringTrim']
@@ -131,6 +118,15 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
                                 ->getMessage(MessagesOptions::USERNAME_INVALID),
                         ]
                     ],
+                    [
+                        'name' => 'EmsNoRecordExists',
+                        'options' => [
+                            'field' => 'username',
+                            'entity' => $this->userOptions->getUserEntity(),
+                            'message' => $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::USERNAME_TAKEN),
+                        ]
+                    ]
                 ],
             ],
             'email' => [
@@ -153,6 +149,15 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
                                 ->getMessage(MessagesOptions::EMAIL_INVALID),
                         ]
                     ],
+                    [
+                        'name' => 'EmsNoRecordExists',
+                        'options' => [
+                            'field' => 'email',
+                            'entity' => $this->userOptions->getUserEntity(),
+                            'message' => $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::EMAIL_TAKEN),
+                        ]
+                    ]
                 ]
             ],
             'password' => [

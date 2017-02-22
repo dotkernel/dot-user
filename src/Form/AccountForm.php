@@ -11,10 +11,13 @@ declare(strict_types = 1);
 
 namespace Dot\User\Form;
 
+use Dot\User\Entity\UserEntity;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptionsAwareInterface;
 use Dot\User\Options\UserOptionsAwareTrait;
+use Dot\Validator\Ems\NoRecordExists;
 use Zend\Form\Form;
+use Zend\Form\FormInterface;
 use Zend\InputFilter\InputFilter;
 
 /**
@@ -65,9 +68,34 @@ class AccountForm extends Form implements UserOptionsAwareInterface
         $this->setValidationGroup([
             'account_csrf',
             'user' => [
-                'id',
                 'username',
             ]
         ]);
+    }
+
+    /**
+     * @param object $object
+     * @param int $flags
+     * @return Form
+     */
+    public function bind($object, $flags = FormInterface::VALUES_NORMALIZED)
+    {
+        if ($object instanceof UserEntity) {
+            $usernameValidators = $this->getInputFilter()->get('user')->get('username')->getValidatorChain();
+            foreach ($usernameValidators as $validator) {
+                if ($validator instanceof NoRecordExists) {
+                    $validator->setExclude(['id' => $object->getId()]);
+                    break;
+                }
+            }
+            $emailValidators = $this->getInputFilter()->get('user')->get('email')->getValidatorChain();
+            foreach ($emailValidators as $validator) {
+                if ($validator instanceof NoRecordExists) {
+                    $validator->setExclude(['id' => $object->getId()]);
+                    break;
+                }
+            }
+        }
+        return parent::bind($object, $flags);
     }
 }

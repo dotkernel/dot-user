@@ -90,13 +90,14 @@ class AuthenticationListener extends AbstractAuthenticationEventListener
         $authenticationService = $e->getParam('authenticationService');
 
         $identity = $result->getIdentity();
-        $user = $this->userService->find($identity->getId());
+        $user = $this->userService->find($identity->getId(), [
+            'conditions' => ['status' => $this->userOptions->getLoginOptions()->getAllowedStatus()]
+        ]);
 
-        $status = $user->getStatus();
-        if ($status && !in_array($status, $this->userOptions->getLoginOptions()->getAllowedStatus())) {
+        if (!$user) {
             $this->formsPlugin->saveState($form);
             $e->setParam('error', $this->userOptions->getMessagesOptions()
-                ->getMessage(MessagesOptions::ACCOUNT_INACTIVE));
+                ->getMessage(MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED));
 
             $authenticationService->clearIdentity();
             return;

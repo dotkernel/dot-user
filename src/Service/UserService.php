@@ -131,7 +131,7 @@ class UserService implements
         $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
         $user = null;
         try {
-            $user = $mapper->getByEmail($email);
+            $user = $mapper->getByEmail($email, ['conditions' => ['status' => UserEntity::STATUS_PENDING]]);
             if ($user instanceof UserEntity) {
                 $token = $this->tokenService->findConfirmToken($user, $token);
                 if ($token) {
@@ -226,7 +226,10 @@ class UserService implements
         $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
         $user = null;
         try {
-            $user = $mapper->getByEmail($email);
+            $user = $mapper->getByEmail(
+                $email,
+                ['conditions' => ['status' => $this->userOptions->getLoginOptions()->getAllowedStatus()]]
+            );
             if ($user) {
                 $token = $this->tokenService->findResetToken($user, $token);
                 if ($token) {
@@ -530,7 +533,12 @@ class UserService implements
 
         /** @var UserMapperInterface $mapper */
         $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
-        $user = $mapper->getByEmail($email);
+        $user = $mapper->getByEmail($email, [
+            'conditions' => [
+                'status' => $this->userOptions->getLoginOptions()->getAllowedStatus()
+            ]
+        ]);
+
         if ($user) {
             return $this->tokenService->generateResetToken($user);
         }

@@ -59,6 +59,8 @@ class InjectLoginForm extends AbstractAuthenticationEventListener
         $form = $formsPlugin('Login');
 
         $e->setParam('form', $form);
+        // overwrite the login template with the one configured for this module
+        $e->setParam('template', $this->userOptions->getTemplateOptions()->getLoginTemplate());
         $e->setParam('passwordRecoveryEnabled', $this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery());
     }
 }

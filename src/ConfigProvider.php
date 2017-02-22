@@ -12,7 +12,7 @@ namespace Dk\User;
 use Dot\Ems\Factory\DbMapperFactory;
 use Dot\User\Authentication\AuthenticationListener;
 use Dot\User\Authentication\InjectLoginForm;
-use Dot\User\Controller\UserUserController;
+use Dot\User\Controller\UserController;
 use Dot\User\Entity\ConfirmTokenEntity;
 use Dot\User\Entity\RememberTokenEntity;
 use Dot\User\Entity\ResetTokenEntity;
@@ -27,6 +27,7 @@ use Dot\User\Factory\PasswordCheckFactory;
 use Dot\User\Factory\TokenServiceFactory;
 use Dot\User\Factory\UserControllerFactory;
 use Dot\User\Factory\UserDbMapperFactory;
+use Dot\User\Factory\UserFieldsetFactory;
 use Dot\User\Factory\UserOptionsFactory;
 use Dot\User\Factory\UserServiceFactory;
 use Dot\User\Form\AccountForm;
@@ -78,7 +79,7 @@ class ConfigProvider
                 'user_route' => [
                     'name' => 'user',
                     'path' => '/user[/{action}]',
-                    'middleware' => UserUserController::class,
+                    'middleware' => UserController::class,
                 ],
             ],
 
@@ -92,8 +93,6 @@ class ConfigProvider
                 'web' => [
                     'login_route' => ['route_name' => 'login'],
                     'logout_route' => ['route_name' => 'logout'],
-
-                    'login_template' => 'dot-user-form::login',
 
                     'after_login_route' => ['route_name' => 'user', 'route_params' => ['action' => 'account']],
                     'after_logout_route' => ['route_name' => 'login'],
@@ -144,7 +143,7 @@ class ConfigProvider
             'dot_form' => [
                 'form_manager' => [
                     'factories' => [
-                        UserFieldset::class => FormElementFactory::class,
+                        UserFieldset::class => UserFieldsetFactory::class,
                         RegisterForm::class => FormElementFactory::class,
                         AccountForm::class => FormElementFactory::class,
                         ChangePasswordForm::class => FormElementFactory::class,
@@ -174,7 +173,7 @@ class ConfigProvider
                 PasswordCheck::class => PasswordCheckFactory::class,
 
                 UserOptions::class => UserOptionsFactory::class,
-                UserUserController::class => UserControllerFactory::class,
+                UserController::class => UserControllerFactory::class,
                 UserService::class => UserServiceFactory::class,
                 TokenService::class => TokenServiceFactory::class,
 

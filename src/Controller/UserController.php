@@ -20,10 +20,10 @@ use Dot\Controller\Plugin\Forms\FormsPlugin;
 use Dot\Controller\Plugin\TemplatePlugin;
 use Dot\Controller\Plugin\UrlHelperPlugin;
 use Dot\User\Entity\UserEntity;
+use Dot\User\Event\DispatchUserControllerEventsTrait;
 use Dot\User\Event\UserControllerEvent;
 use Dot\User\Event\UserControllerEventListenerInterface;
 use Dot\User\Event\UserControllerEventListenerTrait;
-use Dot\User\Event\DispatchUserControllerEventsTrait;
 use Dot\User\Exception\InvalidArgumentException;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
@@ -49,7 +49,7 @@ use Zend\Form\FormInterface;
  * @method AuthenticationPlugin authentication()
  * @method AuthorizationPlugin isGranted(string $permission, array $roles = [], mixed $context = null)
  */
-class UserUserController extends AbstractActionController implements UserControllerEventListenerInterface
+class UserController extends AbstractActionController implements UserControllerEventListenerInterface
 {
     use DispatchUserControllerEventsTrait;
     use UserControllerEventListenerTrait;
@@ -136,36 +136,41 @@ class UserUserController extends AbstractActionController implements UserControl
 
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
-            $user = $this->userService->find($identity->getId());
-            if ($user) {
-                $form->setBindOnValidate(FormInterface::BIND_MANUAL);
-                $form->setData($data);
-                if ($form->isValid()) {
-                    $data = $form->getData(FormInterface::VALUES_AS_ARRAY);
+            $user = $this->userService->find($identity->getId(), [
+                'conditions' =>
+                    ['status' => $this->userOptions->getLoginOptions()->getAllowedStatus()]
+            ]);
 
-                    $result = $this->userService->changePassword($user, $data);
-                    if ($result->isValid()) {
-                        $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
-                            ->getMessage(MessagesOptions::CHANGE_PASSWORD_SUCCESS));
+            if (!$user) {
+                // could happen if user is deleted during its session
+                $this->authentication()->clearIdentity();
+                $this->messenger()->addError($this->userOptions->getMessagesOptions()
+                    ->getMessage(MessagesOptions::ACCOUNT_INVALID));
+                return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            }
 
-                        return $this->redirectTo($request->getUri(), $request->getQueryParams());
-                    } else {
-                        $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
-                            ->getMessage(MessagesOptions::CHANGE_PASSWORD_ERROR));
-                        $this->messenger()->addError($message);
-                        $this->forms()->saveState($form);
+            $form->setBindOnValidate(FormInterface::BIND_MANUAL);
+            $form->setData($data);
+            if ($form->isValid()) {
+                $data = $form->getData(FormInterface::VALUES_AS_ARRAY);
 
-                        return new RedirectResponse($request->getUri(), 303);
-                    }
+                $result = $this->userService->changePassword($user, $data);
+                if ($result->isValid()) {
+                    $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::CHANGE_PASSWORD_SUCCESS));
+
+                    return $this->redirectTo($request->getUri(), $request->getQueryParams());
                 } else {
-                    $this->messenger()->addError($this->forms()->getMessages($form));
+                    $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::CHANGE_PASSWORD_ERROR));
+                    $this->messenger()->addError($message);
                     $this->forms()->saveState($form);
 
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $this->messenger()->addError($this->userOptions->getMessagesOptions()
-                    ->getMessage(MessagesOptions::USER_NOT_FOUND));
+                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->forms()->saveState($form);
 
                 return new RedirectResponse($request->getUri(), 303);
             }
@@ -275,7 +280,17 @@ class UserUserController extends AbstractActionController implements UserControl
         $request = $this->getRequest();
         $form = $this->forms('Account');
 
-        $user = $this->userService->find($this->authentication()->getIdentity()->getId());
+        $user = $this->userService->find($this->authentication()->getIdentity()->getId(), [
+            'conditions' => ['status' => $this->userOptions->getLoginOptions()->getAllowedStatus()]
+        ]);
+        if (!$user) {
+            // could happen if user is deleted/disabled during its session
+            $this->authentication()->clearIdentity();
+            $this->messenger()->addError($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::ACCOUNT_INVALID));
+            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+        }
+
         $form->bind($user);
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
@@ -482,15 +497,7 @@ class UserUserController extends AbstractActionController implements UserControl
      */
     public function onBeforeAccountUpdateFormValidation(UserControllerEvent $e)
     {
-        $data = $e->getParam('data', []);
-        $form = $e->getParam('form');
-        $user = $e->getParam('user');
-
-        if ($data['user']['username'] === $user->getUsername()) {
-            $validationGroup = $form->getValidationGroup();
-            unset($validationGroup['user']['username']);
-            $form->setValidationGroup($validationGroup);
-        }
+        // no-op
     }
 
     /**

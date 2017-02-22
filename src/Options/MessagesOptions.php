@@ -62,7 +62,6 @@ class MessagesOptions extends AbstractOptions
     const USER_REGISTER_ERROR = 81;
     const USER_UPDATE_ERROR = 82;
     const USER_UPDATE_SUCCESS = 83;
-    const USER_NOT_FOUND = 84;
 
     const REGISTER_DISABLED = 90;
     const REGISTER_SUCCESS = 91;
@@ -70,7 +69,8 @@ class MessagesOptions extends AbstractOptions
 
     const FORM_EXPIRED = 100;
     const UNAUTHORIZED = 105;
-    const ACCOUNT_INACTIVE = 110;
+    const ACCOUNT_LOGIN_STATUS_NOT_ALLOWED = 110;
+    const ACCOUNT_INVALID = 115;
 
     /** @var array */
     protected $messages = [
@@ -116,7 +116,6 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::USER_REGISTER_ERROR => 'Account creation has failed. Please try again',
         MessagesOptions::USER_UPDATE_ERROR => 'Account update has failed. Please try again',
         MessagesOptions::USER_UPDATE_SUCCESS => 'Account information was successfully updated',
-        MessagesOptions::USER_NOT_FOUND => 'Could not get the currently authenticated user',
 
         MessagesOptions::REGISTER_DISABLED => 'Account registration is disabled',
         MessagesOptions::REGISTER_SUCCESS => 'You account was successfully created',
@@ -124,7 +123,9 @@ class MessagesOptions extends AbstractOptions
 
         MessagesOptions::FORM_EXPIRED => 'The form CSRF has expired and was refreshed. Try again now',
         MessagesOptions::UNAUTHORIZED => 'You must sign in first in order to access the requested content',
-        MessagesOptions::ACCOUNT_INACTIVE => 'You account is inactive or it may not have been confirmed'
+        MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED =>
+            'Your account is inactive or it may not have been confirmed',
+        MessagesOptions::ACCOUNT_INVALID => 'Your account had been disabled or deleted',
     ];
 
     /**

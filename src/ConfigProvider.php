@@ -7,7 +7,7 @@
  * Time: 2:39 PM
  */
 
-namespace Dk\User;
+namespace Dot\User;
 
 use Dot\Ems\Factory\DbMapperFactory;
 use Dot\User\Authentication\AuthenticationListener;

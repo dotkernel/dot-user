@@ -15,7 +15,7 @@ namespace Dot\User\Entity;
  * Class ResetTokenEntity
  * @package Dot\User\Entity
  */
-class ResetTokenEntity extends AbstractSelectorTokenEntity
+class ResetTokenEntity extends AbstractTokenEntity
 {
     public function getType(): string
     {

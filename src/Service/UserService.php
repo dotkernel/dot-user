@@ -26,6 +26,7 @@ use Dot\User\Options\UserOptions;
 use Dot\User\Result\ErrorCode;
 use Dot\User\Result\Result;
 use Zend\Crypt\Password\PasswordInterface;
+use Zend\EventManager\EventManagerInterface;
 
 /**
  * Class UserService
@@ -39,8 +40,13 @@ class UserService implements
 {
     use MapperManagerAwareTrait;
     use DispatchUserEventsTrait;
-    use UserEventListenerTrait;
-    use TokenEventListenerTrait;
+    use UserEventListenerTrait,
+        TokenEventListenerTrait {
+        UserEventListenerTrait::attach as userEventAttach;
+        TokenEventListenerTrait::attach as tokenEventAttach;
+        UserEventListenerTrait::detach as userEventDetach;
+        TokenEventListenerTrait::detach as tokenEventDetach;
+    }
 
     /** @var  UserOptions */
     protected $userOptions;
@@ -557,5 +563,36 @@ class UserService implements
         /** @var UserEntity $entity */
         $entity = $mapper->newEntity();
         return $entity;
+    }
+
+    /**
+     * @param EventManagerInterface $events
+     * @param int $priority
+     */
+    public function attach(EventManagerInterface $events, $priority = 1)
+    {
+        $identifiers = $events->getIdentifiers();
+        if (in_array(UserService::class, $identifiers)) {
+            $this->userEventAttach($events, $priority);
+        }
+
+        if (in_array(TokenService::class, $identifiers)) {
+            $this->tokenEventAttach($events, $priority);
+        }
+    }
+
+    /**
+     * @param EventManagerInterface $events
+     */
+    public function detach(EventManagerInterface $events)
+    {
+        $identifiers = $events->getIdentifiers();
+        if (in_array(UserService::class, $identifiers)) {
+            $this->userEventDetach($events);
+        }
+
+        if (in_array(TokenService::class, $identifiers)) {
+            $this->tokenEventDetach($events);
+        }
     }
 }

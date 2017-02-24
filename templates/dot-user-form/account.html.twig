@@ -1,8 +1,6 @@
 {% set dummy = form.prepare() %}
 {{ form().openTag(form) | raw }}
 
-    {{ formElement(form.get('id')) }}
-
     {% set username = form.getBaseFieldset().get('username') %}
     <div class="form-group {% if username.getMessages() %}has-error{% endif %}">
         {% set dummy = username.setAttribute('class', 'form-control') %}

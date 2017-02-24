@@ -23,7 +23,7 @@ abstract class AbstractTokenEntity extends Entity
     const TOKEN_RESET = 'reset';
     const TOKEN_REMEMBER = 'remember';
 
-    /** @var  string */
+    /** @var  mixed */
     protected $id;
 
     /** @var  string */
@@ -39,33 +39,33 @@ abstract class AbstractTokenEntity extends Entity
     protected $created;
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getId(): string
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * @param string $id
+     * @param mixed $id
      */
-    public function setId(string $id)
+    public function setId($id)
     {
         $this->id = $id;
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getUserId(): string
+    public function getUserId()
     {
         return $this->userId;
     }
 
     /**
-     * @param string $userId
+     * @param mixed $userId
      */
-    public function setUserId(string $userId)
+    public function setUserId($userId)
     {
         $this->userId = $userId;
     }

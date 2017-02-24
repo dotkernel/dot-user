@@ -19,7 +19,7 @@ use Dot\Ems\Entity\Entity;
  */
 class RoleEntity extends Entity
 {
-    /** @var  string */
+    /** @var  mixed */
     protected $id;
 
     /** @var  string */
@@ -28,15 +28,15 @@ class RoleEntity extends Entity
     /**
      * @return string
      */
-    public function getId(): string
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * @param string $id
+     * @param mixed $id
      */
-    public function setId(string $id)
+    public function setId($id)
     {
         $this->id = $id;
     }

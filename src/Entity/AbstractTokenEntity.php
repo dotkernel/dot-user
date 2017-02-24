@@ -105,7 +105,7 @@ abstract class AbstractTokenEntity extends Entity
     /**
      * @return string
      */
-    public function getCreated(): string
+    public function getCreated()
     {
         return $this->created;
     }
@@ -113,7 +113,7 @@ abstract class AbstractTokenEntity extends Entity
     /**
      * @param string $created
      */
-    public function setCreated(string $created)
+    public function setCreated($created)
     {
         $this->created = $created;
     }

@@ -146,7 +146,7 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getDateCreated(): string
+    public function getDateCreated()
     {
         return $this->dateCreated;
     }
@@ -154,7 +154,7 @@ class UserEntity extends Entity implements
     /**
      * @param string $dateCreated
      */
-    public function setDateCreated(string $dateCreated)
+    public function setDateCreated($dateCreated)
     {
         $this->dateCreated = $dateCreated;
     }

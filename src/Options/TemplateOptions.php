@@ -11,11 +11,13 @@ declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
+use Zend\Stdlib\AbstractOptions;
+
 /**
  * Class TemplateOptions
  * @package Dot\User\Options
  */
-class TemplateOptions
+class TemplateOptions extends AbstractOptions
 {
     /** @var string */
     protected $loginTemplate = '';

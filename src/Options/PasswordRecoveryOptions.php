@@ -11,11 +11,13 @@ declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
+use Zend\Stdlib\AbstractOptions;
+
 /**
  * Class PasswordRecoveryOptions
  * @package Dot\User\Options
  */
-class PasswordRecoveryOptions
+class PasswordRecoveryOptions extends AbstractOptions
 {
     /** @var bool */
     protected $enableRecovery = true;

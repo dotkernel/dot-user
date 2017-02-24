@@ -55,6 +55,8 @@ class AuthenticationListener extends AbstractAuthenticationEventListener
     ) {
         $this->formsPlugin = $formsPlugin;
         $this->userOptions = $userOptions;
+        $this->userService = $userService;
+        $this->tokenService = $tokenService;
     }
 
     /**

@@ -21,7 +21,7 @@ use Zend\Stdlib\AbstractOptions;
 class RegisterOptions extends AbstractOptions
 {
     /** @var bool */
-    protected $enableRegistration = false;
+    protected $enableRegistration = true;
 
     /** @var string */
     protected $defaultUserStatus = UserEntity::STATUS_PENDING;

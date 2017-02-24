@@ -292,6 +292,7 @@ class UserController extends AbstractActionController implements UserControllerE
         }
 
         $form->bind($user);
+        $this->forms()->restoreState($form);
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
 

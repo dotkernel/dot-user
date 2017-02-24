@@ -35,7 +35,7 @@ class ForgotPasswordForm extends Form implements InputFilterProviderInterface, U
     {
         $this->add([
             'name' => 'email',
-            'type' => 'email',
+            'type' => 'Email',
             'options' => [
                 'label' => 'Email associated with your account',
             ],

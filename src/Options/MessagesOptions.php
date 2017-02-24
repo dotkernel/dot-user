@@ -25,6 +25,7 @@ class MessagesOptions extends AbstractOptions
     const PASSWORD_EMPTY = 5;
     const PASSWORD_LENGTH = 10;
     const PASSWORD_MISMATCH = 11;
+    const PASSWORD_CONFIRM_EMPTY = 14;
     const CURRENT_PASSWORD_EMPTY = 12;
     const CURRENT_PASSWORD_INVALID = 13;
 
@@ -78,6 +79,7 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::PASSWORD_EMPTY => 'Password is required and cannot be empty',
         MessagesOptions::PASSWORD_LENGTH => 'Password must have between 4 and 150 characters',
         MessagesOptions::PASSWORD_MISMATCH => 'Password confirm does not match',
+        MessagesOptions::PASSWORD_CONFIRM_EMPTY => 'Password confirmation is required and cannot be empty',
         MessagesOptions::CURRENT_PASSWORD_EMPTY => 'Current password is required and cannot be empty',
         MessagesOptions::CURRENT_PASSWORD_INVALID => 'Current password is not valid',
 

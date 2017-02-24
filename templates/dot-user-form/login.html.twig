@@ -4,14 +4,12 @@
     {% set identity = form.get('identity') %}
     <div class="form-group {% if identity.getMessages() %}has-error{% endif %}">
         {% set dummy = identity.setAttribute('class', 'form-control') %}
-        {{ formLabel(identity) }}
         {{ formElement(identity) }}
     </div>
 
     {% set password = form.get('password') %}
     <div class="form-group {% if password.getMessages() %}has-error{% endif %}">
         {% set dummy = password.setAttribute('class', 'form-control') %}
-        {{ formLabel(password) }}
         {{ formElement(password) }}
     </div>
 

@@ -105,6 +105,9 @@ class AuthenticationListener extends AbstractAuthenticationEventListener
             return;
         }
 
+        // sets the identity to the found user, gives us more details
+        $authenticationService->setIdentity($user);
+
         //generate remember me token if active
         if ($this->userOptions->getLoginOptions()->isEnableRemember()) {
             $data = $form->getData();

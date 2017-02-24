@@ -28,7 +28,7 @@ class FormElementFactory
      * @param array $options
      * @return Element
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = [])
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         /** @var Element $formElement */
         $formElement = new $requestedName($options);

@@ -21,8 +21,9 @@ use Interop\Container\ContainerInterface;
  */
 class UserDbMapperFactory extends DbMapperFactory
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = [])
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $options = $options ?? [];
         $options += [
             'user_options' => $container->get(UserOptions::class)
         ];

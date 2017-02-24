@@ -30,7 +30,7 @@ class UserFieldsetFactory
      * @param array $options
      * @return UserFieldset
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = []): UserFieldset
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): UserFieldset
     {
         /** @var UserOptions $userOptions */
         $userOptions = $container->get(UserOptions::class);

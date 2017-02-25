@@ -478,11 +478,11 @@ class UserController extends AbstractActionController implements UserControllerE
     }
 
     /**
-     * @param UriInterface $defaultUri
+     * @param UriInterface|string $defaultUri
      * @param array $queryParams
      * @return ResponseInterface
      */
-    public function redirectTo(UriInterface $defaultUri, array $queryParams = []): ResponseInterface
+    public function redirectTo($defaultUri, array $queryParams = []): ResponseInterface
     {
         if (isset($queryParams['redirect'])) {
             $uri = new Uri(urldecode($queryParams['redirect']));

@@ -81,17 +81,21 @@ class AccountForm extends Form implements UserOptionsAwareInterface
     public function bind($object, $flags = FormInterface::VALUES_NORMALIZED)
     {
         if ($object instanceof UserEntity) {
-            $usernameValidators = $this->getInputFilter()->get('user')->get('username')->getValidatorChain();
+            $usernameValidators = $this->getInputFilter()->get('user')->get('username')
+                ->getValidatorChain()->getValidators();
             foreach ($usernameValidators as $validator) {
+                $validator = $validator['instance'];
                 if ($validator instanceof NoRecordExists) {
-                    $validator->setExclude(['id' => $object->getId()]);
+                    $validator->setExclude(['field' => 'id', 'value' => $object->getId()]);
                     break;
                 }
             }
-            $emailValidators = $this->getInputFilter()->get('user')->get('email')->getValidatorChain();
+            $emailValidators = $this->getInputFilter()->get('user')->get('email')
+                ->getValidatorChain()->getValidators();
             foreach ($emailValidators as $validator) {
+                $validator = $validator['instance'];
                 if ($validator instanceof NoRecordExists) {
-                    $validator->setExclude(['id' => $object->getId()]);
+                    $validator->setExclude(['field' => 'id', 'value' => $object->getId()]);
                     break;
                 }
             }

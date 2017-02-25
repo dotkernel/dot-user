@@ -19,6 +19,7 @@ use Dot\Controller\Plugin\FlashMessenger\FlashMessengerPlugin;
 use Dot\Controller\Plugin\Forms\FormsPlugin;
 use Dot\Controller\Plugin\TemplatePlugin;
 use Dot\Controller\Plugin\UrlHelperPlugin;
+use Dot\Helpers\Route\RouteOptionHelper;
 use Dot\User\Entity\UserEntity;
 use Dot\User\Event\DispatchUserControllerEventsTrait;
 use Dot\User\Event\UserControllerEvent;
@@ -66,20 +67,26 @@ class UserController extends AbstractActionController implements UserControllerE
     /** @var  LoginAction */
     protected $loginAction;
 
+    /** @var  RouteOptionHelper */
+    protected $routeHelper;
+
     /**
      * UserController constructor.
      * @param UserServiceInterface $userService
      * @param UserOptions $userOptions
+     * @param RouteOptionHelper $routeHelper
      * @param LoginAction|null $loginAction
      */
     public function __construct(
         UserServiceInterface $userService,
         UserOptions $userOptions,
+        RouteOptionHelper $routeHelper,
         LoginAction $loginAction = null
     ) {
         $this->userService = $userService;
         $this->userOptions = $userOptions;
         $this->loginAction = $loginAction;
+        $this->routeHelper = $routeHelper;
 
         if ($this->userOptions->getRegisterOptions()->isLoginAfterRegistration()
             && !$this->loginAction instanceof LoginAction
@@ -94,7 +101,7 @@ class UserController extends AbstractActionController implements UserControllerE
     public function confirmAccountAction(): ResponseInterface
     {
         if ($this->authentication()->hasIdentity()) {
-            return new RedirectResponse($this->url(static::USER_ROUTE_NAME, ['action' => 'account']));
+            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->isEnableAccountConfirmation()) {
@@ -199,7 +206,7 @@ class UserController extends AbstractActionController implements UserControllerE
     public function registerAction(): ResponseInterface
     {
         if ($this->authentication()->hasIdentity()) {
-            return new RedirectResponse($this->url(static::USER_ROUTE_NAME, ['action' => 'account']));
+            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->getRegisterOptions()->isEnableRegistration()) {
@@ -352,7 +359,7 @@ class UserController extends AbstractActionController implements UserControllerE
     public function resetPasswordAction(): ResponseInterface
     {
         if ($this->authentication()->hasIdentity()) {
-            return new RedirectResponse($this->url(static::USER_ROUTE_NAME, ['action' => 'account']));
+            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
@@ -383,6 +390,7 @@ class UserController extends AbstractActionController implements UserControllerE
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::RESET_PASSWORD_ERROR));
+
                     $this->messenger()->addError($message);
                     $this->forms()->saveState($form);
 
@@ -419,7 +427,7 @@ class UserController extends AbstractActionController implements UserControllerE
     public function forgotPasswordAction(): ResponseInterface
     {
         if ($this->authentication()->hasIdentity()) {
-            return new RedirectResponse($this->url(static::USER_ROUTE_NAME, ['action' => 'account']));
+            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {

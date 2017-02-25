@@ -69,6 +69,12 @@ class UserOptions extends AbstractOptions
     /** @var  MessagesOptions */
     protected $messagesOptions;
 
+    /** @var  array */
+    protected $routeDefault = [
+        'route_name' => 'user',
+        'route_params' => ['action' => 'account']
+    ];
+
     /**
      * @return string
      */
@@ -307,5 +313,21 @@ class UserOptions extends AbstractOptions
     public function setMessagesOptions(array $messagesOptions)
     {
         $this->messagesOptions = new MessagesOptions($messagesOptions);
+    }
+
+    /**
+     * @return array
+     */
+    public function getRouteDefault(): array
+    {
+        return $this->routeDefault;
+    }
+
+    /**
+     * @param array $routeDefault
+     */
+    public function setRouteDefault(array $routeDefault)
+    {
+        $this->routeDefault = $routeDefault;
     }
 }

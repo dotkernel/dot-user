@@ -44,7 +44,7 @@ class RoleEntity extends Entity
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -52,7 +52,7 @@ class RoleEntity extends Entity
     /**
      * @param string $name
      */
-    public function setName(string $name)
+    public function setName($name)
     {
         $this->name = $name;
     }

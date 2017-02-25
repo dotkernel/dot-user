@@ -66,7 +66,7 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getUsername(): string
+    public function getUsername()
     {
         return $this->username;
     }
@@ -74,7 +74,7 @@ class UserEntity extends Entity implements
     /**
      * @param string $username
      */
-    public function setUsername(string $username)
+    public function setUsername($username)
     {
         $this->username = $username;
     }
@@ -82,7 +82,7 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getEmail()
     {
         return $this->email;
     }
@@ -90,7 +90,7 @@ class UserEntity extends Entity implements
     /**
      * @param string $email
      */
-    public function setEmail(string $email)
+    public function setEmail($email)
     {
         $this->email = $email;
     }
@@ -98,7 +98,7 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getPassword(): string
+    public function getPassword()
     {
         return $this->password;
     }
@@ -106,7 +106,7 @@ class UserEntity extends Entity implements
     /**
      * @param string $password
      */
-    public function setPassword(string $password)
+    public function setPassword($password)
     {
         $this->password = $password;
     }
@@ -130,7 +130,7 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getStatus(): string
+    public function getStatus()
     {
         return $this->status;
     }
@@ -138,7 +138,7 @@ class UserEntity extends Entity implements
     /**
      * @param string $status
      */
-    public function setStatus(string $status)
+    public function setStatus($status)
     {
         $this->status = $status;
     }
@@ -167,6 +167,6 @@ class UserEntity extends Entity implements
         if ($this->username) {
             return $this->username;
         }
-        return $this->email;
+        return $this->email ?? '';
     }
 }

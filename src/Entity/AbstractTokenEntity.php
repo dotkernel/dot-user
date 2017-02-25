@@ -73,7 +73,7 @@ abstract class AbstractTokenEntity extends Entity
     /**
      * @return string
      */
-    public function getToken(): string
+    public function getToken()
     {
         return $this->token;
     }
@@ -81,7 +81,7 @@ abstract class AbstractTokenEntity extends Entity
     /**
      * @param string $token
      */
-    public function setToken(string $token)
+    public function setToken($token)
     {
         $this->token = $token;
     }
@@ -89,7 +89,7 @@ abstract class AbstractTokenEntity extends Entity
     /**
      * @return string
      */
-    public function getExpire(): string
+    public function getExpire()
     {
         return $this->expire;
     }
@@ -97,7 +97,7 @@ abstract class AbstractTokenEntity extends Entity
     /**
      * @param string $expire
      */
-    public function setExpire(string $expire)
+    public function setExpire($expire)
     {
         $this->expire = $expire;
     }

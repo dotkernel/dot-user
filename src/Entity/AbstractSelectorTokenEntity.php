@@ -23,7 +23,7 @@ abstract class AbstractSelectorTokenEntity extends AbstractTokenEntity
     /**
      * @return string
      */
-    public function getSelector(): string
+    public function getSelector()
     {
         return $this->selector;
     }
@@ -31,7 +31,7 @@ abstract class AbstractSelectorTokenEntity extends AbstractTokenEntity
     /**
      * @param string $selector
      */
-    public function setSelector(string $selector)
+    public function setSelector($selector)
     {
         $this->selector = $selector;
     }

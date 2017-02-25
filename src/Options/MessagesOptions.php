@@ -75,22 +75,22 @@ class MessagesOptions extends AbstractOptions
 
     /** @var array */
     protected $messages = [
-        MessagesOptions::IDENTITY_EMPTY => 'Identity is required and cannot be empty',
-        MessagesOptions::PASSWORD_EMPTY => 'Password is required and cannot be empty',
-        MessagesOptions::PASSWORD_LENGTH => 'Password must have between 4 and 150 characters',
-        MessagesOptions::PASSWORD_MISMATCH => 'Password confirm does not match',
-        MessagesOptions::PASSWORD_CONFIRM_EMPTY => 'Password confirmation is required and cannot be empty',
-        MessagesOptions::CURRENT_PASSWORD_EMPTY => 'Current password is required and cannot be empty',
-        MessagesOptions::CURRENT_PASSWORD_INVALID => 'Current password is not valid',
+        MessagesOptions::IDENTITY_EMPTY => '<b>Identity</b> is required and cannot be empty',
+        MessagesOptions::PASSWORD_EMPTY => '<b>Password</b> is required and cannot be empty',
+        MessagesOptions::PASSWORD_LENGTH => '<b>Password</b> must have between 4 and 150 characters',
+        MessagesOptions::PASSWORD_MISMATCH => '<b>Password confirm</b> does not match',
+        MessagesOptions::PASSWORD_CONFIRM_EMPTY => '<b>Password confirmation</b> is required and cannot be empty',
+        MessagesOptions::CURRENT_PASSWORD_EMPTY => '<b>Current password</b> is required and cannot be empty',
+        MessagesOptions::CURRENT_PASSWORD_INVALID => '<b>Current password</b> is not valid',
 
-        MessagesOptions::USERNAME_EMPTY => 'Username is required and cannot be empty',
-        MessagesOptions::USERNAME_INVALID => 'Username contains invalid characters',
-        MessagesOptions::USERNAME_LENGTH => 'Username must have between 3 and 150 characters',
-        MessagesOptions::USERNAME_TAKEN => 'Username is already taken',
+        MessagesOptions::USERNAME_EMPTY => '<b>Username</b> is required and cannot be empty',
+        MessagesOptions::USERNAME_INVALID => '<b>Username</b> contains invalid characters',
+        MessagesOptions::USERNAME_LENGTH => '<b>Username</b> must have between 3 and 150 characters',
+        MessagesOptions::USERNAME_TAKEN => '<b>Username</b> cannot be used as it\'s already taken',
 
-        MessagesOptions::EMAIL_EMPTY => 'Email address is required and cannot be empty',
-        MessagesOptions::EMAIL_INVALID => 'Email address is not valid',
-        MessagesOptions::EMAIL_TAKEN => 'Email address is already registered',
+        MessagesOptions::EMAIL_EMPTY => '<b>E-mail address</b> is required and cannot be empty',
+        MessagesOptions::EMAIL_INVALID => '<b>E-mail address</b> is not valid',
+        MessagesOptions::EMAIL_TAKEN => '<b>E-mail address</b> is already registered with an account',
 
         MessagesOptions::CONFIRM_ACCOUNT_ERROR => 'Account confirmation failed. Please try again',
         MessagesOptions::CONFIRM_ACCOUNT_INVALID_EMAIL => 'Account confirmation failed. Please try again',

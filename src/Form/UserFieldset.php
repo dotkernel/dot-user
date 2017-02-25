@@ -50,7 +50,7 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
 
         $this->add([
             'name' => 'email',
-            'type' => 'email',
+            'type' => 'text',
             'options' => [
                 'label' => 'Email',
             ],

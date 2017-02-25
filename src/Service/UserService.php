@@ -486,9 +486,10 @@ class UserService implements
 
     /**
      * @param UserEntity $user
+     * @param bool $hashPassword
      * @return Result
      */
-    public function updateAccount(UserEntity $user): Result
+    public function updateAccount(UserEntity $user, bool $hashPassword = false): Result
     {
         /** @var UserMapperInterface $mapper */
         $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
@@ -502,7 +503,10 @@ class UserService implements
                 return $event->last();
             }
 
-            $user->setPassword($this->passwordService->create($user->getPassword()));
+            if ($hashPassword) {
+                $user->setPassword($this->passwordService->create($user->getPassword()));
+            }
+
             $r = $mapper->save($user);
             if ($r) {
                 $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_ACCOUNT_UPDATE, [

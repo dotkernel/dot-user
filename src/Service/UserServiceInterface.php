@@ -60,9 +60,10 @@ interface UserServiceInterface
 
     /**
      * @param UserEntity $user
+     * @param bool $hashPassword
      * @return Result
      */
-    public function updateAccount(UserEntity $user): Result;
+    public function updateAccount(UserEntity $user, bool $hashPassword = false): Result;
 
     /**
      * @param array $data

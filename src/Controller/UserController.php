@@ -306,8 +306,8 @@ class UserController extends AbstractActionController implements UserControllerE
             $form->setData($data);
             if ($form->isValid()) {
                 $user = $form->getData();
-
-                $result = $this->userService->updateAccount($user);
+                $hashPassword = array_key_exists('password', $data) ? true : false;
+                $result = $this->userService->updateAccount($user, $hashPassword);
                 if ($result->isValid()) {
                     $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::USER_UPDATE_SUCCESS));

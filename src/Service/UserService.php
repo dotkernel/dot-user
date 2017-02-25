@@ -153,7 +153,7 @@ class UserService implements
                     $mapper->beginTransaction();
 
                     $user->setStatus($this->userOptions->getConfirmedAccountStatus());
-                    $r = $mapper->save($user);
+                    $r = $mapper->save($user, ['atomic' => false]);
                     if ($r) {
                         $this->tokenService->deleteConfirmTokens($user);
 
@@ -430,7 +430,7 @@ class UserService implements
             $user->setPassword($this->passwordService->create($user->getPassword()));
             $user->setStatus($this->userOptions->getRegisterOptions()->getDefaultUserStatus());
 
-            $r = $mapper->save($user);
+            $r = $mapper->save($user, ['atomic' => false]);
             if ($r) {
                 if ($this->userOptions->isEnableAccountConfirmation()) {
                     $t = $this->tokenService->generateConfirmToken($user);

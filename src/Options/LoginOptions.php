@@ -11,6 +11,7 @@ declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
+use Dot\User\Entity\UserEntity;
 use Zend\Stdlib\AbstractOptions;
 
 /**
@@ -32,7 +33,7 @@ class LoginOptions extends AbstractOptions
     protected $rememberCookieSecure = false;
 
     /** @var array */
-    protected $allowedStatus = ['active'];
+    protected $allowedStatus = [UserEntity::STATUS_ACTIVE];
 
     /**
      * @return bool

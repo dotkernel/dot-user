@@ -43,6 +43,12 @@ interface UserServiceInterface
      * @param array $params
      * @return Result
      */
+    public function optOut(array $params): Result;
+
+    /**
+     * @param array $params
+     * @return Result
+     */
     public function confirmAccount(array $params): Result;
 
     /**

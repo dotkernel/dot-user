@@ -26,11 +26,11 @@ class LoginOptions extends AbstractOptions
     /** @var string */
     protected $rememberCookieName = 'rememberMe';
 
-    /** @var int */
-    protected $rememberCookieExpire = 3600 * 24 * 30;
-
     /** @var bool */
     protected $rememberCookieSecure = false;
+
+    /** @var int */
+    protected $rememberTokenExpire = 3600 * 24 * 30;
 
     /** @var array */
     protected $allowedStatus = [UserEntity::STATUS_ACTIVE];
@@ -70,17 +70,17 @@ class LoginOptions extends AbstractOptions
     /**
      * @return int
      */
-    public function getRememberCookieExpire(): int
+    public function getRememberTokenExpire(): int
     {
-        return $this->rememberCookieExpire;
+        return $this->rememberTokenExpire;
     }
 
     /**
-     * @param int $rememberCookieExpire
+     * @param int $rememberTokenExpire
      */
-    public function setRememberCookieExpire(int $rememberCookieExpire)
+    public function setRememberTokenExpire(int $rememberTokenExpire)
     {
-        $this->rememberCookieExpire = $rememberCookieExpire;
+        $this->rememberTokenExpire = $rememberTokenExpire;
     }
 
     /**

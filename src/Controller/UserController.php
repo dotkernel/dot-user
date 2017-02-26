@@ -98,16 +98,39 @@ class UserController extends AbstractActionController implements UserControllerE
     /**
      * @return ResponseInterface
      */
-    public function confirmAccountAction(): ResponseInterface
+    public function optOutAction(): ResponseInterface
     {
         if ($this->authentication()->hasIdentity()) {
+            $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
             return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 
-        if (!$this->userOptions->isEnableAccountConfirmation()) {
-            $this->messenger()->addError($this->userOptions->getMessagesOptions()
-                ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_DISABLED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+        $request = $this->getRequest();
+        $params = $request->getQueryParams();
+
+        $result = $this->userService->optOut($params);
+        if ($result->isValid()) {
+            $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::OPT_OUT_SUCCESS));
+        } else {
+            $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::OPT_OUT_ERROR));
+            $this->messenger()->addError($message);
+        }
+
+        return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public function confirmAccountAction(): ResponseInterface
+    {
+        if ($this->authentication()->hasIdentity()) {
+            $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
+            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 
         $request = $this->getRequest();
@@ -206,6 +229,8 @@ class UserController extends AbstractActionController implements UserControllerE
     public function registerAction(): ResponseInterface
     {
         if ($this->authentication()->hasIdentity()) {
+            $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
             return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 
@@ -234,11 +259,7 @@ class UserController extends AbstractActionController implements UserControllerE
                     } else {
                         $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
                             ->getMessage(MessagesOptions::REGISTER_SUCCESS));
-
-                        return $this->redirectTo(
-                            $this->url(static::LOGIN_ROUTE_NAME),
-                            $request->getQueryParams()
-                        );
+                        return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
                     }
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
@@ -359,13 +380,9 @@ class UserController extends AbstractActionController implements UserControllerE
     public function resetPasswordAction(): ResponseInterface
     {
         if ($this->authentication()->hasIdentity()) {
+            $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
             return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
-        }
-
-        if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
-            $this->messenger()->addError($this->userOptions->getMessagesOptions()
-                ->getMessage(MessagesOptions::RESET_PASSWORD_DISABLED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();
@@ -427,6 +444,8 @@ class UserController extends AbstractActionController implements UserControllerE
     public function forgotPasswordAction(): ResponseInterface
     {
         if ($this->authentication()->hasIdentity()) {
+            $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
             return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 

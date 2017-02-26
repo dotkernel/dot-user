@@ -13,6 +13,7 @@ namespace Dot\User\Service;
 
 use Dot\Ems\Mapper\MapperManagerAwareInterface;
 use Dot\Ems\Mapper\MapperManagerAwareTrait;
+use Dot\User\Entity\ResetTokenEntity;
 use Dot\User\Entity\UserEntity;
 use Dot\User\Event\DispatchUserEventsTrait;
 use Dot\User\Event\TokenEventListenerInterface;
@@ -218,6 +219,93 @@ class UserService implements
         }
     }
 
+    public function optOut(array $params): Result
+    {
+        $email = $params['email'] ?? '';
+        $token = $params['token'] ?? '';
+
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+        try {
+            $user = $mapper->getByEmail($email, ['conditions' => ['status' => UserEntity::STATUS_PENDING]]);
+            if ($user instanceof UserEntity) {
+                $token = $this->tokenService->findConfirmToken($user, $token);
+                if ($token) {
+                    $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_OPT_OUT, [
+                        'user' => $user,
+                        'token' => $token,
+                        'mapper' => $mapper
+                    ]);
+                    if ($event->stopped()) {
+                        return $event->last();
+                    }
+
+                    $mapper->beginTransaction();
+                    $r = $mapper->delete($user, ['atomic' => false]);
+                    if ($r) {
+                        $this->tokenService->deleteConfirmTokens($user);
+
+                        $mapper->commit();
+                        $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_OPT_OUT, [
+                            'user' => $user,
+                            'token' => $token,
+                            'mapper' => $mapper
+                        ]);
+
+                        return new Result(['token' => $token, 'user' => $user, 'mapper' => $mapper]);
+                    } else {
+                        $this->dispatchEvent(UserEvent::EVENT_USER_OPT_OUT_ERROR, [
+                            'user' => $user,
+                            'token' => $token,
+                            'mapper' => $mapper,
+                            'error' => ErrorCode::USER_DELETE_ERROR
+                        ]);
+                        $mapper->rollback();
+                        return new Result(
+                            ['token' => $token, 'user' => $user, 'mapper' => $mapper],
+                            $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::OPT_OUT_ERROR)
+                        );
+                    }
+                }
+                $this->dispatchEvent(UserEvent::EVENT_USER_OPT_OUT_ERROR, [
+                    'user' => $user,
+                    'token' => $token,
+                    'mapper' => $mapper,
+                    'error' => ErrorCode::TOKEN_NOT_FOUND
+                ]);
+                return new Result(
+                    ['user' => $user, 'mapper' => $mapper, 'token' => $token],
+                    $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::OPT_OUT_INVALID_PARAMS)
+                );
+            }
+            $this->dispatchEvent(UserEvent::EVENT_USER_OPT_OUT_ERROR, [
+                'email' => $email,
+                'mapper' => $mapper,
+                'error' => ErrorCode::USER_NOT_FOUND
+            ]);
+            return new Result(
+                ['email' => $email, 'mapper' => $mapper],
+                $this->userOptions->getMessagesOptions()
+                    ->getMessage(MessagesOptions::OPT_OUT_INVALID_PARAMS)
+            );
+        } catch (\Exception $e) {
+            $errorData = ['mapper' => $mapper];
+            if (isset($user)) {
+                $errorData['user'] = $user;
+            }
+            if (isset($token)) {
+                $errorData['token'] = $token;
+            }
+            $this->dispatchEvent(UserEvent::EVENT_USER_OPT_OUT_ERROR, $errorData + ['error' => $e]);
+            $mapper->rollback();
+            $result = new Result($errorData, $e);
+
+            return $result;
+        }
+    }
+
     /**
      * @param array $data
      * @return Result
@@ -240,7 +328,7 @@ class UserService implements
                 $token = $this->tokenService->findResetToken($user, $token);
                 if ($token) {
                     //check validity
-                    if ($token->getExpire() >= time()) {
+                    if ((int) $token->getExpire() >= time()) {
                         $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_PASSWORD_RESET, [
                             'user' => $user,
                             'token' => $token,
@@ -253,6 +341,9 @@ class UserService implements
                         $user->setPassword($this->passwordService->create($newPassword));
                         $r = $mapper->save($user);
                         if ($r) {
+                            // delete reset tokens for this user, as a security measure, if reset successful
+                            $this->tokenService->deleteResetTokens($user);
+
                             $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_PASSWORD_RESET, [
                                 'user' => $user,
                                 'token' => $token,
@@ -272,6 +363,11 @@ class UserService implements
                             $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::RESET_PASSWORD_ERROR)
                         );
                     }
+                    // delete the expired token
+                    if ($token instanceof ResetTokenEntity && $token->getId()) {
+                        $this->tokenService->deleteResetToken($token);
+                    }
+
                     $this->dispatchEvent(UserEvent::EVENT_USER_RESET_PASSWORD_ERROR, [
                         'user' => $user,
                         'token' => $token,

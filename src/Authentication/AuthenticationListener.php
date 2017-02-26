@@ -112,6 +112,8 @@ class AuthenticationListener extends AbstractAuthenticationEventListener
         if ($this->userOptions->getLoginOptions()->isEnableRemember()) {
             $data = $form->getData();
             if (isset($data['remember']) && $data['remember'] == 'yes') {
+                //we always delete any previous remember tokens before generating new one
+                $this->tokenService->deleteRememberTokens(['userId' => $user->getId()]);
                 $t = $this->tokenService->generateRememberToken($user);
                 if (!$t->isValid()) {
                     error_log('Error generating remember me token for user id: ' . $user->getId());

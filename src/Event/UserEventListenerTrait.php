@@ -114,6 +114,21 @@ trait UserEventListenerTrait
             [$this, 'onChangePasswordError'],
             $priority
         );
+        $this->listeners[] = $events->attach(
+            UserEvent::EVENT_USER_BEFORE_OPT_OUT,
+            [$this, 'onBeforeOptOut'],
+            $priority
+        );
+        $this->listeners[] = $events->attach(
+            UserEvent::EVENT_USER_AFTER_OPT_OUT,
+            [$this, 'onAfterOptOut'],
+            $priority
+        );
+        $this->listeners[] = $events->attach(
+            UserEvent::EVENT_USER_OPT_OUT_ERROR,
+            [$this, 'onOptOutError'],
+            $priority
+        );
     }
 
     public function onBeforeRegistration(UserEvent $e)
@@ -142,6 +157,21 @@ trait UserEventListenerTrait
     }
 
     public function onAccountConfirmationError(UserEvent $e)
+    {
+        // no-op
+    }
+
+    public function onBeforeOptOut(UserEvent $e)
+    {
+        // no-op
+    }
+
+    public function onAfterOptOut(UserEvent $e)
+    {
+        // no-op
+    }
+
+    public function onOptOutError(UserEvent $e)
     {
         // no-op
     }

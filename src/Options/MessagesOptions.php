@@ -43,7 +43,6 @@ class MessagesOptions extends AbstractOptions
     const CONFIRM_ACCOUNT_INVALID_TOKEN = 52;
     const CONFIRM_ACCOUNT_INVALID_EMAIL = 53;
     const CONFIRM_ACCOUNT_SUCCESS = 54;
-    const CONFIRM_ACCOUNT_DISABLED = 55;
 
     const REMEMBER_TOKEN_SAVE_ERROR = 60;
     const REMEMBER_TOKEN_INVALID = 61;
@@ -73,6 +72,12 @@ class MessagesOptions extends AbstractOptions
     const ACCOUNT_LOGIN_STATUS_NOT_ALLOWED = 110;
     const ACCOUNT_INVALID = 115;
 
+    const OPT_OUT_SUCCESS = 120;
+    const OPT_OUT_ERROR = 121;
+    const OPT_OUT_INVALID_PARAMS = 122;
+
+    const SIGN_OUT_FIRST = 125;
+
     /** @var array */
     protected $messages = [
         MessagesOptions::IDENTITY_EMPTY => '<b>Identity</b> is required and cannot be empty',
@@ -92,12 +97,12 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::EMAIL_INVALID => '<b>E-mail address</b> is not valid',
         MessagesOptions::EMAIL_TAKEN => '<b>E-mail address</b> is already registered with an account',
 
-        MessagesOptions::CONFIRM_ACCOUNT_ERROR => 'Account confirmation failed. Please try again',
-        MessagesOptions::CONFIRM_ACCOUNT_INVALID_EMAIL => 'Account confirmation failed. Please try again',
-        MessagesOptions::CONFIRM_ACCOUNT_INVALID_TOKEN => 'Account confirmation failed. Please try again',
-        MessagesOptions::CONFIRM_TOKEN_SAVE_ERROR => 'Account creation request has failed. Please try again',
-        MessagesOptions::CONFIRM_ACCOUNT_SUCCESS => 'Account was successfully confirmed. You may sign in now',
-        MessagesOptions::CONFIRM_ACCOUNT_DISABLED => 'Account confirmation is disabled',
+        MessagesOptions::CONFIRM_ACCOUNT_ERROR => 'Account activation failed. Please try again or contact us',
+        MessagesOptions::CONFIRM_ACCOUNT_INVALID_EMAIL => 'Account activation failed due to invalid parameters',
+        MessagesOptions::CONFIRM_ACCOUNT_INVALID_TOKEN => 'Account activation failed due to invalid parameters',
+        MessagesOptions::CONFIRM_TOKEN_SAVE_ERROR =>
+            'Account activation link could not be generated. Please try again',
+        MessagesOptions::CONFIRM_ACCOUNT_SUCCESS => 'Your account was successfully activated. You may sign in now',
 
         MessagesOptions::REMEMBER_TOKEN_SAVE_ERROR =>
             'Remember me feature has encountered and error. This will not affect general usability',
@@ -128,6 +133,12 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED =>
             'Your account is inactive or it may not have been confirmed',
         MessagesOptions::ACCOUNT_INVALID => 'Your account had been disabled or deleted',
+
+        MessagesOptions::OPT_OUT_ERROR => 'Account has failed to be inactivated. Please try again or contact us',
+        MessagesOptions::OPT_OUT_SUCCESS => 'Account was successfully unregistered',
+        MessagesOptions::OPT_OUT_INVALID_PARAMS => 'Account has failed to be inactivated due to invalid parameters',
+
+        MessagesOptions::SIGN_OUT_FIRST => 'Sign out first in order to access the requested link'
     ];
 
     /**

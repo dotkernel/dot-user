@@ -78,4 +78,16 @@ interface TokenServiceInterface
      * @return Result
      */
     public function generateResetToken(UserEntity $user): Result;
+
+    /**
+     * @param UserEntity $user
+     * @return int
+     */
+    public function deleteResetTokens(UserEntity $user): int;
+
+    /**
+     * @param ResetTokenEntity $token
+     * @return mixed
+     */
+    public function deleteResetToken(ResetTokenEntity $token);
 }

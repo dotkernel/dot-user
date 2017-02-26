@@ -165,7 +165,7 @@ class TokenService implements
             $token->setSelector(Rand::getString(32));
             $token->setToken(Rand::getString(32));
             $token->setUserId($user->getId());
-            $token->setExpire((string)(time() + $options->getRememberCookieExpire()));
+            $token->setExpire((string)(time() + $options->getRememberTokenExpire()));
 
             $event = $this->dispatchEvent(TokenEvent::EVENT_TOKEN_BEFORE_SAVE_REMEMBER_TOKEN, [
                 'token' => $token,
@@ -224,10 +224,9 @@ class TokenService implements
         $cookieData = base64_encode(serialize(['selector' => $token->getSelector(), 'token' => $token->getToken()]));
 
         $name = $options->getRememberCookieName();
-        $expire = $options->getRememberCookieExpire();
         $secure = $options->isRememberCookieSecure();
 
-        setcookie($name, $cookieData, time() + $expire, "/", "", $secure, true);
+        setcookie($name, $cookieData, time() + $options->getRememberTokenExpire(), "/", "", $secure, true);
     }
 
     /**
@@ -257,7 +256,8 @@ class TokenService implements
                     return $event->last();
                 }
 
-                if (hash_equals($token->getToken(), md5($clearToken))) {
+                if (hash_equals($token->getToken(), md5($clearToken))
+                    && (int) $token->getExpire() >= time()) {
                     $this->dispatchEvent(TokenEvent::EVENT_TOKEN_AFTER_VALIDATE_REMEMBER_TOKEN, [
                         'token' => $token,
                         'userToken' => $clearToken,
@@ -318,7 +318,6 @@ class TokenService implements
     {
         /** @var TokenMapperInterface $mapper */
         $mapper = $this->getMapperManager()->get($this->userOptions->getRememberTokenEntity());
-
         $n = $mapper->deleteAll(array_merge($conditions, ['type' => AbstractTokenEntity::TOKEN_REMEMBER]));
 
         //clear cookies
@@ -360,6 +359,28 @@ class TokenService implements
 
     /**
      * @param UserEntity $user
+     * @return int
+     */
+    public function deleteResetTokens(UserEntity $user): int
+    {
+        /** @var TokenMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getResetTokenEntity());
+        return $mapper->deleteAll(['userId' => $user->getId(), 'type' => AbstractTokenEntity::TOKEN_RESET]);
+    }
+
+    /**
+     * @param ResetTokenEntity $token
+     * @return mixed
+     */
+    public function deleteResetToken(ResetTokenEntity $token)
+    {
+        /** @var TokenMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getResetTokenEntity());
+        return $mapper->delete($token);
+    }
+
+    /**
+     * @param UserEntity $user
      * @return Result
      */
     public function generateResetToken(UserEntity $user): Result
@@ -373,9 +394,7 @@ class TokenService implements
 
             $token->setUserId($user->getId());
             $token->setToken(md5(Rand::getString(32) . time() . $user->getEmail()));
-            $token->setExpire(
-                (string)(time() + $this->userOptions->getPasswordRecoveryOptions()->getResetTokenTimeout())
-            );
+            $token->setExpire(time() + $this->userOptions->getPasswordRecoveryOptions()->getResetTokenTimeout());
 
             $event = $this->dispatchEvent(TokenEvent::EVENT_TOKEN_BEFORE_SAVE_RESET_TOKEN, [
                 'token' => $token,

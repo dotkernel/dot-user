@@ -31,6 +31,12 @@ interface UserEventListenerInterface extends ListenerAggregateInterface
 
     public function onAccountConfirmationError(UserEvent $e);
 
+    public function onBeforeOptOut(UserEvent $e);
+
+    public function onAfterOptOut(UserEvent $e);
+
+    public function onOptOutError(UserEvent $e);
+
     public function onBeforePasswordReset(UserEvent $e);
 
     public function onAfterPasswordReset(UserEvent $e);

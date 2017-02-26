@@ -27,6 +27,10 @@ class UserEvent extends Event
     const EVENT_USER_AFTER_ACCOUNT_CONFIRMATION = 'event.user.afterAccountConfirmation';
     const EVENT_USER_ACCOUNT_CONFIRMATION_ERROR = 'event.user.accountConfirmationError';
 
+    const EVENT_USER_BEFORE_OPT_OUT = 'event.user.beforeOptOut';
+    const EVENT_USER_AFTER_OPT_OUT = 'event.user.afterOptOut';
+    const EVENT_USER_OPT_OUT_ERROR = 'event.user.optOutError';
+
     const EVENT_USER_BEFORE_PASSWORD_RESET = 'event.user.beforePasswordReset';
     const EVENT_USER_AFTER_PASSWORD_RESET = 'event.user.afterPasswordReset';
     const EVENT_USER_RESET_PASSWORD_ERROR = 'event.user.resetPasswordError';

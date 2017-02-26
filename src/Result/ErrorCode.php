@@ -24,5 +24,6 @@ class ErrorCode
 
     const USER_SAVE_ERROR = 'user.saveError';
     const USER_NOT_FOUND = 'user.notFound';
+    const USER_DELETE_ERROR = 'user.deleteError';
     const USER_PASSWORD_INVALID = 'user.passwordInvalid';
 }

@@ -126,14 +126,14 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::USER_UPDATE_SUCCESS => 'Account information was successfully updated',
 
         MessagesOptions::REGISTER_DISABLED => 'Account registration is disabled',
-        MessagesOptions::REGISTER_SUCCESS => 'You account was successfully created',
+        MessagesOptions::REGISTER_SUCCESS => 'Your account was successfully created',
         MessagesOptions::FORGOT_PASSWORD_SUCCESS => 'Success! Check your email for further instructions',
 
         MessagesOptions::FORM_EXPIRED => 'The form CSRF has expired and was refreshed. Try again now',
         MessagesOptions::UNAUTHORIZED => 'You must sign in first in order to access the requested content',
         MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED =>
             'Your account is inactive or it may not have been confirmed',
-        MessagesOptions::ACCOUNT_UNCONFIRMED => 'You account needs to be activated first',
+        MessagesOptions::ACCOUNT_UNCONFIRMED => 'Your account needs to be activated first',
         MessagesOptions::ACCOUNT_INVALID => 'Your account had been disabled or deleted',
 
         MessagesOptions::OPT_OUT_ERROR => 'Account has failed to be inactivated. Please try again or contact us',

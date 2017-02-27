@@ -87,6 +87,18 @@ class UserService implements
     }
 
     /**
+     * @param string $email
+     * @param array $options
+     * @return UserEntity|null
+     */
+    public function findByEmail(string $email, array $options = []): ?UserEntity
+    {
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+        return $mapper->getByEmail($email, $options);
+    }
+
+    /**
      * @param UserEntity $user
      * @return mixed
      */

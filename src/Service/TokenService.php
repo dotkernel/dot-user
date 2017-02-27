@@ -83,6 +83,25 @@ class TokenService implements
 
     /**
      * @param UserEntity $user
+     * @return array
+     */
+    public function findConfirmTokens(UserEntity $user): array
+    {
+        /** @var TokenMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getConfirmTokenEntity());
+        return $mapper->find(
+            'all',
+            [
+                'conditions' => [
+                    'userId' => $user->getId(),
+                    'type' => AbstractTokenEntity::TOKEN_CONFIRM
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @param UserEntity $user
      * @return int
      */
     public function deleteConfirmTokens(UserEntity $user): int
@@ -90,6 +109,17 @@ class TokenService implements
         /** @var TokenMapperInterface $mapper */
         $mapper = $this->getMapperManager()->get($this->userOptions->getConfirmTokenEntity());
         return $mapper->deleteAll(['userId' => $user->getId(), 'type' => AbstractTokenEntity::TOKEN_CONFIRM]);
+    }
+
+    /**
+     * @param ConfirmTokenEntity $token
+     * @return mixed
+     */
+    public function deleteConfirmToken(ConfirmTokenEntity $token)
+    {
+        /** @var TokenMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getConfirmTokenEntity());
+        return $mapper->delete($token);
     }
 
     /**
@@ -320,14 +350,33 @@ class TokenService implements
         $mapper = $this->getMapperManager()->get($this->userOptions->getRememberTokenEntity());
         $n = $mapper->deleteAll(array_merge($conditions, ['type' => AbstractTokenEntity::TOKEN_REMEMBER]));
 
+        $this->clearRememberCookie();
+
+        return $n;
+    }
+
+    /**
+     * @param RememberTokenEntity $token
+     * @return mixed
+     */
+    public function deleteRememberToken(RememberTokenEntity $token)
+    {
+        /** @var TokenMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getRememberTokenEntity());
+        return $mapper->delete($token);
+    }
+
+    /**
+     * Clear remember me cookies
+     */
+    public function clearRememberCookie()
+    {
         //clear cookies
         $options = $this->userOptions->getLoginOptions();
         if (isset($_COOKIE[$options->getRememberCookieName()])) {
             unset($_COOKIE[$options->getRememberCookieName()]);
             setcookie($options->getRememberCookieName(), '', time() - 3600, '/');
         }
-
-        return $n;
     }
 
     /**
@@ -355,6 +404,21 @@ class TokenService implements
         }
 
         return null;
+    }
+
+    public function findResetTokens(UserEntity $user): array
+    {
+        /** @var TokenMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getResetTokenEntity());
+        return $mapper->find(
+            'all',
+            [
+                'conditions' => [
+                    'userId' => $user->getId(),
+                    'type' => AbstractTokenEntity::TOKEN_RESET
+                ]
+            ]
+        );
     }
 
     /**

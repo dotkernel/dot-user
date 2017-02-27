@@ -32,9 +32,21 @@ interface TokenServiceInterface
 
     /**
      * @param UserEntity $user
+     * @return array
+     */
+    public function findConfirmTokens(UserEntity $user): array;
+
+    /**
+     * @param UserEntity $user
      * @return int
      */
     public function deleteConfirmTokens(UserEntity $user): int;
+
+    /**
+     * @param ConfirmTokenEntity $token
+     * @return mixed
+     */
+    public function deleteConfirmToken(ConfirmTokenEntity $token);
 
     /**
      * @param UserEntity $user
@@ -67,11 +79,23 @@ interface TokenServiceInterface
     public function deleteRememberTokens(array $conditions): int;
 
     /**
+     * @param RememberTokenEntity $token
+     * @return mixed
+     */
+    public function deleteRememberToken(RememberTokenEntity $token);
+
+    /**
      * @param UserEntity $user
      * @param string $token
      * @return ResetTokenEntity|null
      */
     public function findResetToken(UserEntity $user, string $token): ?ResetTokenEntity;
+
+    /**
+     * @param UserEntity $user
+     * @return array
+     */
+    public function findResetTokens(UserEntity $user): array;
 
     /**
      * @param UserEntity $user

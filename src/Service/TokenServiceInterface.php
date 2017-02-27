@@ -66,6 +66,11 @@ interface TokenServiceInterface
     public function generateRememberCookie(RememberTokenEntity $token);
 
     /**
+     * @return mixed
+     */
+    public function clearRememberCookie();
+
+    /**
      * @param string $selector
      * @param string $clearToken
      * @return Result

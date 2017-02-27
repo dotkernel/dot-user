@@ -99,21 +99,23 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::EMAIL_TAKEN => '<b>E-mail address</b> is already registered with an account',
 
         MessagesOptions::CONFIRM_ACCOUNT_ERROR => 'Account activation failed. Please try again or contact us',
-        MessagesOptions::CONFIRM_ACCOUNT_INVALID_EMAIL => 'Account activation failed due to invalid parameters',
-        MessagesOptions::CONFIRM_ACCOUNT_INVALID_TOKEN => 'Account activation failed due to invalid parameters',
+        MessagesOptions::CONFIRM_ACCOUNT_INVALID_EMAIL => 'Account activation failed due to invalid token or e-mail',
+        MessagesOptions::CONFIRM_ACCOUNT_INVALID_TOKEN => 'Account activation failed due to invalid token or e-mail',
         MessagesOptions::CONFIRM_TOKEN_SAVE_ERROR =>
             'Account activation link could not be generated. Please try again',
-        MessagesOptions::CONFIRM_ACCOUNT_SUCCESS => 'Your account was successfully activated. You may sign in now',
+        MessagesOptions::CONFIRM_ACCOUNT_SUCCESS => 'Account successfully activated. You may sign in now',
 
         MessagesOptions::REMEMBER_TOKEN_SAVE_ERROR =>
             'Remember me feature has encountered and error. This will not affect general usability',
         MessagesOptions::REMEMBER_TOKEN_INVALID => 'Remember me token is not valid',
 
-        MessagesOptions::RESET_TOKEN_SAVE_ERROR => 'Could not register the reset password request. Please try again',
+        MessagesOptions::RESET_TOKEN_SAVE_ERROR => 'Could not process the password recovery request. Please try again',
         MessagesOptions::RESET_PASSWORD_ERROR => 'Failed to update account password. Please try again',
-        MessagesOptions::RESET_TOKEN_EXPIRED => 'Reset token has expired. Please submit another password reset request',
-        MessagesOptions::RESET_TOKEN_INVALID => 'Reset token is not valid anymore',
-        MessagesOptions::RESET_PASSWORD_INVALID_EMAIL => 'There is no account registered with the given email address',
+        MessagesOptions::RESET_TOKEN_EXPIRED =>
+            'Reset token has expired. Please submit another password recovery request',
+        MessagesOptions::RESET_TOKEN_INVALID => 'Could not reset password due to invalid token or e-mail address',
+        MessagesOptions::RESET_PASSWORD_INVALID_EMAIL =>
+            'Could not reset password due to invalid token or e-mail address',
         MessagesOptions::RESET_PASSWORD_SUCCESS => 'Password was successfully reset',
         MessagesOptions::RESET_PASSWORD_DISABLED => 'Password recovery is disabled',
 
@@ -126,15 +128,14 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::USER_UPDATE_SUCCESS => 'Account information was successfully updated',
 
         MessagesOptions::REGISTER_DISABLED => 'Account registration is disabled',
-        MessagesOptions::REGISTER_SUCCESS => 'Your account was successfully created',
+        MessagesOptions::REGISTER_SUCCESS => 'Account was successfully created',
         MessagesOptions::FORGOT_PASSWORD_SUCCESS => 'Password recovery e-mail was sent to %s',
 
         MessagesOptions::FORM_EXPIRED => 'The form CSRF has expired and was refreshed. Try again now',
         MessagesOptions::UNAUTHORIZED => 'You must sign in first in order to access the requested content',
-        MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED =>
-            'Your account is inactive or it may not have been confirmed',
-        MessagesOptions::ACCOUNT_UNCONFIRMED => 'Your account needs to be activated first',
-        MessagesOptions::ACCOUNT_INVALID => 'Your account had been disabled or deleted',
+        MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED => 'Account status is inactive',
+        MessagesOptions::ACCOUNT_UNCONFIRMED => 'Account needs to be confirmed.',
+        MessagesOptions::ACCOUNT_INVALID => 'Account had been disabled or deleted',
 
         MessagesOptions::OPT_OUT_ERROR => 'Account failed to be un-registered. Please try again or contact us',
         MessagesOptions::OPT_OUT_SUCCESS => 'Account was successfully un-registered',

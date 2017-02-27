@@ -112,7 +112,7 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::RESET_TOKEN_SAVE_ERROR => 'Could not register the reset password request. Please try again',
         MessagesOptions::RESET_PASSWORD_ERROR => 'Failed to update account password. Please try again',
         MessagesOptions::RESET_TOKEN_EXPIRED => 'Reset token has expired. Please submit another password reset request',
-        MessagesOptions::RESET_TOKEN_INVALID => 'Reset token is not valid',
+        MessagesOptions::RESET_TOKEN_INVALID => 'Reset token is not valid anymore',
         MessagesOptions::RESET_PASSWORD_INVALID_EMAIL => 'There is no account registered with the given email address',
         MessagesOptions::RESET_PASSWORD_SUCCESS => 'Password was successfully reset',
         MessagesOptions::RESET_PASSWORD_DISABLED => 'Password recovery is disabled',
@@ -127,7 +127,7 @@ class MessagesOptions extends AbstractOptions
 
         MessagesOptions::REGISTER_DISABLED => 'Account registration is disabled',
         MessagesOptions::REGISTER_SUCCESS => 'Your account was successfully created',
-        MessagesOptions::FORGOT_PASSWORD_SUCCESS => 'Success! Check your email for further instructions',
+        MessagesOptions::FORGOT_PASSWORD_SUCCESS => 'Password recovery e-mail was sent to %s',
 
         MessagesOptions::FORM_EXPIRED => 'The form CSRF has expired and was refreshed. Try again now',
         MessagesOptions::UNAUTHORIZED => 'You must sign in first in order to access the requested content',
@@ -136,9 +136,9 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::ACCOUNT_UNCONFIRMED => 'Your account needs to be activated first',
         MessagesOptions::ACCOUNT_INVALID => 'Your account had been disabled or deleted',
 
-        MessagesOptions::OPT_OUT_ERROR => 'Account has failed to be inactivated. Please try again or contact us',
-        MessagesOptions::OPT_OUT_SUCCESS => 'Account was successfully unregistered',
-        MessagesOptions::OPT_OUT_INVALID_PARAMS => 'Account has failed to be inactivated due to invalid parameters',
+        MessagesOptions::OPT_OUT_ERROR => 'Account failed to be un-registered. Please try again or contact us',
+        MessagesOptions::OPT_OUT_SUCCESS => 'Account was successfully un-registered',
+        MessagesOptions::OPT_OUT_INVALID_PARAMS => 'Account has failed to be un-registered due to invalid parameters',
 
         MessagesOptions::SIGN_OUT_FIRST => 'Sign out first in order to access the requested link'
     ];

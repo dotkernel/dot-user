@@ -467,8 +467,8 @@ class UserController extends AbstractActionController implements UserControllerE
 
                 $result = $this->userService->resetPasswordRequest($data);
                 if ($result->isValid()) {
-                    $this->messenger()->addInfo($this->userOptions->getMessagesOptions()
-                        ->getMessage(MessagesOptions::FORGOT_PASSWORD_SUCCESS));
+                    $this->messenger()->addInfo(sprintf($this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::FORGOT_PASSWORD_SUCCESS), $data['email']));
 
                     return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
                 } else {

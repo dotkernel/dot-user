@@ -456,6 +456,11 @@ class UserService implements
                 $user->setPassword($this->passwordService->create($newPassword));
                 $r = $mapper->save($user);
                 if ($r) {
+                    // does not sign out the user, but at least deletes any remember tokens and cookies
+                    // to force user to sign up after its session expires
+                    $this->tokenService->deleteRememberTokens(['userId' => $user->getId()]);
+                    $this->tokenService->clearRememberCookie();
+
                     $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_CHANGE_PASSWORD, [
                         'user' => $user,
                         'mapper' => $mapper
@@ -675,6 +680,14 @@ class UserService implements
         /** @var UserEntity $entity */
         $entity = $mapper->newEntity();
         return $entity;
+    }
+
+    /**
+     * @return TokenServiceInterface
+     */
+    public function getTokenService(): TokenServiceInterface
+    {
+        return $this->tokenService;
     }
 
     /**

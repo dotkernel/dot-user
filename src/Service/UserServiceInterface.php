@@ -88,4 +88,9 @@ interface UserServiceInterface
      * @return UserEntity
      */
     public function newUser(): UserEntity;
+
+    /**
+     * @return TokenServiceInterface
+     */
+    public function getTokenService(): TokenServiceInterface;
 }

@@ -16,6 +16,7 @@ use Dot\Authentication\AuthenticationResult;
 use Dot\Authentication\Web\Event\AbstractAuthenticationEventListener;
 use Dot\Authentication\Web\Event\AuthenticationEvent;
 use Dot\Controller\Plugin\Forms\FormsPlugin;
+use Dot\User\Entity\UserEntity;
 use Dot\User\Form\LoginForm;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
@@ -92,31 +93,39 @@ class AuthenticationListener extends AbstractAuthenticationEventListener
         $authenticationService = $e->getParam('authenticationService');
 
         $identity = $result->getIdentity();
-        $user = $this->userService->find($identity->getId(), [
-            'conditions' => ['status' => $this->userOptions->getLoginOptions()->getAllowedStatus()]
-        ]);
+        $user = $this->userService->find($identity->getId());
+        if ($user instanceof UserEntity) {
+            $e->setParam('user', $user);
 
-        if (!$user) {
-            $this->formsPlugin->saveState($form);
-            $e->setParam('error', $this->userOptions->getMessagesOptions()
-                ->getMessage(MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED));
+            if ($user->getStatus() === UserEntity::STATUS_PENDING) {
+                $this->formsPlugin->saveState($form);
+                $e->setParam('error', $this->userOptions->getMessagesOptions()
+                    ->getMessage(MessagesOptions::ACCOUNT_UNCONFIRMED));
 
-            $authenticationService->clearIdentity();
-            return;
-        }
+                $authenticationService->clearIdentity();
+                return;
+            } elseif (!in_array($user->getStatus(), $this->userOptions->getLoginOptions()->getAllowedStatus())) {
+                $this->formsPlugin->saveState($form);
+                $e->setParam('error', $this->userOptions->getMessagesOptions()
+                    ->getMessage(MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED));
 
-        // sets the identity to the found user, gives us more details
-        $authenticationService->setIdentity($user);
+                $authenticationService->clearIdentity();
+                return;
+            }
 
-        //generate remember me token if active
-        if ($this->userOptions->getLoginOptions()->isEnableRemember()) {
-            $data = $form->getData();
-            if (isset($data['remember']) && $data['remember'] == 'yes') {
-                //we always delete any previous remember tokens before generating new one
-                $this->tokenService->deleteRememberTokens(['userId' => $user->getId()]);
-                $t = $this->tokenService->generateRememberToken($user);
-                if (!$t->isValid()) {
-                    error_log('Error generating remember me token for user id: ' . $user->getId());
+            // sets the identity to the found user, gives us more details
+            $authenticationService->setIdentity($user);
+
+            //generate remember me token if active
+            if ($this->userOptions->getLoginOptions()->isEnableRemember()) {
+                $data = $form->getData();
+                if (isset($data['remember']) && $data['remember'] == 'yes') {
+                    //we always delete any previous remember tokens before generating new one
+                    $this->tokenService->deleteRememberTokens(['userId' => $user->getId()]);
+                    $t = $this->tokenService->generateRememberToken($user);
+                    if (!$t->isValid()) {
+                        error_log('Error generating remember me token for user id: ' . $user->getId());
+                    }
                 }
             }
         }

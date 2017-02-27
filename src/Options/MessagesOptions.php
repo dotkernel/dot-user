@@ -70,6 +70,7 @@ class MessagesOptions extends AbstractOptions
     const FORM_EXPIRED = 100;
     const UNAUTHORIZED = 105;
     const ACCOUNT_LOGIN_STATUS_NOT_ALLOWED = 110;
+    const ACCOUNT_UNCONFIRMED = 111;
     const ACCOUNT_INVALID = 115;
 
     const OPT_OUT_SUCCESS = 120;
@@ -132,6 +133,7 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::UNAUTHORIZED => 'You must sign in first in order to access the requested content',
         MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED =>
             'Your account is inactive or it may not have been confirmed',
+        MessagesOptions::ACCOUNT_UNCONFIRMED => 'You account needs to be activated first',
         MessagesOptions::ACCOUNT_INVALID => 'Your account had been disabled or deleted',
 
         MessagesOptions::OPT_OUT_ERROR => 'Account has failed to be inactivated. Please try again or contact us',

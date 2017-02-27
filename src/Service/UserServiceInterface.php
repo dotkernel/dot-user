@@ -28,6 +28,13 @@ interface UserServiceInterface
     public function find($id, array $options = []): ?UserEntity;
 
     /**
+     * @param string $email
+     * @param array $options
+     * @return UserEntity|null
+     */
+    public function findByEmail(string $email, array $options = []): ?UserEntity;
+
+    /**
      * @param UserEntity $user
      * @return mixed
      */

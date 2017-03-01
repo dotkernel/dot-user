@@ -13,11 +13,13 @@
         {{ formElement(password) }}
     </div>
 
+    {% if form.has('remember') %}
     <div class="checkbox">
         <label>
             {{ formCheckbox(form.get('remember')) }} {{ form.get('remember').getLabel() }}
         </label>
     </div>
+    {% endif %}
 
     {{ formElement(form.get('login_csrf')) }}
 

@@ -61,19 +61,21 @@ class LoginForm extends Form implements InputFilterProviderInterface, UserOption
             ]
         ], ['priority' => -10]);
 
-        $this->add(array(
-            'type' => 'checkbox',
-            'name' => 'remember',
-            'options' => [
-                'label' => 'Remember Me',
-                'use_hidden_element' => true,
-                'checked_value' => 'yes',
-                'unchecked_value' => 'no',
-            ],
-            'attributes' => [
-                'value' => 'yes'
-            ],
-        ), ['priority' => -100]);
+        if ($this->userOptions->getLoginOptions()->isEnableRemember()) {
+            $this->add(array(
+                'type' => 'checkbox',
+                'name' => 'remember',
+                'options' => [
+                    'label' => 'Remember Me',
+                    'use_hidden_element' => true,
+                    'checked_value' => 'yes',
+                    'unchecked_value' => 'no',
+                ],
+                'attributes' => [
+                    'value' => 'yes'
+                ],
+            ), ['priority' => -100]);
+        }
 
         $this->add([
             'name' => 'login_csrf',

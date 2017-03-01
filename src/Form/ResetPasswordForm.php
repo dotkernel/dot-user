@@ -25,6 +25,9 @@ class ResetPasswordForm extends Form implements UserOptionsAwareInterface
 {
     use UserOptionsAwareTrait;
 
+    /**
+     * ResetPasswordForm constructor.
+     */
     public function __construct()
     {
         parent::__construct('resetPasswordForm');

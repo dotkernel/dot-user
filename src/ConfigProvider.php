@@ -21,7 +21,7 @@ use Dot\User\Entity\UserEntity;
 use Dot\User\Factory\AuthenticationListenerFactory;
 use Dot\User\Factory\AutoLoginFactory;
 use Dot\User\Factory\BcryptFactory;
-use Dot\User\Factory\FormElementFactory;
+use Dot\User\Factory\FormFactory;
 use Dot\User\Factory\InjectLoginFormFactory;
 use Dot\User\Factory\PasswordCheckFactory;
 use Dot\User\Factory\TokenServiceFactory;
@@ -144,12 +144,12 @@ class ConfigProvider
                 'form_manager' => [
                     'factories' => [
                         UserFieldset::class => UserFieldsetFactory::class,
-                        RegisterForm::class => FormElementFactory::class,
-                        AccountForm::class => FormElementFactory::class,
-                        ChangePasswordForm::class => FormElementFactory::class,
-                        ForgotPasswordForm::class => FormElementFactory::class,
-                        LoginForm::class => FormElementFactory::class,
-                        ResetPasswordForm::class => FormElementFactory::class,
+                        RegisterForm::class => FormFactory::class,
+                        AccountForm::class => FormFactory::class,
+                        ChangePasswordForm::class => FormFactory::class,
+                        ForgotPasswordForm::class => FormFactory::class,
+                        LoginForm::class => FormFactory::class,
+                        ResetPasswordForm::class => FormFactory::class,
                     ],
                     'aliases' => [
                         'UserFieldset' => UserFieldset::class,

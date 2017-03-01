@@ -28,6 +28,9 @@ class AccountForm extends Form implements UserOptionsAwareInterface
 {
     use UserOptionsAwareTrait;
 
+    /**
+     * AccountForm constructor.
+     */
     public function __construct()
     {
         parent::__construct('accountForm');

@@ -25,6 +25,9 @@ class ForgotPasswordForm extends Form implements InputFilterProviderInterface, U
 {
     use UserOptionsAwareTrait;
 
+    /**
+     * ForgotPasswordForm constructor.
+     */
     public function __construct()
     {
         parent::__construct('forgotPasswordForm');

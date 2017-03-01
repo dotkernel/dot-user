@@ -25,6 +25,9 @@ class RegisterForm extends Form implements UserOptionsAwareInterface
 {
     use UserOptionsAwareTrait;
 
+    /**
+     * RegisterForm constructor.
+     */
     public function __construct()
     {
         parent::__construct('registerForm');

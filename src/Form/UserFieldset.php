@@ -27,11 +27,10 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
 
     /**
      * UserFieldset constructor.
-     * @param string $name
      */
-    public function __construct(string $name = 'user')
+    public function __construct()
     {
-        parent::__construct($name);
+        parent::__construct('user');
     }
 
     public function init()

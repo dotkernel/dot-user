@@ -27,17 +27,17 @@ class UserFieldsetFactory
     /**
      * @param ContainerInterface $container
      * @param $requestedName
-     * @param array $options
      * @return UserFieldset
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): UserFieldset
+    public function __invoke(ContainerInterface $container, $requestedName): UserFieldset
     {
         /** @var UserOptions $userOptions */
         $userOptions = $container->get(UserOptions::class);
-        /** @var UserFieldset $fieldset */
-        $fieldset = new $requestedName($options);
         /** @var HydratorPluginManager $hydratorManager */
         $hydratorManager = $container->get('HydratorManager');
+
+        /** @var UserFieldset $fieldset */
+        $fieldset = new $requestedName();
 
         $entity = $userOptions->getUserEntity();
         if ($container->has($entity)) {

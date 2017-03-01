@@ -25,6 +25,9 @@ class ChangePasswordForm extends Form implements InputFilterProviderInterface, U
 {
     use UserOptionsAwareTrait;
 
+    /**
+     * ChangePasswordForm constructor.
+     */
     public function __construct()
     {
         parent::__construct('changePasswordForm');

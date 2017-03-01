@@ -25,6 +25,9 @@ class LoginForm extends Form implements InputFilterProviderInterface, UserOption
 {
     use UserOptionsAwareTrait;
 
+    /**
+     * LoginForm constructor.
+     */
     public function __construct()
     {
         parent::__construct('loginForm');

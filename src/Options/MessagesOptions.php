@@ -133,9 +133,9 @@ class MessagesOptions extends AbstractOptions
 
         MessagesOptions::FORM_EXPIRED => 'The form CSRF has expired and was refreshed. Try again now',
         MessagesOptions::UNAUTHORIZED => 'You must sign in first in order to access the requested content',
-        MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED => 'Account status is inactive',
+        MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED => 'Could not sign in. Account is disabled',
         MessagesOptions::ACCOUNT_UNCONFIRMED => 'Account needs to be confirmed.',
-        MessagesOptions::ACCOUNT_INVALID => 'Account had been disabled or deleted',
+        MessagesOptions::ACCOUNT_INVALID => 'Account has been disabled or deleted',
 
         MessagesOptions::OPT_OUT_ERROR => 'Account failed to be un-registered. Please try again or contact us',
         MessagesOptions::OPT_OUT_SUCCESS => 'Account was successfully un-registered',

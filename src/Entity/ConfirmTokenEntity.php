@@ -15,10 +15,24 @@ namespace Dot\User\Entity;
  * Class ConfirmTokenEntity
  * @package Dot\User\Entity
  */
-class ConfirmTokenEntity extends AbstractTokenEntity
+class ConfirmTokenEntity extends AbstractTokenEntity implements \JsonSerializable
 {
     public function getType(): string
     {
         return AbstractTokenEntity::TOKEN_CONFIRM;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'userId' => $this->getUserId(),
+            'token' => $this->getToken(),
+            'type' => $this->getType(),
+            'created' => $this->getCreated()
+        ];
     }
 }

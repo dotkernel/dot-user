@@ -19,7 +19,8 @@ use Dot\Ems\Entity\Entity;
  */
 class UserEntity extends Entity implements
     AuthenticationIdentity,
-    AuthorizationIdentity
+    AuthorizationIdentity,
+    \JsonSerializable
 {
     const STATUS_PENDING = 'pending';
     const STATUS_ACTIVE = 'active';
@@ -168,5 +169,21 @@ class UserEntity extends Entity implements
             return $this->username;
         }
         return $this->email ?? '';
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'username' => $this->getUsername(),
+            'email' => $this->getEmail(),
+            'password' => $this->getPassword(),
+            'roles' => $this->getRoles(),
+            'status' => $this->getStatus(),
+            'dateCreated' => $this->getDateCreated()
+        ];
     }
 }

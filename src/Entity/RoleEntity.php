@@ -17,7 +17,7 @@ use Dot\Ems\Entity\Entity;
  * Class RoleEntity
  * @package Dot\User\Entity
  */
-class RoleEntity extends Entity
+class RoleEntity extends Entity implements \JsonSerializable
 {
     /** @var  mixed */
     protected $id;
@@ -63,5 +63,13 @@ class RoleEntity extends Entity
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name
+        ];
     }
 }

@@ -184,14 +184,6 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
             'passwordConfirm' => [
                 'validators' => [
                     [
-                        'name' => 'NotEmpty',
-                        'break_chain_on_failure' => true,
-                        'options' => [
-                            'message' => $this->userOptions->getMessagesOptions()
-                                ->getMessage(MessagesOptions::PASSWORD_CONFIRM_EMPTY),
-                        ]
-                    ],
-                    [
                         'name' => 'Identical',
                         'options' => [
                             'token' => 'password',

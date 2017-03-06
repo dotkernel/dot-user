@@ -72,7 +72,7 @@ class UserServiceFactory
     protected function attachListeners(ContainerInterface $container, array $listeners, EventManagerInterface $em)
     {
         foreach ($listeners as $listener) {
-            if (is_string($listeners)) {
+            if (is_string($listener)) {
                 $l = $this->getListenerObject($container, $listener);
                 $p = 1;
                 $l->attach($em, $p);

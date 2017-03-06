@@ -43,6 +43,7 @@ class MessagesOptions extends AbstractOptions
     const CONFIRM_ACCOUNT_INVALID_TOKEN = 52;
     const CONFIRM_ACCOUNT_INVALID_EMAIL = 53;
     const CONFIRM_ACCOUNT_SUCCESS = 54;
+    const CONFIRM_ACCOUNT_DISABLED = 55;
 
     const REMEMBER_TOKEN_SAVE_ERROR = 60;
     const REMEMBER_TOKEN_INVALID = 61;
@@ -104,6 +105,7 @@ class MessagesOptions extends AbstractOptions
         MessagesOptions::CONFIRM_TOKEN_SAVE_ERROR =>
             'Account activation link could not be generated. Please try again',
         MessagesOptions::CONFIRM_ACCOUNT_SUCCESS => 'Account successfully activated. You may sign in now',
+        MessagesOptions::CONFIRM_ACCOUNT_DISABLED => 'Account activation is disabled',
 
         MessagesOptions::REMEMBER_TOKEN_SAVE_ERROR =>
             'Remember me feature has encountered and error. This will not affect general usability',

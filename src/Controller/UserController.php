@@ -106,6 +106,12 @@ class UserController extends AbstractActionController implements UserControllerE
             return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
         }
 
+        if (!$this->userOptions->isEnableAccountConfirmation()) {
+            $this->messenger()->addError($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_DISABLED));
+            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+        }
+
         $request = $this->getRequest();
         $params = $request->getQueryParams();
 
@@ -131,6 +137,12 @@ class UserController extends AbstractActionController implements UserControllerE
             $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
             return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
+        }
+
+        if (!$this->userOptions->isEnableAccountConfirmation()) {
+            $this->messenger()->addError($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_DISABLED));
+            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();
@@ -383,6 +395,12 @@ class UserController extends AbstractActionController implements UserControllerE
             $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
             return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
+        }
+
+        if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
+            $this->messenger()->addError($this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::RESET_PASSWORD_DISABLED));
+            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
         }
 
         $request = $this->getRequest();

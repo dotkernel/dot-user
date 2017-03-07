@@ -199,19 +199,19 @@ class UserController extends AbstractActionController implements UserControllerE
                 $result = $this->userService->changePassword($user, $data);
                 if ($result->isValid()) {
                     $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
-                        ->getMessage(MessagesOptions::CHANGE_PASSWORD_SUCCESS));
+                        ->getMessage(MessagesOptions::CHANGE_PASSWORD_SUCCESS), 'change-password');
 
                     return $this->redirectTo($request->getUri(), $request->getQueryParams());
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::CHANGE_PASSWORD_ERROR));
-                    $this->messenger()->addError($message);
+                    $this->messenger()->addError($message, 'change-password');
                     $this->forms()->saveState($form);
 
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->messenger()->addError($this->forms()->getMessages($form), 'change-password');
                 $this->forms()->saveState($form);
 
                 return new RedirectResponse($request->getUri(), 303);
@@ -270,19 +270,19 @@ class UserController extends AbstractActionController implements UserControllerE
                         return $this->autoLogin($user, $data['password']);
                     } else {
                         $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
-                            ->getMessage(MessagesOptions::REGISTER_SUCCESS));
+                            ->getMessage(MessagesOptions::REGISTER_SUCCESS), 'register');
                         return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
                     }
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::USER_REGISTER_ERROR));
-                    $this->messenger()->addError($message);
+                    $this->messenger()->addError($message, 'register');
                     $this->forms()->saveState($form);
 
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->messenger()->addError($this->forms()->getMessages($form), 'register');
                 $this->forms()->saveState($form);
 
                 return new RedirectResponse($request->getUri(), 303);
@@ -350,19 +350,19 @@ class UserController extends AbstractActionController implements UserControllerE
                 $result = $this->userService->updateAccount($user, $hashPassword);
                 if ($result->isValid()) {
                     $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
-                        ->getMessage(MessagesOptions::USER_UPDATE_SUCCESS));
+                        ->getMessage(MessagesOptions::USER_UPDATE_SUCCESS), 'account');
 
                     return new RedirectResponse($request->getUri());
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::USER_UPDATE_ERROR));
-                    $this->messenger()->addError($message);
+                    $this->messenger()->addError($message, 'account');
                     $this->forms()->saveState($form);
 
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->messenger()->addError($this->forms()->getMessages($form), 'account');
                 $this->forms()->saveState($form);
 
                 return new RedirectResponse($request->getUri(), 303);
@@ -419,20 +419,20 @@ class UserController extends AbstractActionController implements UserControllerE
                 $result = $this->userService->resetPassword($data);
                 if ($result->isValid()) {
                     $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
-                        ->getMessage(MessagesOptions::RESET_PASSWORD_SUCCESS));
+                        ->getMessage(MessagesOptions::RESET_PASSWORD_SUCCESS), 'reset-password');
 
                     return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::RESET_PASSWORD_ERROR));
 
-                    $this->messenger()->addError($message);
+                    $this->messenger()->addError($message, 'reset-password');
                     $this->forms()->saveState($form);
 
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->messenger()->addError($this->forms()->getMessages($form), 'reset-password');
                 $this->forms()->saveState($form);
 
                 return new RedirectResponse($request->getUri(), 303);
@@ -486,19 +486,19 @@ class UserController extends AbstractActionController implements UserControllerE
                 $result = $this->userService->resetPasswordRequest($data);
                 if ($result->isValid()) {
                     $this->messenger()->addInfo(sprintf($this->userOptions->getMessagesOptions()
-                        ->getMessage(MessagesOptions::FORGOT_PASSWORD_SUCCESS), $data['email']));
+                        ->getMessage(MessagesOptions::FORGOT_PASSWORD_SUCCESS), $data['email']), 'forgot-password');
 
                     return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::RESET_TOKEN_SAVE_ERROR));
-                    $this->messenger()->addError($message);
+                    $this->messenger()->addError($message, 'forgot-password');
                     $this->forms()->saveState($form);
 
                     return new RedirectResponse($request->getUri(), 303);
                 }
             } else {
-                $this->messenger()->addError($this->forms()->getMessages($form));
+                $this->messenger()->addError($this->forms()->getMessages($form), 'forgot-password');
                 $this->forms()->saveState($form);
 
                 return new RedirectResponse($request->getUri(), 303);

@@ -270,7 +270,7 @@ class UserController extends AbstractActionController implements UserControllerE
                         return $this->autoLogin($user, $data['password']);
                     } else {
                         $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
-                            ->getMessage(MessagesOptions::REGISTER_SUCCESS), 'register');
+                            ->getMessage(MessagesOptions::REGISTER_SUCCESS));
                         return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
                     }
                 } else {
@@ -419,7 +419,7 @@ class UserController extends AbstractActionController implements UserControllerE
                 $result = $this->userService->resetPassword($data);
                 if ($result->isValid()) {
                     $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
-                        ->getMessage(MessagesOptions::RESET_PASSWORD_SUCCESS), 'reset-password');
+                        ->getMessage(MessagesOptions::RESET_PASSWORD_SUCCESS));
 
                     return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
                 } else {
@@ -486,7 +486,7 @@ class UserController extends AbstractActionController implements UserControllerE
                 $result = $this->userService->resetPasswordRequest($data);
                 if ($result->isValid()) {
                     $this->messenger()->addInfo(sprintf($this->userOptions->getMessagesOptions()
-                        ->getMessage(MessagesOptions::FORGOT_PASSWORD_SUCCESS), $data['email']), 'forgot-password');
+                        ->getMessage(MessagesOptions::FORGOT_PASSWORD_SUCCESS), $data['email']));
 
                     return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
                 } else {

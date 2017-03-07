@@ -18,7 +18,6 @@ use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserService;
 use Interop\Container\ContainerInterface;
 use Zend\Crypt\Password\PasswordInterface;
-use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 
@@ -47,18 +46,13 @@ class UserServiceFactory
             $container->get(UserOptions::class)
         );
 
-        $events = $container->has(EventManagerInterface::class)
-            ? $container->get(EventManagerInterface::class)
-            : new EventManager();
-
-        $service->setEventManager($events);
-        $service->attach($events, 1000);
+        $service->attach($service->getEventManager(), 1000);
         if ($tokenService instanceof EventManagerAwareInterface) {
             $service->attach($tokenService->getEventManager(), 500);
         }
 
         if (isset($options->getEventListeners()['user']) && is_array($options->getEventListeners()['user'])) {
-            $this->attachListeners($container, $options->getEventListeners()['user'], $events);
+            $this->attachListeners($container, $options->getEventListeners()['user'], $service->getEventManager());
         }
 
         return $service;

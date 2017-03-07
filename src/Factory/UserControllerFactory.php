@@ -19,7 +19,6 @@ use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
-use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
 
 /**
@@ -46,16 +45,16 @@ class UserControllerFactory
             $container->get(LoginAction::class)
         );
 
-        $em = $container->has(EventManagerInterface::class)
-            ? $container->get(EventManagerInterface::class)
-            : new EventManager();
-        $controller->setEventManager($em);
-        $controller->attach($em, 1000);
+        $controller->attach($controller->getEventManager(), 1000);
 
         if (isset($options->getEventListeners()['controller'])
             && is_array($options->getEventListeners()['controller'])
         ) {
-            $this->attachListeners($container, $options->getEventListeners()['controller'], $em);
+            $this->attachListeners(
+                $container,
+                $options->getEventListeners()['controller'],
+                $controller->getEventManager()
+            );
         }
 
         return $controller;

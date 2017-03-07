@@ -16,7 +16,6 @@ use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenService;
 use Interop\Container\ContainerInterface;
-use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
 
 /**
@@ -37,15 +36,10 @@ class TokenServiceFactory
 
         /** @var TokenService $service */
         $service = new $requestedName($options);
-        $events = $container->has(EventManagerInterface::class)
-            ? $container->get(EventManagerInterface::class)
-            : new EventManager();
-
-        $service->setEventManager($events);
-        $service->attach($events, 1000);
+        $service->attach($service->getEventManager(), 1000);
 
         if (isset($options->getEventListeners()['token']) && is_array($options->getEventListeners()['token'])) {
-            $this->attachListeners($container, $options->getEventListeners()['token'], $events);
+            $this->attachListeners($container, $options->getEventListeners()['token'], $service->getEventManager());
         }
 
         return $service;

@@ -24,7 +24,7 @@ class LoginOptions extends AbstractOptions
     protected $enableRemember = true;
 
     /** @var string */
-    protected $rememberCookieName = 'rememberMe';
+    protected $rememberCookieName = 'remember';
 
     /** @var bool */
     protected $rememberCookieSecure = false;

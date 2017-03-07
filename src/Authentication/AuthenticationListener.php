@@ -150,6 +150,8 @@ class AuthenticationListener extends AbstractAuthenticationEventListener
         $authentication = $e->getParam('authenticationService');
         $identity = $authentication->getIdentity();
 
-        $this->tokenService->deleteRememberTokens(['userId' => $identity->getId()]);
+        if ($this->userOptions->getLoginOptions()->isEnableRemember()) {
+            $this->tokenService->deleteRememberTokens(['userId' => $identity->getId()]);
+        }
     }
 }

@@ -9,7 +9,7 @@
 
 namespace Dot\User;
 
-use Dot\Ems\Factory\DbMapperFactory;
+use Dot\Mapper\Factory\DbMapperFactory;
 use Dot\User\Authentication\AuthenticationListener;
 use Dot\User\Authentication\InjectLoginForm;
 use Dot\User\Controller\UserController;

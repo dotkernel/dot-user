@@ -11,8 +11,8 @@ declare(strict_types = 1);
 
 namespace Dot\User\Service;
 
-use Dot\Ems\Mapper\MapperManagerAwareInterface;
-use Dot\Ems\Mapper\MapperManagerAwareTrait;
+use Dot\Mapper\Mapper\MapperManagerAwareInterface;
+use Dot\Mapper\Mapper\MapperManagerAwareTrait;
 use Dot\User\Entity\ResetTokenEntity;
 use Dot\User\Entity\UserEntity;
 use Dot\User\Event\DispatchUserEventsTrait;
@@ -340,7 +340,7 @@ class UserService implements
                 $token = $this->tokenService->findResetToken($user, $token);
                 if ($token) {
                     //check validity
-                    if ((int) $token->getExpire() >= time()) {
+                    if ((int)$token->getExpire() >= time()) {
                         $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_PASSWORD_RESET, [
                             'user' => $user,
                             'token' => $token,

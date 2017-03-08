@@ -11,7 +11,7 @@ declare(strict_types = 1);
 
 namespace Dot\User\Factory;
 
-use Dot\Ems\Factory\DbMapperFactory;
+use Dot\Mapper\Factory\DbMapperFactory;
 use Dot\User\Options\UserOptions;
 use Interop\Container\ContainerInterface;
 

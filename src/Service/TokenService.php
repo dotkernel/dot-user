@@ -11,8 +11,8 @@ declare(strict_types = 1);
 
 namespace Dot\User\Service;
 
-use Dot\Ems\Mapper\MapperManagerAwareInterface;
-use Dot\Ems\Mapper\MapperManagerAwareTrait;
+use Dot\Mapper\Mapper\MapperManagerAwareInterface;
+use Dot\Mapper\Mapper\MapperManagerAwareTrait;
 use Dot\User\Entity\AbstractTokenEntity;
 use Dot\User\Entity\ConfirmTokenEntity;
 use Dot\User\Entity\RememberTokenEntity;
@@ -287,7 +287,8 @@ class TokenService implements
                 }
 
                 if (hash_equals($token->getToken(), md5($clearToken))
-                    && (int) $token->getExpire() >= time()) {
+                    && (int)$token->getExpire() >= time()
+                ) {
                     $this->dispatchEvent(TokenEvent::EVENT_TOKEN_AFTER_VALIDATE_REMEMBER_TOKEN, [
                         'token' => $token,
                         'userToken' => $clearToken,

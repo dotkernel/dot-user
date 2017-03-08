@@ -11,7 +11,7 @@ declare(strict_types = 1);
 
 namespace Dot\User\Mapper;
 
-use Dot\Ems\Mapper\AbstractDbMapper;
+use Dot\Mapper\Mapper\AbstractDbMapper;
 use Dot\User\Entity\AbstractSelectorTokenEntity;
 
 /**

@@ -11,10 +11,10 @@ declare(strict_types = 1);
 
 namespace Dot\User\Mapper;
 
-use Dot\Ems\Event\MapperEvent;
-use Dot\Ems\Mapper\AbstractDbMapper;
-use Dot\Ems\Mapper\MapperInterface;
-use Dot\Ems\Mapper\MapperManager;
+use Dot\Mapper\Event\MapperEvent;
+use Dot\Mapper\Mapper\AbstractDbMapper;
+use Dot\Mapper\Mapper\MapperInterface;
+use Dot\Mapper\Mapper\MapperManager;
 use Dot\User\Entity\RoleEntity;
 use Dot\User\Entity\UserEntity;
 use Dot\User\Exception\RuntimeException;

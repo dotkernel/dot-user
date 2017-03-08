@@ -11,7 +11,7 @@ namespace Dot\User\Entity;
 
 use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentity;
 use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentity;
-use Dot\Ems\Entity\Entity;
+use Dot\Mapper\Entity\Entity;
 
 /**
  * Class UserEntity

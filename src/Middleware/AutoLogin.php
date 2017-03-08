@@ -87,8 +87,11 @@ class AutoLogin
                             /** @var RememberTokenEntity $token */
                             $token = $r->getParam('token');
                             $userId = (int)$token->getUserId();
-                            $user = $this->userService->find($userId, ['conditions' => [
-                                'status' => $this->userOptions->getLoginOptions()->getAllowedStatus()]]);
+                            $user = $this->userService->find($userId, [
+                                'conditions' => [
+                                    'status' => $this->userOptions->getLoginOptions()->getAllowedStatus()
+                                ]
+                            ]);
                             if ($user) {
                                 // renew tokens
                                 $this->tokenService->deleteRememberTokens(['userId' => $userId]);

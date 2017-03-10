@@ -1,11 +1,13 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 7/6/2016
- * Time: 11:03 PM
+ * Date: 2/14/2017
+ * Time: 12:30 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Result;
 
@@ -16,25 +18,44 @@ namespace Dot\User\Result;
 interface ResultInterface
 {
     /**
-     * Get error message when error occurs
-     * @return string[]
+     * @param $name
+     * @param $value
      */
-    public function getMessages();
+    public function setParam($name, $value);
 
     /**
-     * Tells if the MailService that produced this result was properly sent
+     * @param $name
+     * @return mixed
+     */
+    public function getParam($name);
+
+    /**
+     * @param array $params
+     */
+    public function setParams(array $params);
+
+    /**
      * @return bool
      */
-    public function isValid();
+    public function isValid(): bool;
 
     /**
-     * Tells if Result has an Exception
      * @return bool
      */
-    public function hasException();
+    public function hasError(): bool;
 
     /**
-     * @return \Exception
+     * @return bool
      */
-    public function getException();
+    public function hasException(): bool;
+
+    /**
+     * @return mixed
+     */
+    public function getError();
+
+    /**
+     * @param $error
+     */
+    public function setError($error);
 }

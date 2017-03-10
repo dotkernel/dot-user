@@ -1,43 +1,43 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 6/21/2016
- * Time: 10:50 PM
+ * Date: 2/18/2017
+ * Time: 9:29 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Factory;
 
-use Dot\FlashMessenger\FlashMessengerInterface;
-use Dot\User\Form\LoginForm;
-use Dot\User\Form\UserFormManager;
-use Dot\User\Listener\AuthenticationListener;
+use Dot\Controller\Plugin\PluginManager;
+use Dot\User\Authentication\AuthenticationListener;
 use Dot\User\Options\UserOptions;
+use Dot\User\Service\TokenServiceInterface;
+use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
 
 /**
- * Class AuthenticationListenerFactory
+ * Class BeforeAuthenticationListenerFactory
  * @package Dot\User\Factory
  */
 class AuthenticationListenerFactory
 {
-    /**
-     * @param ContainerInterface $container
-     * @return AuthenticationListener
-     */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container, string $requestedName): AuthenticationListener
     {
-        /** @var UserFormManager $formManager */
-        $formManager = $container->get(UserFormManager::class);
+        /** @var PluginManager $controllerPluginManager */
+        $controllerPluginManager = $container->get(PluginManager::class);
+        $formsPlugin = $controllerPluginManager->get('forms');
+        $userOptions = $container->get(UserOptions::class);
+        $userService = $container->get(UserServiceInterface::class);
+        $tokenService = $container->get(TokenServiceInterface::class);
 
-        /** @var UserOptions $options */
-        $options = $container->get(UserOptions::class);
-        return new AuthenticationListener(
-            $formManager->get(LoginForm::class),
-            $container->get(FlashMessengerInterface::class),
-            $container->get('UserService'),
-            $options
+        return new $requestedName(
+            $userService,
+            $tokenService,
+            $formsPlugin,
+            $userOptions
         );
     }
 }

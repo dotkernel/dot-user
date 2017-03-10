@@ -1,148 +1,59 @@
 <?php
-
 return [
-
-    'dependencies' => [
-
-    ],
+    'dependencies' => [],
 
     'dot_user' => [
+        'user_entity' => \Dot\User\Entity\UserEntity::class,
 
-        //overwrite user entity, must implement UserEntityInterface
-        //service name or class name, defaults to UserEntity and ClassMethods(false)
-        'user_entity' => '',
-        'user_entity_hydrator' => '',
+        'default_roles' => ['user'],
+        'route_default' => ['route_name' => 'user', 'route_params' => ['action' => 'account']],
 
-        //bcrypt password cost, don't change if unsure
+        'enable_account_confirmation' => true,
+        'confirmed_account_status' => \Dot\User\Entity\UserEntity::STATUS_ACTIVE,
+
         'password_cost' => 11,
 
-        //whether to use user status throughout the user module
-        'enable_user_status' => true,
+        'event_listeners' => [
+            'user' => [
 
-        //when displaying forms, show labels along the intputs
-        'show_form_input_labels' => true,
+            ],
+            'token' => [
 
-        //CSRF token expiration for all defined forms
-        'form_csrf_timeout' => 3600,
+            ],
+            'controller' => [
 
-        //database options for mysql/pdo mapper
-        'db_options' => [
-            //service name of the database adapter
-            'db_adapter' => '',
-
-            //user table name
-            'user_table' => '',
-
-            //table name where reset tokens are stored
-            'user_reset_token_table' => '',
-
-            //table name where confirm tokens are stored
-            'user_confirm_token_table' => '',
-
-            //table name where remember tokens are stored
-            'user_remember_token_table' => ''
+            ]
         ],
 
         'login_options' => [
-            //activate remember me logic, and enable remember me checkbox in login form
-            'enable_remember_me' => true,
-
-            //cookie name to use for remember me tokens
-            'remember_me_cookie_name' => 'rememberMe',
-
-            //remember me cookie expiration
-            'remember_me_cookie_expire' => 60 * 60 * 24 * 30,
-
-            //use cookie only on secure connections
-            'remember_me_cookie_secure' => true,
-
-            //what fields to use when authenticating
-            'auth_identity_fields' => ['username', 'email'],
-
-            //whitelist user statuses that are allowed to authenticate successfully
-            'allowed_login_statuses' => ['active'],
+            'enable_remember' => true,
+            'allowed_status' => [\Dot\User\Entity\UserEntity::STATUS_ACTIVE],
         ],
-
-        //config for user registration related flow
         'register_options' => [
-            //enable user registration through the website
             'enable_registration' => true,
+            'default_user_status' => \Dot\User\Entity\UserEntity::STATUS_PENDING,
 
-            //enable the username field, along with the email
-            'enable_username' => true,
+            'use_registration_captcha' => true,
+            'captcha_options' => [],
 
-            //what status should newly registered users be assigned
-            'default_user_status' => 'pending',
-
-            //use captcha when registering
-            'use_registration_form_captcha' => true,
-
-            //if captcha enabled, this is its config
-            'form_captcha_options' => [
-                'class' => 'Figlet',
-                'options' => [
-                    'wordLen' => 5,
-                    'expiration' => 300,
-                    'timeout' => 300,
-                ],
-            ],
+            'login_after_registration' => false,
         ],
-
         'password_recovery_options' => [
-            //enable password recovery
-            'enable_password_recovery' => true,
-
-            //expiration for reset token
-            'reset_password_token_timeout' => 3600,
+            'enable_recovery' => true,
+            'reset_token_timeout' => 3600,
         ],
-
-        'confirm_account_options' => [
-            //enable account confirmation
-            'enable_account_confirmation' => true,
-
-            //what status should be assigned to users that confirm their account
-            'active_user_status' => 'active',
+        'template_options' => [
+            'login_template' => '',
+            'register_template' => '',
+            'account_template' => '',
+            'change_password_template' => '',
+            'forgot_password_template' => '',
+            'reset_password_template' => ''
         ],
-
-        //overwrite default user module messages
         'messages_options' => [
             'messages' => [
-
-            ],
-        ],
-
-        //overwrite default templates
-        /*'template_options' => [
-            'login_template' => '',
-
-            'login_layout' => '',
-
-            'register_template' => '',
-
-            'register_layout' => '',
-
-            'account_template' => '',
-
-            'account_layout' => '',
-
-            'change_password_template' => '',
-
-            'change_password_layout' => '',
-
-            'forgot_password_template' => '',
-
-            'forgot_password_layout' => '',
-
-            'reset_password_template' => '',
-
-            'reset_password_layout' => '',
-        ],*/
-
-        //default user event listeners
-        'user_event_listeners' => [
-
-        ],
-        
-    ],
-
+                // checkout MessagesOptions class for a complete list of messages
+            ]
+        ]
+    ]
 ];

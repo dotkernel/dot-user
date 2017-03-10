@@ -1,7 +1,7 @@
 {
   "name": "dotkernel/dot-user",
   "type": "library",
-  "description": "Complete configurable user module for DK built around dot-authentication-web",
+  "description": "DotKernel configurable user component providing common user functions and extending the authentication flow",
   "license": "MIT",
   "authors": [
     {
@@ -10,42 +10,39 @@
     }
   ],
   "require": {
-    "php": "^5.6 || ^7.0",
+    "php": "^7.1",
     "psr/http-message": "^1.0",
     "container-interop/container-interop": "^1.1",
     "zendframework/zend-expressive-template": "^1.0",
     "zendframework/zend-diactoros": "^1.3",
-    "zendframework/zend-hydrator": "^2.2",
-    "zendframework/zend-filter": "^2.6",
     "zendframework/zend-servicemanager": "^3.0",
-    "zendframework/zend-form": "^2.9",
-    "zendframework/zend-inputfilter": "^2.7",
     "zendframework/zend-db": "^2.8",
     "zendframework/zend-math": "^3.0",
     "zendframework/zend-crypt": "^3.1",
 
-    "dotkernel/dot-helpers": "0.6.x-dev",
-    "dotkernel/dot-ems": "0.6.x-dev",
-    "dotkernel/dot-event": "0.6.x-dev",
-    "dotkernel/dot-flashmessenger": "0.6.x-dev",
-    "dotkernel/dot-controller": "0.6.x-dev",
-    "dotkernel/dot-controller-plugin-flashmessenger": "0.6.x-dev",
-    "dotkernel/dot-controller-plugin-authentication": "0.6.x-dev",
-    "dotkernel/dot-controller-plugin-authorization": "0.6.x-dev",
-    "dotkernel/dot-authentication": "0.6.x-dev",
-    "dotkernel/dot-authentication-web": "0.6.x-dev",
-    "dotkernel/dot-authorization": "0.6.x-dev"
+    "dotkernel/dot-helpers": "~0.1",
+    "dotkernel/dot-event": "~0.1",
+    "dotkernel/dot-mapper": "~0.1",
+    "dotkernel/dot-filter": "^1.0",
+    "dotkernel/dot-validator": "^1.0",
+    "dotkernel/dot-inputfilter": "^1.0",
+    "dotkernel/dot-hydrator": "^1.0",
+    "dotkernel/dot-form": "^1.0",
+    "dotkernel/dot-flashmessenger": "~0.1",
+    "dotkernel/dot-controller": "~0.1",
+    "dotkernel/dot-controller-plugin-flashmessenger": "~0.1",
+    "dotkernel/dot-controller-plugin-authentication": "~0.1",
+    "dotkernel/dot-controller-plugin-authorization": "~0.1",
+    "dotkernel/dot-controller-plugin-forms": "~0.1",
+    "dotkernel/dot-authentication": "~0.1",
+    "dotkernel/dot-authentication-web": "~0.1",
+    "dotkernel/dot-authorization": "~0.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^4.8",
-    "squizlabs/php_codesniffer": "^2.3"
+    "squizlabs/php_codesniffer": "^2.3",
+    "zendframework/zend-captcha": "^2.7"
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-ems"
-    }
-  ],
   "autoload": {
     "psr-4": {
       "Dot\\User\\": "src/"
@@ -58,7 +55,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.6-dev"
+      "dev-master": "0.2-dev"
     }
   }
 }

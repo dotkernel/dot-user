@@ -1,15 +1,18 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 6/20/2016
- * Time: 7:55 PM
+ * Date: 2/8/2017
+ * Time: 4:51 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Mapper;
 
-use Dot\Ems\Mapper\MapperInterface;
+use Dot\Mapper\Mapper\MapperInterface;
+use Dot\User\Entity\UserEntity;
 
 /**
  * Interface UserMapperInterface
@@ -18,69 +21,9 @@ use Dot\Ems\Mapper\MapperInterface;
 interface UserMapperInterface extends MapperInterface
 {
     /**
-     * Insert a reset token into the backend
-     *
-     * @param $data
-     * @return mixed
+     * @param string $email
+     * @param array $options
+     * @return UserEntity|null
      */
-    public function saveResetToken($data);
-
-    /**
-     * Creates a confirmation token in the backend
-     *
-     * @param $data
-     * @return mixed
-     */
-    public function saveConfirmToken($data);
-
-    /**
-     * Gets a reset token for a user, if it exists
-     *
-     * @param $userId
-     * @param $token
-     * @return mixed
-     */
-    public function findResetToken($userId, $token);
-
-    /**
-     * Gets confirm token from the backend for a specific user
-     *
-     * @param $userId
-     * @param $token
-     * @return mixed
-     */
-    public function findConfirmToken($userId, $token);
-
-    /**
-     * Deletes or marks the confirm token as used and disabled
-     *
-     * @param $userId
-     * @param $token
-     * @return mixed
-     */
-    public function removeConfirmToken($userId, $token);
-
-    /**
-     * Creates a remember token in the backend
-     *
-     * @param $data
-     * @return mixed
-     */
-    public function saveRememberToken($data);
-
-    /**
-     * Gets a remember token row from the backend based on its selector
-     *
-     * @param $selector
-     * @return mixed
-     */
-    public function findRememberToken($selector);
-
-    /**
-     * Deletes remember tokens for a given user
-     *
-     * @param $userId
-     * @return mixed
-     */
-    public function removeRememberToken($userId);
+    public function getByEmail(string $email, array $options = []): ?UserEntity;
 }

@@ -1,0 +1,17 @@
+{% set dummy = form.prepare() %}
+{{ form().openTag(form) | raw }}
+
+    {% set username = form.getBaseFieldset().get('username') %}
+    <div class="form-group {% if username.getMessages() %}has-error{% endif %}">
+        {% set dummy = username.setAttribute('class', 'form-control') %}
+        {{ formLabel(username) }}
+        {{ formElement(username) }}
+    </div>
+
+    {{ formElement(form.get('account_csrf')) }}
+
+    {% set submit = form.get('submit') %}
+    {% set dummy = submit.setAttribute('class', 'btn btn-lg btn-primary btn-block') %}
+    {{ formSubmit(submit) }}
+
+{{ form().closeTag() | raw }}

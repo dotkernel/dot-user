@@ -1,14 +1,17 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 6/23/2016
- * Time: 3:44 PM
+ * Date: 2/14/2017
+ * Time: 12:01 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
+use Dot\User\Entity\UserEntity;
 use Zend\Stdlib\AbstractOptions;
 
 /**
@@ -18,128 +21,97 @@ use Zend\Stdlib\AbstractOptions;
 class LoginOptions extends AbstractOptions
 {
     /** @var bool */
-    protected $enableRememberMe = true;
+    protected $enableRemember = true;
 
     /** @var string */
-    protected $rememberMeCookieName = 'rememberMe';
-
-    /** @var int */
-    protected $rememberMeCookieExpire = 60 * 60 * 24 * 30;
+    protected $rememberCookieName = 'remember';
 
     /** @var bool */
-    protected $rememberMeCookieSecure = false;
+    protected $rememberCookieSecure = false;
+
+    /** @var int */
+    protected $rememberTokenExpire = 3600 * 24 * 30;
 
     /** @var array */
-    protected $authIdentityFields = ['username', 'email'];
-
-    /** @var  array */
-    protected $allowedLoginStatuses = ['active'];
+    protected $allowedStatus = [UserEntity::STATUS_ACTIVE];
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isEnableRememberMe()
+    public function isEnableRemember(): bool
     {
-        return $this->enableRememberMe;
+        return $this->enableRemember;
     }
 
     /**
-     * @param boolean $enableRememberMe
-     * @return LoginOptions
+     * @param bool $enableRemember
      */
-    public function setEnableRememberMe($enableRememberMe)
+    public function setEnableRemember(bool $enableRemember)
     {
-        $this->enableRememberMe = $enableRememberMe;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAuthIdentityFields()
-    {
-        return $this->authIdentityFields;
-    }
-
-    /**
-     * @param array $authIdentityFields
-     * @return LoginOptions
-     */
-    public function setAuthIdentityFields($authIdentityFields)
-    {
-        $this->authIdentityFields = (array)$authIdentityFields;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAllowedLoginStatuses()
-    {
-        return $this->allowedLoginStatuses;
-    }
-
-    /**
-     * @param array $allowedLoginStatuses
-     * @return LoginOptions
-     */
-    public function setAllowedLoginStatuses($allowedLoginStatuses)
-    {
-        $this->allowedLoginStatuses = $allowedLoginStatuses;
-        return $this;
+        $this->enableRemember = $enableRemember;
     }
 
     /**
      * @return string
      */
-    public function getRememberMeCookieName()
+    public function getRememberCookieName(): string
     {
-        return $this->rememberMeCookieName;
+        return $this->rememberCookieName;
     }
 
     /**
-     * @param string $rememberMeCookieName
-     * @return LoginOptions
+     * @param string $rememberCookieName
      */
-    public function setRememberMeCookieName($rememberMeCookieName)
+    public function setRememberCookieName(string $rememberCookieName)
     {
-        $this->rememberMeCookieName = $rememberMeCookieName;
-        return $this;
+        $this->rememberCookieName = $rememberCookieName;
     }
 
     /**
      * @return int
      */
-    public function getRememberMeCookieExpire()
+    public function getRememberTokenExpire(): int
     {
-        return $this->rememberMeCookieExpire;
+        return $this->rememberTokenExpire;
     }
 
     /**
-     * @param int $rememberMeCookieExpire
-     * @return LoginOptions
+     * @param int $rememberTokenExpire
      */
-    public function setRememberMeCookieExpire($rememberMeCookieExpire)
+    public function setRememberTokenExpire(int $rememberTokenExpire)
     {
-        $this->rememberMeCookieExpire = $rememberMeCookieExpire;
-        return $this;
+        $this->rememberTokenExpire = $rememberTokenExpire;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isRememberMeCookieSecure()
+    public function isRememberCookieSecure(): bool
     {
-        return $this->rememberMeCookieSecure;
+        return $this->rememberCookieSecure;
     }
 
     /**
-     * @param boolean $rememberMeCookieSecure
-     * @return LoginOptions
+     * @param bool $rememberCookieSecure
      */
-    public function setRememberMeCookieSecure($rememberMeCookieSecure)
+    public function setRememberCookieSecure(bool $rememberCookieSecure)
     {
-        $this->rememberMeCookieSecure = $rememberMeCookieSecure;
-        return $this;
+        $this->rememberCookieSecure = $rememberCookieSecure;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedStatus(): array
+    {
+        return $this->allowedStatus;
+    }
+
+    /**
+     * @param array $allowedStatus
+     */
+    public function setAllowedStatus(array $allowedStatus)
+    {
+        $this->allowedStatus = $allowedStatus;
     }
 }

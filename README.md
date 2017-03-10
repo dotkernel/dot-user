@@ -1,2 +1,3 @@
 # dot-user
-Complete user module for DK based on dot-authentication-web and other DK related modules
+
+DotKernel user component providing configurable common user functions and extending on authentication flow.

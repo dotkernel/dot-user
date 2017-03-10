@@ -1,98 +1,113 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 7/20/2016
- * Time: 4:17 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 2/5/2017
+ * Time: 3:45 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Form;
 
 use Dot\User\Options\MessagesOptions;
-use Dot\User\Options\UserOptions;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\Form\Element\Csrf;
+use Dot\User\Options\UserOptionsAwareInterface;
+use Dot\User\Options\UserOptionsAwareTrait;
 use Zend\Form\Form;
+use Zend\InputFilter\InputFilterProviderInterface;
 
 /**
  * Class ChangePasswordForm
  * @package Dot\User\Form
  */
-class ChangePasswordForm extends Form
+class ChangePasswordForm extends Form implements InputFilterProviderInterface, UserOptionsAwareInterface
 {
-    use EventManagerAwareTrait;
-
-    /** @var  UserOptions */
-    protected $userOptions;
+    use UserOptionsAwareTrait;
 
     /**
      * ChangePasswordForm constructor.
-     * @param UserOptions $userOptions
-     * @param string $name
-     * @param array $options
      */
-    public function __construct(
-        UserOptions $userOptions,
-        $name = 'change-password',
-        array $options = []
-    ) {
-        $this->userOptions = $userOptions;
-        parent::__construct($name, $options);
+    public function __construct()
+    {
+        parent::__construct('changePasswordForm');
+        $this->setAttribute('method', 'post');
     }
 
     public function init()
     {
         $this->add([
-            'name' => 'password',
-            'type' => 'password',
+            'name' => 'currentPassword',
+            'type' => 'Password',
             'options' => [
-                'label' => 'Current Password'
+                'label' => 'Your current password',
             ],
             'attributes' => [
-                'placeholder' => 'Current Password'
+                'placeholder' => 'Current password...',
+                //'required' => 'required',
             ]
         ]);
 
         $this->add([
-            'name' => 'newPassword',
-            'type' => 'password',
+            'type' => 'UserFieldset',
             'options' => [
-                'label' => 'New Password'
-            ],
-            'attributes' => [
-                'placeholder' => 'New Password'
+                'use_as_base_fieldset' => true,
             ]
         ]);
 
         $this->add([
-            'name' => 'newPasswordVerify',
-            'type' => 'password',
+            'name' => 'change_password_csrf',
+            'type' => 'Csrf',
             'options' => [
-                'label' => 'Confirm New Password'
-            ],
-            'attributes' => [
-                'placeholder' => 'Confirm New Password'
+                'csrf_options' => [
+                    'timeout' => 3600,
+                    'message' => $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::FORM_EXPIRED)
+                ]
             ]
         ]);
 
-        $csrf = new Csrf('change_password_csrf', [
-            'csrf_options' => [
-                'timeout' => $this->userOptions->getFormCsrfTimeout(),
-                'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
-            ]
-        ]);
-        $this->add($csrf);
-
-        $this->add(array(
-            'type' => 'submit',
+        $this->add([
             'name' => 'submit',
-            'attributes' => array(
-                'value' => 'Change Password',
-            ),
-        ), ['priority' => -100]);
+            'attributes' => [
+                'type' => 'submit',
+                'value' => 'Change password'
+            ]
+        ]);
 
+        $this->getBaseFieldset()->get('password')
+            ->setLabel('New password')
+            ->setAttribute('placeholder', 'New password...');
 
-        $this->getEventManager()->trigger('init', $this);
+        $this->getBaseFieldset()->get('passwordConfirm')
+            ->setLabel('Confirm new password')
+            ->setAttribute('placeholder', 'New password confirm...');
+
+        $this->setValidationGroup([
+            'change_password_csrf',
+            'currentPassword',
+            'user' => [
+                'password',
+                'passwordConfirm'
+            ]
+        ]);
+    }
+
+    public function getInputFilterSpecification()
+    {
+        return [
+            'currentPassword' => [
+                'validators' => [
+                    [
+                        'name' => 'NotEmpty',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'message' => $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::CURRENT_PASSWORD_EMPTY)
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 }

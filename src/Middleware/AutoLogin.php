@@ -1,21 +1,23 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 7/12/2016
- * Time: 11:04 PM
+ * Date: 2/18/2017
+ * Time: 8:05 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Middleware;
 
 use Dot\Authentication\AuthenticationInterface;
-use Dot\FlashMessenger\FlashMessengerInterface;
+use Dot\User\Entity\RememberTokenEntity;
 use Dot\User\Options\UserOptions;
+use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserServiceInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Expressive\Helper\UrlHelper;
 
 /**
  * Class AutoLogin
@@ -24,19 +26,16 @@ use Zend\Expressive\Helper\UrlHelper;
 class AutoLogin
 {
     /** @var  UserOptions */
-    protected $options;
-
-    /** @var  FlashMessengerInterface */
-    protected $flashMessenger;
-
-    /** @var  UrlHelper */
-    protected $urlHelper;
+    protected $userOptions;
 
     /** @var  UserServiceInterface */
     protected $userService;
 
+    /** @var  TokenServiceInterface */
+    protected $tokenService;
+
     /** @var  AuthenticationInterface */
-    protected $authentication;
+    protected $authenticationService;
 
     /** @var  ServerRequestInterface */
     protected $request;
@@ -45,60 +44,61 @@ class AutoLogin
      * AutoLogin constructor.
      * @param AuthenticationInterface $authentication
      * @param UserServiceInterface $userService
-     * @param UrlHelper $urlHelper
-     * @param FlashMessengerInterface $messenger
-     * @param UserOptions $options
+     * @param TokenServiceInterface $tokenService
+     * @param UserOptions $userOptions
      */
     public function __construct(
         AuthenticationInterface $authentication,
         UserServiceInterface $userService,
-        UrlHelper $urlHelper,
-        FlashMessengerInterface $messenger,
-        UserOptions $options
+        TokenServiceInterface $tokenService,
+        UserOptions $userOptions
     ) {
-        $this->authentication = $authentication;
+        $this->authenticationService = $authentication;
         $this->userService = $userService;
-        $this->urlHelper = $urlHelper;
-        $this->flashMessenger = $messenger;
-        $this->options = $options;
+        $this->tokenService = $tokenService;
+        $this->userOptions = $userOptions;
     }
 
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @param callable|null $next
-     * @return mixed
+     * @param callable $next
+     * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
-    {
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next
+    ): ResponseInterface {
         $this->request = $request;
-
-        if ($this->options->getLoginOptions()->isEnableRememberMe() && !$this->authentication->hasIdentity()) {
+        if ($this->userOptions->getLoginOptions()->isEnableRemember() && !$this->authenticationService->hasIdentity()) {
             $cookies = $request->getCookieParams();
-            $key = $this->options->getLoginOptions()->getRememberMeCookieName();
+            $key = $this->userOptions->getLoginOptions()->getRememberCookieName();
 
             if (isset($cookies[$key])) {
                 try {
                     $data = @unserialize(base64_decode($cookies[$key]));
-
                     if ($data) {
                         $selector = $data['selector'];
                         $token = $data['token'];
 
-                        $r = $this->userService->checkRememberToken($selector, $token);
-                        if ($r) {
-                            $userId = (int)$r['userId'];
-                            $user = $this->userService->find(
-                                [$this->userService->getMapper()->getIdentifierName() => $userId]
-                            );
-
+                        $r = $this->tokenService->validateRememberToken($selector, $token);
+                        if ($r->isValid()) {
+                            /** @var RememberTokenEntity $token */
+                            $token = $r->getParam('token');
+                            $userId = (int)$token->getUserId();
+                            $user = $this->userService->find($userId, [
+                                'conditions' => [
+                                    'status' => $this->userOptions->getLoginOptions()->getAllowedStatus()
+                                ]
+                            ]);
                             if ($user) {
-                                //renew the tokens
-                                $this->userService->removeRememberToken($user);
-                                $this->userService->generateRememberToken($user);
+                                // renew tokens
+                                $this->tokenService->deleteRememberTokens(['userId' => $userId]);
+                                $this->tokenService->generateRememberToken($user);
 
-                                //autologin user
-                                $this->authentication->setIdentity($user);
+                                //auto-login user
+                                $this->authenticationService->setIdentity($user);
                             }
                         } else {
                             $this->unsetRememberCookie($key);
@@ -107,7 +107,7 @@ class AutoLogin
                         $this->unsetRememberCookie($key);
                     }
                 } catch (\Exception $e) {
-                    error_log("Auto-login error: " . $e->getMessage());
+                    error_log('Auto-login error: ' . $e->getMessage());
                     $this->unsetRememberCookie($key);
                 }
             }
@@ -116,7 +116,10 @@ class AutoLogin
         return $next($request, $response);
     }
 
-    protected function unsetRememberCookie($key)
+    /**
+     * @param $key
+     */
+    protected function unsetRememberCookie(string $key)
     {
         if (isset($_COOKIE[$key])) {
             unset($_COOKIE[$key]);

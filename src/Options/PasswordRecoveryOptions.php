@@ -1,11 +1,13 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 7/6/2016
- * Time: 8:13 PM
+ * Date: 2/14/2017
+ * Time: 9:00 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
@@ -18,44 +20,40 @@ use Zend\Stdlib\AbstractOptions;
 class PasswordRecoveryOptions extends AbstractOptions
 {
     /** @var bool */
-    protected $enablePasswordRecovery = true;
+    protected $enableRecovery = true;
 
     /** @var int */
-    protected $resetPasswordTokenTimeout = 3600;
+    protected $resetTokenTimeout = 3600;
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isEnablePasswordRecovery()
+    public function isEnableRecovery(): bool
     {
-        return $this->enablePasswordRecovery;
+        return $this->enableRecovery;
     }
 
     /**
-     * @param boolean $enablePasswordRecovery
-     * @return PasswordRecoveryOptions
+     * @param bool $enableRecovery
      */
-    public function setEnablePasswordRecovery($enablePasswordRecovery)
+    public function setEnableRecovery(bool $enableRecovery)
     {
-        $this->enablePasswordRecovery = $enablePasswordRecovery;
-        return $this;
+        $this->enableRecovery = $enableRecovery;
     }
 
     /**
      * @return int
      */
-    public function getResetPasswordTokenTimeout()
+    public function getResetTokenTimeout(): int
     {
-        return $this->resetPasswordTokenTimeout;
+        return $this->resetTokenTimeout;
     }
 
     /**
-     * @param int $resetPasswordTokenTimeout
-     * @return PasswordRecoveryOptions
+     * @param int $resetTokenTimeout
      */
-    public function setResetPasswordTokenTimeout($resetPasswordTokenTimeout)
+    public function setResetTokenTimeout(int $resetTokenTimeout)
     {
-        $this->resetPasswordTokenTimeout = $resetPasswordTokenTimeout;
-        return $this;
+        $this->resetTokenTimeout = $resetTokenTimeout;
     }
 }

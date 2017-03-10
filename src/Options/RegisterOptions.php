@@ -1,14 +1,17 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 6/23/2016
- * Time: 7:48 PM
+ * Date: 2/15/2017
+ * Time: 3:07 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
+use Dot\User\Entity\UserEntity;
 use Zend\Stdlib\AbstractOptions;
 
 /**
@@ -20,133 +23,95 @@ class RegisterOptions extends AbstractOptions
     /** @var bool */
     protected $enableRegistration = true;
 
-    /** @var bool */
-    protected $enableUsername = true;
-
-    /** @var  mixed */
-    protected $defaultUserStatus = 'pending';
+    /** @var string */
+    protected $defaultUserStatus = UserEntity::STATUS_PENDING;
 
     /** @var bool */
-    protected $useRegistrationFormCaptcha = true;
+    protected $useRegistrationCaptcha = true;
 
-    /** @var  mixed */
-    protected $formCaptchaOptions = [
-        'class' => 'Figlet',
-        'options' => [
-            'wordLen' => 5,
-            'expiration' => 300,
-            'timeout' => 300,
-        ],
-    ];
+    /** @var array */
+    protected $captchaOptions = [];
 
     /** @var bool */
     protected $loginAfterRegistration = false;
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isEnableRegistration()
+    public function isEnableRegistration(): bool
     {
         return $this->enableRegistration;
     }
 
     /**
-     * @param boolean $enableRegistration
-     * @return RegisterOptions
+     * @param bool $enableRegistration
      */
-    public function setEnableRegistration($enableRegistration)
+    public function setEnableRegistration(bool $enableRegistration)
     {
         $this->enableRegistration = $enableRegistration;
-        return $this;
     }
 
     /**
-     * @return boolean
+     * @return string
      */
-    public function isEnableUsername()
-    {
-        return $this->enableUsername;
-    }
-
-    /**
-     * @param boolean $enableUsername
-     * @return RegisterOptions
-     */
-    public function setEnableUsername($enableUsername)
-    {
-        $this->enableUsername = $enableUsername;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDefaultUserStatus()
+    public function getDefaultUserStatus(): string
     {
         return $this->defaultUserStatus;
     }
 
     /**
-     * @param mixed $defaultUserStatus
-     * @return RegisterOptions
+     * @param string $defaultUserStatus
      */
-    public function setDefaultUserStatus($defaultUserStatus)
+    public function setDefaultUserStatus(string $defaultUserStatus)
     {
         $this->defaultUserStatus = $defaultUserStatus;
-        return $this;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isUseRegistrationFormCaptcha()
+    public function isUseRegistrationCaptcha(): bool
     {
-        return $this->useRegistrationFormCaptcha;
+        return $this->useRegistrationCaptcha;
     }
 
     /**
-     * @param boolean $useRegistrationFormCaptcha
-     * @return RegisterOptions
+     * @param bool $useRegistrationCaptcha
      */
-    public function setUseRegistrationFormCaptcha($useRegistrationFormCaptcha)
+    public function setUseRegistrationCaptcha(bool $useRegistrationCaptcha)
     {
-        $this->useRegistrationFormCaptcha = $useRegistrationFormCaptcha;
-        return $this;
+        $this->useRegistrationCaptcha = $useRegistrationCaptcha;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getFormCaptchaOptions()
-    {
-        return $this->formCaptchaOptions;
-    }
-
-    /**
-     * @param mixed $formCaptchaOptions
-     * @return RegisterOptions
-     */
-    public function setFormCaptchaOptions($formCaptchaOptions)
-    {
-        $this->formCaptchaOptions = $formCaptchaOptions;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isLoginAfterRegistration()
+    public function isLoginAfterRegistration(): bool
     {
         return $this->loginAfterRegistration;
     }
 
     /**
-     * @param boolean $loginAfterRegistration
-     * @return RegisterOptions
+     * @param bool $loginAfterRegistration
      */
-    public function setLoginAfterRegistration($loginAfterRegistration)
+    public function setLoginAfterRegistration(bool $loginAfterRegistration)
     {
         $this->loginAfterRegistration = $loginAfterRegistration;
-        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCaptchaOptions(): array
+    {
+        return $this->captchaOptions;
+    }
+
+    /**
+     * @param array $captchaOptions
+     */
+    public function setCaptchaOptions(array $captchaOptions)
+    {
+        $this->captchaOptions = $captchaOptions;
     }
 }

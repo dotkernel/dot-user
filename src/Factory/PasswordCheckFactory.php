@@ -1,11 +1,13 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-admin
+ * @library: dk-user
  * @author: n3vrax
- * Date: 11/23/2016
- * Time: 10:35 PM
+ * Date: 2/15/2017
+ * Time: 2:49 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Factory;
 
@@ -15,14 +17,10 @@ use Zend\Crypt\Password\PasswordInterface;
 
 /**
  * Class PasswordCheckFactory
- * @package Dot\Admin\Factory
+ * @package Dot\User\Factory
  */
 class PasswordCheckFactory
 {
-    /**
-     * @param ContainerInterface $container
-     * @return PasswordCheck
-     */
     public function __invoke(ContainerInterface $container)
     {
         return new PasswordCheck($container->get(PasswordInterface::class));

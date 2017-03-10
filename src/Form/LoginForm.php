@@ -1,80 +1,67 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 6/21/2016
- * Time: 9:33 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 2/5/2017
+ * Time: 3:34 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Form;
 
 use Dot\User\Options\MessagesOptions;
-use Dot\User\Options\UserOptions;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\Form\Element\Csrf;
-use Zend\Form\Element\Submit;
+use Dot\User\Options\UserOptionsAwareInterface;
+use Dot\User\Options\UserOptionsAwareTrait;
 use Zend\Form\Form;
+use Zend\InputFilter\InputFilterProviderInterface;
 
 /**
  * Class LoginForm
  * @package Dot\User\Form
  */
-class LoginForm extends Form
+class LoginForm extends Form implements InputFilterProviderInterface, UserOptionsAwareInterface
 {
-    use EventManagerAwareTrait;
-
-    /** @var  UserOptions */
-    protected $userOptions;
+    use UserOptionsAwareTrait;
 
     /**
      * LoginForm constructor.
-     * @param UserOptions $userOptions
-     * @param string $name
-     * @param array $options
      */
-    public function __construct(
-        UserOptions $userOptions,
-        $name = 'login',
-        $options = array()
-    ) {
-        $this->userOptions = $userOptions;
-        parent::__construct($name, $options);
+    public function __construct()
+    {
+        parent::__construct('loginForm');
+        $this->setAttribute('method', 'post');
     }
 
     public function init()
     {
-        $placeholder = '';
-        foreach ($this->userOptions->getLoginOptions()->getAuthIdentityFields() as $field) {
-            $placeholder = (!empty($placeholder) ? $placeholder . ' or ' : '') . ucfirst($field);
-        }
-
-        $this->add(array(
+        $this->add([
             'name' => 'identity',
             'type' => 'text',
             'options' => [
-                'label' => $placeholder
+                'label' => 'Username or email',
             ],
-            'attributes' => array(
-                'placeholder' => $placeholder,
-                //'required' => true,
+            'attributes' => [
+                //'required' => 'required',
+                'placeholder' => 'Username or email...',
                 'autofocus' => true,
-            ),
+            ]
+        ]);
 
-        ));
-        $this->add(array(
-            'type' => 'password',
+        $this->add([
             'name' => 'password',
+            'type' => 'Password',
             'options' => [
-                'label' => 'Password'
+                'label' => 'Password',
             ],
-            'attributes' => array(
-                'placeholder' => 'Password',
-                //'required' => true,
-            ),
-        ));
+            'attributes' => [
+                //'required' => 'required',
+                'placeholder' => 'Password...',
+            ]
+        ], ['priority' => -10]);
 
-        if ($this->userOptions->getLoginOptions()->isEnableRememberMe()) {
+        if ($this->userOptions->getLoginOptions()->isEnableRemember()) {
             $this->add(array(
                 'type' => 'checkbox',
                 'name' => 'remember',
@@ -87,28 +74,58 @@ class LoginForm extends Form
                 'attributes' => [
                     'value' => 'yes'
                 ],
-            ), ['priority' => -90]);
+            ), ['priority' => -100]);
         }
 
-        $csrf = new Csrf('login_csrf', [
-            'csrf_options' => [
-                'timeout' => $this->userOptions->getFormCsrfTimeout(),
-                'message' => $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::MESSAGE_CSRF_EXPIRED)
+        $this->add([
+            'name' => 'login_csrf',
+            'type' => 'Csrf',
+            'options' => [
+                'csrf_options' => [
+                    'timeout' => 3600,
+                    'message' => $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::FORM_EXPIRED)
+                ]
             ]
         ]);
-        $this->add($csrf);
 
-        $submitElement = new Submit('submit');
-        $submitElement
-            ->setLabel('Sign In')
-            ->setValue('Sign In')
-            ->setAttributes(array(
+        $this->add([
+            'name' => 'submit',
+            'type' => 'Submit',
+            'attributes' => [
                 'type' => 'submit',
-            ));
-        $this->add($submitElement, array(
-            'priority' => -100,
-        ));
+                'value' => 'Sign In'
+            ]
+        ], ['priority' => -105]);
+    }
 
-        $this->getEventManager()->trigger('init', $this);
+    public function getInputFilterSpecification()
+    {
+        return [
+            'identity' => [
+                'validators' => [
+                    [
+                        'name' => 'NotEmpty',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'message' => $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::IDENTITY_EMPTY)
+                        ]
+                    ]
+                ]
+            ],
+            'password' => [
+                'validators' => [
+                    [
+                        'name' => 'NotEmpty',
+                        'break_chain_on_failure' => true,
+                        'options' => [
+                            'message' => $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::PASSWORD_EMPTY)
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 }

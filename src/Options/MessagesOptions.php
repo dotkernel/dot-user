@@ -1,11 +1,13 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 10/6/2016
- * Time: 7:40 PM
+ * Date: 2/4/2017
+ * Time: 12:37 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
@@ -13,162 +15,146 @@ use Zend\Stdlib\AbstractOptions;
 use Zend\Stdlib\ArrayUtils;
 
 /**
- * Class MessageOptions
+ * Class MessagesOptions
  * @package Dot\User\Options
  */
 class MessagesOptions extends AbstractOptions
 {
-    /** Confirm account related messages constant */
-    const MESSAGE_CONFIRM_ACCOUNT_MISSING_PARAMS = 1;
-    const MESSAGE_CONFIRM_ACCOUNT_INVALID_EMAIL = 2;
-    const MESSAGE_CONFIRM_ACCOUNT_INVALID_TOKEN = 3;
-    const MESSAGE_CONFIRM_ACCOUNT_DISABLED = 4;
-    const MESSAGE_CONFIRM_ACCOUNT_ERROR = 5;
-    const MESSAGE_CONFIRM_ACCOUNT_SUCCESS = 6;
+    /** login messages */
+    const IDENTITY_EMPTY = 0;
+    const PASSWORD_EMPTY = 5;
+    const PASSWORD_LENGTH = 10;
+    const PASSWORD_MISMATCH = 11;
+    const PASSWORD_CONFIRM_EMPTY = 14;
+    const CURRENT_PASSWORD_EMPTY = 12;
+    const CURRENT_PASSWORD_INVALID = 13;
 
-    /** login related messages */
-    const MESSAGE_LOGIN_EMPTY_IDENTITY = 10;
-    const MESSAGE_LOGIN_EMPTY_PASSWORD = 11;
-    const MESSAGE_LOGIN_PASSWORD_CHARACTER_LIMIT = 12;
-    const MESSAGE_LOGIN_ACCOUNT_INACTIVE = 13;
-    const MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR = 14;
-    const MESSAGE_REMEMBER_TOKEN_REMOVE_ERROR = 15;
+    const USERNAME_EMPTY = 15;
+    const USERNAME_LENGTH = 20;
+    const USERNAME_INVALID = 25;
+    const USERNAME_TAKEN = 30;
 
-    /** password reset related messages */
-    const MESSAGE_RESET_PASSWORD_INVALID_EMAIL = 20;
-    const MESSAGE_RESET_PASSWORD_INVALID_TOKEN = 21;
-    const MESSAGE_RESET_PASSWORD_TOKEN_EXPIRED = 22;
-    const MESSAGE_RESET_PASSWORD_MISSING_PARAMS = 23;
-    const MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD = 24;
-    const MESSAGE_RESET_PASSWORD_PASSWORD_CHARACTER_LIMIT = 25;
-    const MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD_VERIFY = 26;
-    const MESSAGE_RESET_PASSWORD_PASSWORD_MISMATCH = 27;
-    const MESSAGE_RESET_PASSWORD_DISABLED = 28;
-    const MESSAGE_RESET_PASSWORD_ERROR = 29;
-    const MESSAGE_RESET_PASSWORD_SUCCESS = 30;
+    const EMAIL_EMPTY = 35;
+    const EMAIL_INVALID = 40;
+    const EMAIL_TAKEN = 45;
 
-    const MESSAGE_FORGOT_PASSWORD_MISSING_EMAIL = 40;
-    const MESSAGE_FORGOT_PASSWORD_ERROR = 41;
-    const MESSAGE_FORGOT_PASSWORD_SUCCESS = 42;
-    const MESSAGE_FORGOT_PASSWORD_INVALID_EMAIL = 43;
+    const CONFIRM_TOKEN_SAVE_ERROR = 50;
+    const CONFIRM_ACCOUNT_ERROR = 51;
+    const CONFIRM_ACCOUNT_INVALID_TOKEN = 52;
+    const CONFIRM_ACCOUNT_INVALID_EMAIL = 53;
+    const CONFIRM_ACCOUNT_SUCCESS = 54;
+    const CONFIRM_ACCOUNT_DISABLED = 55;
 
-    /** register messages constants */
-    const MESSAGE_REGISTER_EMPTY_EMAIL = 50;
-    const MESSAGE_REGISTER_INVALID_EMAIL = 51;
-    const MESSAGE_REGISTER_EMAIL_ALREADY_REGISTERED = 52;
-    const MESSAGE_REGISTER_EMPTY_USERNAME = 53;
-    const MESSAGE_REGISTER_USERNAME_CHARACTER_LIMIT = 54;
-    const MESSAGE_REGISTER_USERNAME_INVALID_CHARACTERS = 55;
-    const MESSAGE_REGISTER_USERNAME_ALREADY_REGISTERED = 56;
-    const MESSAGE_REGISTER_EMPTY_PASSWORD = 57;
-    const MESSAGE_REGISTER_PASSWORD_CHARACTER_LIMIT = 58;
-    const MESSAGE_REGISTER_EMPTY_PASSWORD_CONFIRM = 59;
-    const MESSAGE_REGISTER_PASSWORD_MISMATCH = 60;
-    const MESSAGE_REGISTER_ERROR = 61;
-    const MESSAGE_REGISTER_SUCCESS = 62;
-    const MESSAGE_REGISTER_DISABLED = 63;
+    const REMEMBER_TOKEN_SAVE_ERROR = 60;
+    const REMEMBER_TOKEN_INVALID = 61;
 
-    /** other user messages */
-    const MESSAGE_CHANGE_PASSWORD_OK = 70;
-    const MESSAGE_CHANGE_PASSWORD_INVALID_USER = 71;
-    const MESSAGE_CHANGE_PASSWORD_INVALID_CURRENT_PASSWORD = 72;
-    const MESSAGE_CHANGE_PASSWORD_ERROR = 73;
-    const MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD = 74;
-    const MESSAGE_CHANGE_PASSWORD_EMPTY_NEW_PASSWORD = 75;
-    const MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_CHARACTER_LIMIT = 76;
-    const MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD_VERIFY = 77;
-    const MESSAGE_CHANGE_PASSWORD_PASSWORD_MISMATCH = 78;
+    const RESET_TOKEN_SAVE_ERROR = 70;
+    const RESET_PASSWORD_ERROR = 71;
+    const RESET_TOKEN_EXPIRED = 72;
+    const RESET_TOKEN_INVALID = 73;
+    const RESET_PASSWORD_INVALID_EMAIL = 74;
+    const RESET_PASSWORD_SUCCESS = 95;
+    const RESET_PASSWORD_DISABLED = 96;
 
-    const MESSAGE_CSRF_EXPIRED = 90;
+    const CHANGE_PASSWORD_ERROR = 75;
+    const CHANGE_PASSWORD_SUCCESS = 76;
 
-    const MESSAGE_ACCOUNT_UPDATE_OK = 100;
-    const MESSAGE_ACCOUNT_UPDATE_ERROR = 101;
+    const USER_DELETE_ERROR = 80;
+    const USER_REGISTER_ERROR = 81;
+    const USER_UPDATE_ERROR = 82;
+    const USER_UPDATE_SUCCESS = 83;
 
-    protected $__strictMode__ = false;
+    const REGISTER_DISABLED = 90;
+    const REGISTER_SUCCESS = 91;
+    const FORGOT_PASSWORD_SUCCESS = 92;
 
+    const FORM_EXPIRED = 100;
+    const UNAUTHORIZED = 105;
+    const ACCOUNT_LOGIN_STATUS_NOT_ALLOWED = 110;
+    const ACCOUNT_UNCONFIRMED = 111;
+    const ACCOUNT_INVALID = 115;
+
+    const OPT_OUT_SUCCESS = 120;
+    const OPT_OUT_ERROR = 121;
+    const OPT_OUT_INVALID_PARAMS = 122;
+
+    const SIGN_OUT_FIRST = 125;
+
+    /** @var array */
     protected $messages = [
-        /** account confirmation messages */
-        MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_DISABLED => 'Account confirmation is disabled',
-        MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_ERROR => 'Account confirmation error. Please try again',
-        MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_INVALID_EMAIL => 'Account confirmation invalid parameters',
-        MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_INVALID_TOKEN => 'Account confirmation invalid parameters',
-        MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_MISSING_PARAMS => 'Account confirmation invalid parameters',
-        MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_SUCCESS => 'Account successfully confirmed. You may sign in now',
+        MessagesOptions::IDENTITY_EMPTY => '<b>Identity</b> is required and cannot be empty',
+        MessagesOptions::PASSWORD_EMPTY => '<b>Password</b> is required and cannot be empty',
+        MessagesOptions::PASSWORD_LENGTH => '<b>Password</b> must have between 4 and 150 characters',
+        MessagesOptions::PASSWORD_MISMATCH => '<b>Password confirm</b> does not match',
+        MessagesOptions::PASSWORD_CONFIRM_EMPTY => '<b>Password confirmation</b> is required and cannot be empty',
+        MessagesOptions::CURRENT_PASSWORD_EMPTY => '<b>Current password</b> is required and cannot be empty',
+        MessagesOptions::CURRENT_PASSWORD_INVALID => '<b>Current password</b> is not valid',
 
-        /** user login messages */
-        MessagesOptions::MESSAGE_LOGIN_EMPTY_IDENTITY => 'Identity is required and cannot be empty',
-        MessagesOptions::MESSAGE_LOGIN_EMPTY_PASSWORD => 'Password is required and cannot be empty',
-        MessagesOptions::MESSAGE_LOGIN_ACCOUNT_INACTIVE => 'Account is not active or it has not been confirmed',
-        MessagesOptions::MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR => [
-            'Remember me feature encountered an error.',
-            'This will not affect the general usability of the website'
-        ],
-        MessagesOptions::MESSAGE_LOGIN_PASSWORD_CHARACTER_LIMIT =>
-            'Password must have at least 4 and up to 150 characters',
-        MessagesOptions::MESSAGE_REMEMBER_TOKEN_REMOVE_ERROR => 'Remember me token remove error',
+        MessagesOptions::USERNAME_EMPTY => '<b>Username</b> is required and cannot be empty',
+        MessagesOptions::USERNAME_INVALID => '<b>Username</b> contains invalid characters',
+        MessagesOptions::USERNAME_LENGTH => '<b>Username</b> must have between 3 and 150 characters',
+        MessagesOptions::USERNAME_TAKEN => '<b>Username</b> cannot be used as it\'s already taken',
 
-        /** password recovery messages */
-        MessagesOptions::MESSAGE_FORGOT_PASSWORD_ERROR => 'Password reset request error. Please try again',
-        MessagesOptions::MESSAGE_FORGOT_PASSWORD_MISSING_EMAIL => 'Email address is required and cannot be empty',
-        MessagesOptions::MESSAGE_FORGOT_PASSWORD_SUCCESS => [
-            'Password reset request successfully registered',
-            'You\'ll receive in email with further instructions'
-        ],
-        MessagesOptions::MESSAGE_FORGOT_PASSWORD_INVALID_EMAIL => 'Email address format is not valid',
+        MessagesOptions::EMAIL_EMPTY => '<b>E-mail address</b> is required and cannot be empty',
+        MessagesOptions::EMAIL_INVALID => '<b>E-mail address</b> is not valid',
+        MessagesOptions::EMAIL_TAKEN => '<b>E-mail address</b> is already registered with an account',
 
-        MessagesOptions::MESSAGE_RESET_PASSWORD_DISABLED => 'Password recovery is disabled',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_ERROR => 'Password reset error. Please try again',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_EMAIL => 'Password reset error. Invalid parameters',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_TOKEN => 'Password reset error. Invalid parameters',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_MISSING_PARAMS => 'Password reset error. Invalid parameters',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD => 'Password is required and cannot be empty',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_PASSWORD_CHARACTER_LIMIT =>
-            'Password must have at least 4 and up to 150 characters',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_EMPTY_PASSWORD_VERIFY =>
-            'Password confirmation is required and cannot be empty',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_PASSWORD_MISMATCH => 'Password confirmation does not match',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_TOKEN_EXPIRED => 'Password reset error. Reset token has expired',
-        MessagesOptions::MESSAGE_RESET_PASSWORD_SUCCESS => 'Account password successfully updated',
+        MessagesOptions::CONFIRM_ACCOUNT_ERROR => 'Account activation failed. Please try again or contact us',
+        MessagesOptions::CONFIRM_ACCOUNT_INVALID_EMAIL => 'Account activation failed due to invalid token or e-mail',
+        MessagesOptions::CONFIRM_ACCOUNT_INVALID_TOKEN => 'Account activation failed due to invalid token or e-mail',
+        MessagesOptions::CONFIRM_TOKEN_SAVE_ERROR =>
+            'Account activation link could not be generated. Please try again',
+        MessagesOptions::CONFIRM_ACCOUNT_SUCCESS => 'Account successfully activated. You may sign in now',
+        MessagesOptions::CONFIRM_ACCOUNT_DISABLED => 'Account activation is disabled',
 
-        /** register messages constants */
-        MessagesOptions::MESSAGE_REGISTER_EMPTY_EMAIL => 'Email address is required and cannot be empty',
-        MessagesOptions::MESSAGE_REGISTER_INVALID_EMAIL => 'Email address format is not valid',
-        MessagesOptions::MESSAGE_REGISTER_EMAIL_ALREADY_REGISTERED => 'Email address is already registered',
-        MessagesOptions::MESSAGE_REGISTER_EMPTY_USERNAME => 'Username is required and cannot be empty',
-        MessagesOptions::MESSAGE_REGISTER_USERNAME_CHARACTER_LIMIT =>
-            'Username must have at least 3 and up to 150 characters',
-        MessagesOptions::MESSAGE_REGISTER_USERNAME_INVALID_CHARACTERS => 'Username contains invalid characters',
-        MessagesOptions::MESSAGE_REGISTER_USERNAME_ALREADY_REGISTERED => 'Username is already taken',
-        MessagesOptions::MESSAGE_REGISTER_EMPTY_PASSWORD => 'Password is required and cannot be empty',
-        MessagesOptions::MESSAGE_REGISTER_PASSWORD_CHARACTER_LIMIT =>
-            'Password must have at least 4 and up to 150 characters',
-        MessagesOptions::MESSAGE_REGISTER_EMPTY_PASSWORD_CONFIRM => 'Password confirmation is required',
-        MessagesOptions::MESSAGE_REGISTER_PASSWORD_MISMATCH => 'Password confirmation does not match',
-        MessagesOptions::MESSAGE_REGISTER_ERROR => 'Registration error. Please try again',
-        MessagesOptions::MESSAGE_REGISTER_SUCCESS => 'Account successfully created',
-        MessagesOptions::MESSAGE_REGISTER_DISABLED => 'Registration is disabled',
+        MessagesOptions::REMEMBER_TOKEN_SAVE_ERROR =>
+            'Remember me feature has encountered and error. This will not affect general usability',
+        MessagesOptions::REMEMBER_TOKEN_INVALID => 'Remember me token is not valid',
 
-        /** other user messages */
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_OK => 'Password successfully updated',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_USER =>
-            'Change password cannot be completed. Authenticated identity is not valid',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_CURRENT_PASSWORD => 'Invalid current password provided',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_ERROR => 'Change password error. Please try again.',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD => 'Password is required and cannot be empty',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_NEW_PASSWORD => 'New password is required and cannot be empty',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_NEW_PASSWORD_CHARACTER_LIMIT =>
-            'New password must have at least 4 and up to 150 characters',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_EMPTY_PASSWORD_VERIFY =>
-            'Password verify is required and cannot be empty',
-        MessagesOptions::MESSAGE_CHANGE_PASSWORD_PASSWORD_MISMATCH => 'Password verify does not match',
+        MessagesOptions::RESET_TOKEN_SAVE_ERROR => 'Could not process the password recovery request. Please try again',
+        MessagesOptions::RESET_PASSWORD_ERROR => 'Failed to update account password. Please try again',
+        MessagesOptions::RESET_TOKEN_EXPIRED =>
+            'Reset token has expired. Please submit another password recovery request',
+        MessagesOptions::RESET_TOKEN_INVALID => 'Could not reset password due to invalid token or e-mail address',
+        MessagesOptions::RESET_PASSWORD_INVALID_EMAIL =>
+            'Could not reset password due to invalid token or e-mail address',
+        MessagesOptions::RESET_PASSWORD_SUCCESS => 'Password was successfully reset',
+        MessagesOptions::RESET_PASSWORD_DISABLED => 'Password recovery is disabled',
 
-        MessagesOptions::MESSAGE_CSRF_EXPIRED => 'The form used to make the request has expired. Please try again now',
+        MessagesOptions::CHANGE_PASSWORD_ERROR => 'Change password has failed. Please try again',
+        MessagesOptions::CHANGE_PASSWORD_SUCCESS => 'Password was successfully updated',
 
-        MessagesOptions::MESSAGE_ACCOUNT_UPDATE_OK => 'You account was successfully updated',
-        MessagesOptions::MESSAGE_ACCOUNT_UPDATE_ERROR =>
-            'Account could not be updated due to a server error. Please try again',
+        MessagesOptions::USER_DELETE_ERROR => 'Could not delete user account',
+        MessagesOptions::USER_REGISTER_ERROR => 'Account creation has failed. Please try again',
+        MessagesOptions::USER_UPDATE_ERROR => 'Account update has failed. Please try again',
+        MessagesOptions::USER_UPDATE_SUCCESS => 'Account information was successfully updated',
+
+        MessagesOptions::REGISTER_DISABLED => 'Account registration is disabled',
+        MessagesOptions::REGISTER_SUCCESS => 'Account was successfully created',
+        MessagesOptions::FORGOT_PASSWORD_SUCCESS => 'Password recovery e-mail was sent to %s',
+
+        MessagesOptions::FORM_EXPIRED => 'The form CSRF has expired and was refreshed. Try again now',
+        MessagesOptions::UNAUTHORIZED => 'You must sign in first in order to access the requested content',
+        MessagesOptions::ACCOUNT_LOGIN_STATUS_NOT_ALLOWED => 'Could not sign in. Account is disabled',
+        MessagesOptions::ACCOUNT_UNCONFIRMED => 'Account needs to be confirmed.',
+        MessagesOptions::ACCOUNT_INVALID => 'Account has been disabled or deleted',
+
+        MessagesOptions::OPT_OUT_ERROR => 'Account failed to be un-registered. Please try again or contact us',
+        MessagesOptions::OPT_OUT_SUCCESS => 'Account was successfully un-registered',
+        MessagesOptions::OPT_OUT_INVALID_PARAMS => 'Account has failed to be un-registered due to invalid parameters',
+
+        MessagesOptions::SIGN_OUT_FIRST => 'Sign out first in order to access the requested link'
     ];
 
+    /**
+     * MessagesOptions constructor.
+     * @param null $options
+     */
+    public function __construct($options = null)
+    {
+        $this->__strictMode__ = false;
+        parent::__construct($options);
+    }
 
     /**
      * @return array

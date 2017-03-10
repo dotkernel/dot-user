@@ -1,91 +1,96 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 7/5/2016
- * Time: 11:08 PM
+ * Date: 2/13/2017
+ * Time: 5:30 PM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Service;
 
-use Dot\Ems\Service\ServiceInterface;
-use Dot\User\Entity\UserEntityInterface;
+use Dot\User\Entity\UserEntity;
+use Dot\User\Result\Result;
 
 /**
  * Interface UserServiceInterface
  * @package Dot\User\Service
  */
-interface UserServiceInterface extends ServiceInterface
+interface UserServiceInterface
 {
     /**
-     * Change user status from unconfirmed to active based on an email and valid confirmation token
-     *
-     * @param $email
-     * @param $token
-     * @return array
+     * @param $id
+     * @param array $options
+     * @return UserEntity|null
      */
-    public function confirmAccount($email, $token);
+    public function find($id, array $options = []): ?UserEntity;
 
     /**
-     * Based on a user email, generate a token and store a hash of it with and expiration time
-     * trigger a specific event, so mail service can send an email based on it
-     *
-     * @param $data
-     * @return bool
+     * @param string $email
+     * @param array $options
+     * @return UserEntity|null
      */
-    public function generateResetToken($data);
+    public function findByEmail(string $email, array $options = []): ?UserEntity;
 
     /**
-     * @param $email
-     * @param $token
-     * @param $data
-     * @return array
-     */
-    public function resetPassword($email, $token, $data);
-
-    /**
-     * @param $oldPassword
-     * @param $newPassword
+     * @param UserEntity $user
      * @return mixed
      */
-    public function changePassword($oldPassword, $newPassword);
+    public function delete(UserEntity $user);
 
     /**
-     * Store a new user into the db, after it validates the data
-     * trigger register events
-     *
-     * @param UserEntityInterface $user
-     * @return bool|UserEntityInterface
+     * @param UserEntity $user
+     * @return Result
      */
-    public function register(UserEntityInterface $user);
+    public function register(UserEntity $user): Result;
 
     /**
-     * @param UserEntityInterface $user
-     * @return mixed
+     * @param array $params
+     * @return Result
      */
-    public function updateAccount(UserEntityInterface $user);
+    public function optOut(array $params): Result;
 
     /**
-     * @param UserEntityInterface $user
-     * @return mixed
+     * @param array $params
+     * @return Result
      */
-    public function generateRememberToken(UserEntityInterface $user);
+    public function confirmAccount(array $params): Result;
 
     /**
-     * Validates the remember me cookie data
-     *
-     * @param $selector
-     * @param $token
-     * @return mixed
+     * @param array $data
+     * @return Result
      */
-    public function checkRememberToken($selector, $token);
+    public function resetPassword(array $data): Result;
 
     /**
-     * Removes all remember tokens for a given user
-     *
-     * @param UserEntityInterface $user
-     * @return mixed
+     * @param UserEntity $user
+     * @param array $data
+     * @return Result
      */
-    public function removeRememberToken(UserEntityInterface $user);
+    public function changePassword(UserEntity $user, array $data): Result;
+
+    /**
+     * @param UserEntity $user
+     * @param bool $hashPassword
+     * @return Result
+     */
+    public function updateAccount(UserEntity $user, bool $hashPassword = false): Result;
+
+    /**
+     * @param array $data
+     * @return Result
+     */
+    public function resetPasswordRequest(array $data): Result;
+
+    /**
+     * @return UserEntity
+     */
+    public function newUser(): UserEntity;
+
+    /**
+     * @return TokenServiceInterface
+     */
+    public function getTokenService(): TokenServiceInterface;
 }

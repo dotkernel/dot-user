@@ -1,17 +1,21 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
+ * @library: dk-user
  * @author: n3vrax
- * Date: 6/20/2016
- * Time: 8:08 PM
+ * Date: 2/4/2017
+ * Time: 12:37 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Options;
 
+use Dot\User\Entity\ConfirmTokenEntity;
+use Dot\User\Entity\RememberTokenEntity;
+use Dot\User\Entity\ResetTokenEntity;
+use Dot\User\Entity\RoleEntity;
 use Dot\User\Entity\UserEntity;
-use Dot\User\Entity\UserEntityHydrator;
-use Dot\User\Exception\InvalidArgumentException;
 use Zend\Stdlib\AbstractOptions;
 
 /**
@@ -24,24 +28,31 @@ class UserOptions extends AbstractOptions
     protected $userEntity = UserEntity::class;
 
     /** @var  string */
-    protected $userEntityHydrator = UserEntityHydrator::class;
+    protected $roleEntity = RoleEntity::class;
+
+    /** @var  string */
+    protected $confirmTokenEntity = ConfirmTokenEntity::class;
+
+    /** @var  string */
+    protected $resetTokenEntity = ResetTokenEntity::class;
+
+    /** @var  string */
+    protected $rememberTokenEntity = RememberTokenEntity::class;
+
+    /** @var array */
+    protected $defaultRoles = ['user'];
 
     /** @var int */
     protected $passwordCost = 11;
 
     /** @var bool */
-    protected $enableUserStatus = true;
+    protected $enableAccountConfirmation = true;
+
+    /** @var string */
+    protected $confirmedAccountStatus = UserEntity::STATUS_ACTIVE;
 
     /** @var array */
-    protected $userEventListeners = [];
-
-    /** @var bool */
-    protected $showFormInputLabels = false;
-
-    protected $formCsrfTimeout = 3600;
-
-    /** @var  DbOptions */
-    protected $dbOptions;
+    protected $eventListeners = [];
 
     /** @var  LoginOptions */
     protected $loginOptions;
@@ -52,367 +63,271 @@ class UserOptions extends AbstractOptions
     /** @var  PasswordRecoveryOptions */
     protected $passwordRecoveryOptions;
 
-    /** @var  ConfirmAccountOptions */
-    protected $confirmAccountOptions;
+    /** @var  TemplateOptions */
+    protected $templateOptions;
 
     /** @var  MessagesOptions */
     protected $messagesOptions;
 
-    /** @var  TemplateOptions */
-    protected $templateOptions;
-
-    protected $__strictMode__ = false;
+    /** @var  array */
+    protected $routeDefault = [
+        'route_name' => 'user',
+        'route_params' => ['action' => 'account']
+    ];
 
     /**
      * @return string
      */
-    public function getUserEntity()
+    public function getUserEntity(): string
     {
         return $this->userEntity;
     }
 
     /**
      * @param string $userEntity
-     * @return UserOptions
      */
-    public function setUserEntity($userEntity)
+    public function setUserEntity(string $userEntity)
     {
         $this->userEntity = $userEntity;
-        return $this;
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getUserEntityHydrator()
+    public function getDefaultRoles(): array
     {
-        return $this->userEntityHydrator;
+        return $this->defaultRoles;
     }
 
     /**
-     * @param string $userEntityHydrator
-     * @return UserOptions
+     * @param array $defaultRoles
      */
-    public function setUserEntityHydrator($userEntityHydrator)
+    public function setDefaultRoles(array $defaultRoles)
     {
-        $this->userEntityHydrator = $userEntityHydrator;
-        return $this;
+        $this->defaultRoles = $defaultRoles;
     }
 
     /**
      * @return int
      */
-    public function getPasswordCost()
+    public function getPasswordCost(): int
     {
         return $this->passwordCost;
     }
 
     /**
      * @param int $passwordCost
-     * @return UserOptions
      */
-    public function setPasswordCost($passwordCost)
+    public function setPasswordCost(int $passwordCost)
     {
         $this->passwordCost = $passwordCost;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isEnableUserStatus()
-    {
-        return $this->enableUserStatus;
-    }
-
-    /**
-     * @param boolean $enableUserStatus
-     * @return UserOptions
-     */
-    public function setEnableUserStatus($enableUserStatus)
-    {
-        $this->enableUserStatus = $enableUserStatus;
-        return $this;
     }
 
     /**
      * @return array
      */
-    public function getUserEventListeners()
+    public function getEventListeners(): array
     {
-        return $this->userEventListeners;
+        return $this->eventListeners;
     }
 
     /**
-     * @param array $userEventListeners
-     * @return UserOptions
+     * @param array $eventListeners
      */
-    public function setUserEventListeners($userEventListeners)
+    public function setEventListeners(array $eventListeners)
     {
-        $this->userEventListeners = (array)$userEventListeners;
-        return $this;
-    }
-
-
-    /**
-     * @return DbOptions
-     */
-    public function getDbOptions()
-    {
-        if (!$this->dbOptions) {
-            $this->setDbOptions([]);
-        }
-        return $this->dbOptions;
+        $this->eventListeners = $eventListeners;
     }
 
     /**
-     * @param DbOptions|array $dbOptions
-     * @return UserOptions
+     * @return string
      */
-    public function setDbOptions($dbOptions)
+    public function getRoleEntity(): string
     {
-        if (is_array($dbOptions)) {
-            $this->dbOptions = new DbOptions($dbOptions);
-        } elseif ($dbOptions instanceof DbOptions) {
-            $this->dbOptions = $dbOptions;
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                'DbOptions should be an array or an %s object. %s provided.',
-                DbOptions::class,
-                is_object($dbOptions) ? get_class($dbOptions) : gettype($dbOptions)
-            ));
-        }
+        return $this->roleEntity;
+    }
 
-        return $this;
+    /**
+     * @param string $roleEntity
+     */
+    public function setRoleEntity(string $roleEntity)
+    {
+        $this->roleEntity = $roleEntity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConfirmTokenEntity(): string
+    {
+        return $this->confirmTokenEntity;
+    }
+
+    /**
+     * @param string $confirmTokenEntity
+     */
+    public function setConfirmTokenEntity(string $confirmTokenEntity)
+    {
+        $this->confirmTokenEntity = $confirmTokenEntity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResetTokenEntity(): string
+    {
+        return $this->resetTokenEntity;
+    }
+
+    /**
+     * @param string $resetTokenEntity
+     */
+    public function setResetTokenEntity(string $resetTokenEntity)
+    {
+        $this->resetTokenEntity = $resetTokenEntity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRememberTokenEntity(): string
+    {
+        return $this->rememberTokenEntity;
+    }
+
+    /**
+     * @param string $rememberTokenEntity
+     */
+    public function setRememberTokenEntity(string $rememberTokenEntity)
+    {
+        $this->rememberTokenEntity = $rememberTokenEntity;
     }
 
     /**
      * @return LoginOptions
      */
-    public function getLoginOptions()
+    public function getLoginOptions(): LoginOptions
     {
-        if (!$this->loginOptions) {
-            $this->setLoginOptions([]);
-        }
         return $this->loginOptions;
     }
 
     /**
-     * @param LoginOptions|array $loginOptions
-     * @return UserOptions
+     * @param array $loginOptions
      */
-    public function setLoginOptions($loginOptions)
+    public function setLoginOptions(array $loginOptions)
     {
-        if (is_array($loginOptions)) {
-            $this->loginOptions = new LoginOptions($loginOptions);
-        } elseif ($loginOptions instanceof LoginOptions) {
-            $this->loginOptions = $loginOptions;
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                'LoginOptions should be an array or an %s object. %s provided.',
-                LoginOptions::class,
-                is_object($loginOptions) ? get_class($loginOptions) : gettype($loginOptions)
-            ));
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return RegisterOptions
-     */
-    public function getRegisterOptions()
-    {
-        if (!$this->registerOptions) {
-            $this->setRegisterOptions([]);
-        }
-
-        return $this->registerOptions;
-    }
-
-    /**
-     * @param RegisterOptions|array $registerOptions
-     * @return UserOptions
-     */
-    public function setRegisterOptions($registerOptions)
-    {
-        if (is_array($registerOptions)) {
-            $this->registerOptions = new RegisterOptions($registerOptions);
-        } elseif ($registerOptions instanceof RegisterOptions) {
-            $this->registerOptions = $registerOptions;
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                'RegisterOptions should be an array or an %s object. %s provided.',
-                RegisterOptions::class,
-                is_object($registerOptions) ? get_class($registerOptions) : gettype($registerOptions)
-            ));
-        }
-
-        return $this;
+        $this->loginOptions = new LoginOptions($loginOptions);
     }
 
     /**
      * @return PasswordRecoveryOptions
      */
-    public function getPasswordRecoveryOptions()
+    public function getPasswordRecoveryOptions(): PasswordRecoveryOptions
     {
-        if (!$this->passwordRecoveryOptions) {
-            $this->setPasswordRecoveryOptions([]);
-        }
-
         return $this->passwordRecoveryOptions;
     }
 
     /**
-     * @param PasswordRecoveryOptions|array $passwordRecoveryOptions
-     * @return UserOptions
+     * @param array $passwordRecoveryOptions
      */
-    public function setPasswordRecoveryOptions($passwordRecoveryOptions)
+    public function setPasswordRecoveryOptions(array $passwordRecoveryOptions)
     {
-        if (is_array($passwordRecoveryOptions)) {
-            $this->passwordRecoveryOptions = new PasswordRecoveryOptions($passwordRecoveryOptions);
-        } elseif ($passwordRecoveryOptions instanceof PasswordRecoveryOptions) {
-            $this->passwordRecoveryOptions = $passwordRecoveryOptions;
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                'PasswordRecoveryOptions should be an array or an %s object. %s provided.',
-                PasswordRecoveryOptions::class,
-                is_object($passwordRecoveryOptions)
-                    ? get_class($passwordRecoveryOptions)
-                    : gettype($passwordRecoveryOptions)
-            ));
-        }
-        return $this;
+        $this->passwordRecoveryOptions = new PasswordRecoveryOptions($passwordRecoveryOptions);
     }
 
     /**
-     * @return ConfirmAccountOptions
+     * @return bool
      */
-    public function getConfirmAccountOptions()
+    public function isEnableAccountConfirmation(): bool
     {
-        if (!$this->confirmAccountOptions) {
-            $this->setConfirmAccountOptions([]);
-        }
-
-        return $this->confirmAccountOptions;
+        return $this->enableAccountConfirmation;
     }
 
     /**
-     * @param ConfirmAccountOptions|array $confirmAccountOptions
-     * @return UserOptions
+     * @param bool $enableAccountConfirmation
      */
-    public function setConfirmAccountOptions($confirmAccountOptions)
+    public function setEnableAccountConfirmation(bool $enableAccountConfirmation)
     {
-        if (is_array($confirmAccountOptions)) {
-            $this->confirmAccountOptions = new ConfirmAccountOptions($confirmAccountOptions);
-        } elseif ($confirmAccountOptions instanceof ConfirmAccountOptions) {
-            $this->confirmAccountOptions = $confirmAccountOptions;
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                'ConfirmAccountOptions should be an array or an %s object. %s provided.',
-                ConfirmAccountOptions::class,
-                is_object($confirmAccountOptions) ? get_class($confirmAccountOptions) : gettype($confirmAccountOptions)
-            ));
-        }
-        return $this;
+        $this->enableAccountConfirmation = $enableAccountConfirmation;
     }
 
     /**
-     * @return MessagesOptions
+     * @return string
      */
-    public function getMessagesOptions()
+    public function getConfirmedAccountStatus(): string
     {
-        if (!$this->messagesOptions) {
-            $this->setMessagesOptions([]);
-        }
-        return $this->messagesOptions;
+        return $this->confirmedAccountStatus;
     }
 
     /**
-     * @param MessagesOptions|array $messagesOptions
-     * @return UserOptions
+     * @param string $confirmedAccountStatus
      */
-    public function setMessagesOptions($messagesOptions)
+    public function setConfirmedAccountStatus(string $confirmedAccountStatus)
     {
-        if (is_array($messagesOptions)) {
-            $this->messagesOptions = new MessagesOptions($messagesOptions);
-        } elseif ($messagesOptions instanceof MessagesOptions) {
-            $this->messagesOptions = $messagesOptions;
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                'MessagesOptions should be an array or an %s object. %s provided.',
-                MessagesOptions::class,
-                is_object($messagesOptions) ? get_class($messagesOptions) : gettype($messagesOptions)
-            ));
-        }
-        return $this;
+        $this->confirmedAccountStatus = $confirmedAccountStatus;
+    }
+
+    /**
+     * @return RegisterOptions
+     */
+    public function getRegisterOptions(): RegisterOptions
+    {
+        return $this->registerOptions;
+    }
+
+    /**
+     * @param array $registerOptions
+     */
+    public function setRegisterOptions(array $registerOptions)
+    {
+        $this->registerOptions = new RegisterOptions($registerOptions);
     }
 
     /**
      * @return TemplateOptions
      */
-    public function getTemplateOptions()
+    public function getTemplateOptions(): TemplateOptions
     {
-        if (!$this->templateOptions) {
-            $this->setTemplateOptions([]);
-        }
         return $this->templateOptions;
     }
 
     /**
-     * @param TemplateOptions|array $templateOptions
-     * @return UserOptions
+     * @param array $templateOptions
      */
-    public function setTemplateOptions($templateOptions)
+    public function setTemplateOptions(array $templateOptions)
     {
-        if (is_array($templateOptions)) {
-            $this->templateOptions = new TemplateOptions($templateOptions);
-        } elseif ($templateOptions instanceof TemplateOptions) {
-            $this->templateOptions = $templateOptions;
-        } else {
-            throw new InvalidArgumentException(sprintf(
-                'TemplateOptions should be an array or an %s object. %s provided.',
-                TemplateOptions::class,
-                is_object($templateOptions) ? get_class($templateOptions) : gettype($templateOptions)
-            ));
-        }
-        return $this;
-    }
-
-
-    /**
-     * @return boolean
-     */
-    public function isShowFormInputLabels()
-    {
-        return $this->showFormInputLabels;
+        $this->templateOptions = new TemplateOptions($templateOptions);
     }
 
     /**
-     * @param boolean $showFormInputLabels
-     * @return UserOptions
+     * @return MessagesOptions
      */
-    public function setShowFormInputLabels($showFormInputLabels)
+    public function getMessagesOptions(): MessagesOptions
     {
-        $this->showFormInputLabels = $showFormInputLabels;
-        return $this;
+        return $this->messagesOptions;
     }
 
     /**
-     * @return int
+     * @param array $messagesOptions
      */
-    public function getFormCsrfTimeout()
+    public function setMessagesOptions(array $messagesOptions)
     {
-        return $this->formCsrfTimeout;
+        $this->messagesOptions = new MessagesOptions($messagesOptions);
     }
 
     /**
-     * @param int $formCsrfTimeout
-     * @return UserOptions
+     * @return array
      */
-    public function setFormCsrfTimeout($formCsrfTimeout)
+    public function getRouteDefault(): array
     {
-        $this->formCsrfTimeout = $formCsrfTimeout;
-        return $this;
+        return $this->routeDefault;
+    }
+
+    /**
+     * @param array $routeDefault
+     */
+    public function setRouteDefault(array $routeDefault)
+    {
+        $this->routeDefault = $routeDefault;
     }
 }

@@ -1,914 +1,723 @@
 <?php
 /**
  * @copyright: DotKernel
- * @library: dotkernel/dot-user
- * @author: n3vrax
- * Date: 6/20/2016
- * Time: 8:04 PM
+ * @library: dk-user
+ * @author: n3vra
+ * Date: 2/5/2017
+ * Time: 5:16 AM
  */
+
+declare(strict_types = 1);
 
 namespace Dot\User\Service;
 
-use Dot\Authentication\AuthenticationInterface;
-use Dot\Ems\Service\EntityService;
-use Dot\Event\Event;
-use Dot\Helpers\Psr7\HttpMessagesAwareInterface;
-use Dot\User\Entity\UserEntityInterface;
-use Dot\User\Event\ChangePasswordEvent;
-use Dot\User\Event\ConfirmAccountEvent;
-use Dot\User\Event\Listener\UserListenerAwareInterface;
-use Dot\User\Event\Listener\UserListenerAwareTrait;
-use Dot\User\Event\PasswordResetEvent;
-use Dot\User\Event\RegisterEvent;
-use Dot\User\Event\RememberTokenEvent;
-use Dot\User\Event\UserUpdateEvent;
-use Dot\User\Exception\RuntimeException;
+use Dot\Mapper\Mapper\MapperManagerAwareInterface;
+use Dot\Mapper\Mapper\MapperManagerAwareTrait;
+use Dot\User\Entity\ResetTokenEntity;
+use Dot\User\Entity\UserEntity;
+use Dot\User\Event\DispatchUserEventsTrait;
+use Dot\User\Event\TokenEventListenerInterface;
+use Dot\User\Event\TokenEventListenerTrait;
+use Dot\User\Event\UserEvent;
+use Dot\User\Event\UserEventListenerInterface;
+use Dot\User\Event\UserEventListenerTrait;
 use Dot\User\Mapper\UserMapperInterface;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
-use Dot\User\Result\ResultInterface;
-use Dot\User\Result\UserOperationResult;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Dot\User\Result\ErrorCode;
+use Dot\User\Result\Result;
 use Zend\Crypt\Password\PasswordInterface;
-use Zend\Math\Rand;
+use Zend\EventManager\EventManagerInterface;
 
 /**
  * Class UserService
  * @package Dot\User\Service
  */
-class UserService extends EntityService implements
+class UserService implements
     UserServiceInterface,
-    UserListenerAwareInterface,
-    HttpMessagesAwareInterface
+    MapperManagerAwareInterface,
+    UserEventListenerInterface,
+    TokenEventListenerInterface
 {
-    use UserListenerAwareTrait;
-
-    /** @var  UserMapperInterface */
-    protected $mapper;
+    use MapperManagerAwareTrait;
+    use DispatchUserEventsTrait;
+    use UserEventListenerTrait,
+        TokenEventListenerTrait {
+        UserEventListenerTrait::attach as userEventAttach;
+        TokenEventListenerTrait::attach as tokenEventAttach;
+        UserEventListenerTrait::detach as userEventDetach;
+        TokenEventListenerTrait::detach as tokenEventDetach;
+    }
 
     /** @var  UserOptions */
-    protected $options;
+    protected $userOptions;
+
+    /** @var  TokenServiceInterface */
+    protected $tokenService;
 
     /** @var  PasswordInterface */
     protected $passwordService;
 
-    /** @var  AuthenticationInterface */
-    protected $authentication;
-
-    /** @var  ServerRequestInterface */
-    protected $request;
-
-    /** @var  ResponseInterface */
-    protected $response;
-
-    /** @var  bool */
-    protected $debug = false;
-
     /**
      * UserService constructor.
-     * @param UserMapperInterface $mapper
-     * @param UserOptions $options
-     * @param PasswordInterface $password
-     * @param AuthenticationInterface $authentication
+     * @param TokenServiceInterface $tokenService
+     * @param PasswordInterface $passwordService
+     * @param UserOptions $userOptions
      */
     public function __construct(
-        UserMapperInterface $mapper,
-        UserOptions $options,
-        PasswordInterface $password,
-        AuthenticationInterface $authentication
+        TokenServiceInterface $tokenService,
+        PasswordInterface $passwordService,
+        UserOptions $userOptions
     ) {
-        parent::__construct($mapper);
-        $this->options = $options;
-        $this->passwordService = $password;
-        $this->authentication = $authentication;
+        $this->tokenService = $tokenService;
+        $this->userOptions = $userOptions;
+        $this->passwordService = $passwordService;
     }
 
     /**
-     * Generates an auto-login token for the user, stores it in the backend and sets a login cookie
-     *
-     * @param UserEntityInterface $user
-     * @return UserOperationResult
+     * @param $id
+     * @param array $options
+     * @return UserEntity|null
      */
-    public function generateRememberToken(UserEntityInterface $user)
+    public function find($id, array $options = []): ?UserEntity
     {
-        $result = new UserOperationResult(true);
-        $data = null;
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+        return $mapper->get($id, $options);
+    }
+
+    /**
+     * @param string $email
+     * @param array $options
+     * @return UserEntity|null
+     */
+    public function findByEmail(string $email, array $options = []): ?UserEntity
+    {
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+        return $mapper->getByEmail($email, $options);
+    }
+
+    /**
+     * @param UserEntity $user
+     * @return mixed
+     */
+    public function delete(UserEntity $user): Result
+    {
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
 
         try {
-            $selector = Rand::getString(32);
-            $token = Rand::getString(32);
-
-            $data = new \stdClass();
-            $data->userId = $user->getId();
-            $data->selector = $selector;
-            $data->token = $token;
-
-            $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
-                RememberTokenEvent::EVENT_TOKEN_GENERATE_PRE,
-                $user,
-                $data
-            ));
-
-            //hash the token
-            $dbData = (array)$data;
-            $dbData['token'] = md5($dbData['token']);
-
-            $this->mapper->saveRememberToken($dbData);
-
-            $cookieData = base64_encode(serialize(['selector' => $selector, 'token' => $token]));
-
-            $name = $this->options->getLoginOptions()->getRememberMeCookieName();
-            $expire = $this->options->getLoginOptions()->getRememberMeCookieExpire();
-            $secure = $this->options->getLoginOptions()->isRememberMeCookieSecure();
-
-            setcookie($name, $cookieData, time() + $expire, "/", "", $secure, true);
-
-            $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
-                RememberTokenEvent::EVENT_TOKEN_GENERATE_POST,
-                $user,
-                $data
-            ));
-        } catch (\Exception $e) {
-            error_log("Remember token generate error: " . $e->getMessage());
-
-            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_GENERATE_ERROR);
-            $result = $this->createUserOperationResultWithException($e, $message, $user);
-
-            $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
-                RememberTokenEvent::EVENT_TOKEN_GENERATE_ERROR,
-                $user,
-                $data,
-                $result
-            ));
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param null $data
-     * @param ResultInterface|null $result
-     * @return RememberTokenEvent
-     */
-    protected function createRememberTokenEvent(
-        $name = RememberTokenEvent::EVENT_TOKEN_GENERATE_PRE,
-        UserEntityInterface $user = null,
-        $data = null,
-        ResultInterface $result = null
-    ) {
-        $event = new RememberTokenEvent($this, $name, $user, $result);
-        if ($data) {
-            $event->setData($data);
-        }
-
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @param Event $event
-     * @return Event
-     */
-    protected function setupEventPsr7Messages(Event $event)
-    {
-        if ($this->request) {
-            $event->setRequest($this->request);
-        }
-        if ($this->response) {
-            $event->setResponse($this->response);
-        }
-
-        return $event;
-    }
-
-    /**
-     * @param \Exception $e
-     * @param null $messages
-     * @param UserEntityInterface|null $user
-     * @return UserOperationResult
-     */
-    protected function createUserOperationResultWithException(
-        \Exception $e,
-        $messages = null,
-        UserEntityInterface $user = null
-    ) {
-        if ($this->isDebug()) {
-            $result = new UserOperationResult(false, $e->getMessage(), $e);
-        } else {
-            if ($messages) {
-                $result = new UserOperationResult(false, $messages, $e);
-            } else {
-                $result = new UserOperationResult(false, $e->getMessage(), $e);
-            }
-        }
-
-        if ($user) {
-            $result->setUser($user);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isDebug()
-    {
-        return $this->debug;
-    }
-
-    /**
-     * @param boolean $debug
-     * @return UserService
-     */
-    public function setDebug($debug)
-    {
-        $this->debug = $debug;
-        return $this;
-    }
-
-    /**
-     * Validates a remember token coming from cookie
-     *
-     * @param $selector
-     * @param $token
-     * @return bool
-     */
-    public function checkRememberToken($selector, $token)
-    {
-        try {
-            $r = $this->mapper->findRememberToken($selector);
-            if ($r) {
-                if ($r['token'] == md5($token)) {
-                    return $r;
-                } else {
-                    //clear any tokens for this user as security measure
-                    $user = $this->mapper->fetch([$this->getMapper()->getIdentifierName() => $r['userId']]);
-                    if ($user) {
-                        $this->removeRememberToken($user);
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            error_log("Check remember token error: " . $e->getMessage());
-            return false;
-        }
-
-        return false;
-    }
-
-    /**
-     * Removes all remember tokens for a given user and also unset the corresponding cookie
-     *
-     * @param UserEntityInterface $user
-     * @return UserOperationResult
-     */
-    public function removeRememberToken(UserEntityInterface $user)
-    {
-        $result = new UserOperationResult(true);
-        try {
-            $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
-                RememberTokenEvent::EVENT_TOKEN_REMOVE_PRE,
-                $user
-            ));
-
-            $this->mapper->removeRememberToken($user->getId());
-
-            //clear cookies
-            if (isset($_COOKIE[$this->options->getLoginOptions()->getRememberMeCookieName()])) {
-                unset($_COOKIE[$this->options->getLoginOptions()->getRememberMeCookieName()]);
-                setcookie($this->options->getLoginOptions()->getRememberMeCookieName(), '', time() - 3600, '/');
+            $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_DELETE, [
+                'user' => $user,
+                'mapper' => $mapper
+            ]);
+            if ($event->stopped()) {
+                return $event->last();
             }
 
-            $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
-                RememberTokenEvent::EVENT_TOKEN_REMOVE_POST,
-                $user
-            ));
-        } catch (\Exception $e) {
-            error_log("Remove remember token error for user " . $user->getId() . " with message: " . $e->getMessage());
-
-            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REMEMBER_TOKEN_REMOVE_ERROR);
-            $result = $this->createUserOperationResultWithException($e, $message, $user);
-
-            $this->getEventManager()->triggerEvent($this->createRememberTokenEvent(
-                RememberTokenEvent::EVENT_TOKEN_REMOVE_ERROR,
-                $user,
-                null,
-                $result
-            ));
-        }
-
-        return $result;
-    }
-
-    /**
-     * Change user status from unconfirmed to active based on an email and valid confirmation token
-     *
-     * @param $email
-     * @param $token
-     * @return UserOperationResult
-     * @throws \Exception
-     */
-    public function confirmAccount($email, $token)
-    {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_SUCCESS));
-
-        $user = null;
-
-        try {
-            if (empty($email) || empty($token)) {
-                $result = $this->createUserOperationResultWithMessages(
-                    $this->options->getMessagesOptions()
-                        ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_MISSING_PARAMS)
-                );
-            } else {
-                /** @var UserEntityInterface $user */
-                $user = $this->mapper->fetch(['email' => $email]);
-                $user->setPassword(null);
-
-                if ($user) {
-                    $r = $this->mapper->findConfirmToken($user->getId(), $token);
-                    if ($r) {
-                        $this->mapper->beginTransaction();
-
-                        //trigger pre event
-                        $this->getEventManager()->triggerEvent(
-                            $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_PRE, $user)
-                        );
-
-                        $user->setStatus($this->options->getConfirmAccountOptions()->getActiveUserStatus());
-                        $this->save($user);
-
-                        $this->mapper->removeConfirmToken($user->getId(), $token);
-
-                        $this->mapper->commit();
-
-                        //post confirm event
-                        $this->getEventManager()->triggerEvent(
-                            $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_POST, $user)
-                        );
-                    } else {
-                        $result = $this->createUserOperationResultWithMessages(
-                            $this->options->getMessagesOptions()
-                                ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_INVALID_TOKEN)
-                        );
-                    }
-                } else {
-                    $result = $this->createUserOperationResultWithMessages(
-                        $this->options->getMessagesOptions()
-                            ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_INVALID_EMAIL)
-                    );
-                }
+            $success = $mapper->delete($user);
+            if ($success) {
+                $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_DELETE, ['user' => $user, 'mapper' => $mapper]);
+                return new Result(['user' => $user, 'mapper' => $mapper]);
             }
-        } catch (\Exception $e) {
-            error_log("Confirm account error: " . $e->getMessage(), E_USER_ERROR);
 
-            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_CONFIRM_ACCOUNT_ERROR);
-            $result = $this->createUserOperationResultWithException($e, $message, $user);
-
-            //trigger error event
-            $this->getEventManager()->triggerEvent(
-                $this->createConfirmAccountEvent(ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_ERROR, $user, $result)
+            $this->dispatchEvent(UserEvent::EVENT_USER_DELETE_ERROR, ['user' => $user, 'mapper' => $mapper]);
+            return new Result(
+                ['user' => $user, 'mapper' => $mapper],
+                $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::USER_DELETE_ERROR)
             );
+        } catch (\Exception $e) {
+            $this->dispatchEvent(UserEvent::EVENT_USER_DELETE_ERROR, [
+                'user' => $user,
+                'mapper' => $mapper,
+                'error' => $e
+            ]);
+            return new Result(['user' => $user, 'mapper' => $mapper], $e);
+        }
+    }
 
-            $this->mapper->rollback();
+    /**
+     * @param array $params
+     * @return Result
+     */
+    public function confirmAccount(array $params): Result
+    {
+        $email = $params['email'] ?? '';
+        $token = $params['token'] ?? '';
+
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+        $user = null;
+        try {
+            $user = $mapper->getByEmail($email, ['conditions' => ['status' => UserEntity::STATUS_PENDING]]);
+            if ($user instanceof UserEntity) {
+                $token = $this->tokenService->findConfirmToken($user, $token);
+                if ($token) {
+                    $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_ACCOUNT_CONFIRMATION, [
+                        'user' => $user,
+                        'token' => $token,
+                        'mapper' => $mapper
+                    ]);
+                    if ($event->stopped()) {
+                        return $event->last();
+                    }
+
+                    $mapper->beginTransaction();
+
+                    $user->setStatus($this->userOptions->getConfirmedAccountStatus());
+                    $r = $mapper->save($user, ['atomic' => false]);
+                    if ($r) {
+                        $this->tokenService->deleteConfirmTokens($user);
+
+                        $mapper->commit();
+                        $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_ACCOUNT_CONFIRMATION, [
+                            'user' => $user,
+                            'token' => $token,
+                            'mapper' => $mapper
+                        ]);
+
+                        return new Result(['token' => $token, 'user' => $user, 'mapper' => $mapper]);
+                    } else {
+                        $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_CONFIRMATION_ERROR, [
+                            'user' => $user,
+                            'token' => $token,
+                            'mapper' => $mapper,
+                            'error' => ErrorCode::USER_SAVE_ERROR
+                        ]);
+                        $mapper->rollback();
+                        return new Result(
+                            ['token' => $token, 'user' => $user, 'mapper' => $mapper],
+                            $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_ERROR)
+                        );
+                    }
+                }
+                $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_CONFIRMATION_ERROR, [
+                    'user' => $user,
+                    'token' => $token,
+                    'mapper' => $mapper,
+                    'error' => ErrorCode::TOKEN_NOT_FOUND
+                ]);
+                return new Result(
+                    ['user' => $user, 'mapper' => $mapper, 'token' => $token],
+                    $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_INVALID_TOKEN)
+                );
+            }
+            $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_CONFIRMATION_ERROR, [
+                'email' => $email,
+                'mapper' => $mapper,
+                'error' => ErrorCode::USER_NOT_FOUND
+            ]);
+            return new Result(
+                ['email' => $email, 'mapper' => $mapper],
+                $this->userOptions->getMessagesOptions()
+                    ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_INVALID_EMAIL)
+            );
+        } catch (\Exception $e) {
+            $errorData = ['mapper' => $mapper];
+            if (isset($user)) {
+                $errorData['user'] = $user;
+            }
+            if (isset($token)) {
+                $errorData['token'] = $token;
+            }
+            $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_CONFIRMATION_ERROR, $errorData + ['error' => $e]);
+            $mapper->rollback();
+            $result = new Result($errorData, $e);
+
             return $result;
         }
-
-        return $result;
     }
 
-    /**
-     * @param $messages
-     * @param UserEntityInterface|null $user
-     * @return UserOperationResult
-     */
-    protected function createUserOperationResultWithMessages($messages, UserEntityInterface $user = null)
+    public function optOut(array $params): Result
     {
-        $result = new UserOperationResult(false, $messages);
-        if ($user) {
-            $result->setUser($user);
-        }
+        $email = $params['email'] ?? '';
+        $token = $params['token'] ?? '';
 
-        return $result;
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param ResultInterface|null $result
-     * @param mixed $data
-     * @return ConfirmAccountEvent
-     */
-    protected function createConfirmAccountEvent(
-        $name = ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_PRE,
-        UserEntityInterface $user = null,
-        $data = null,
-        ResultInterface $result = null
-    ) {
-        $event = new ConfirmAccountEvent($this, $name, $user, $result);
-        if ($data) {
-            $event->setData($data);
-        }
-
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * Based on a user email, generate a token and store a hash of it with and expiration time
-     * trigger a specific event, so mail service can send an email based on it
-     *
-     * @param $email
-     * @return UserOperationResult
-     */
-    public function generateResetToken($email)
-    {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_FORGOT_PASSWORD_SUCCESS));
-
-        $user = null;
-        $data = null;
-
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
         try {
-            /** @var UserEntityInterface $user */
-            $user = $this->find(['email' => $email]);
-            $user->setPassword(null);
+            $user = $mapper->getByEmail($email, ['conditions' => ['status' => UserEntity::STATUS_PENDING]]);
+            if ($user instanceof UserEntity) {
+                $token = $this->tokenService->findConfirmToken($user, $token);
+                if ($token) {
+                    $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_OPT_OUT, [
+                        'user' => $user,
+                        'token' => $token,
+                        'mapper' => $mapper
+                    ]);
+                    if ($event->stopped()) {
+                        return $event->last();
+                    }
 
-            if ($user) {
-                $data = new \stdClass();
-                $data->userId = $user->getId();
-                $data->token = md5(Rand::getString(32) . time() . $email);
-                $data->expireAt = time() + $this->options->getPasswordRecoveryOptions()
-                        ->getResetPasswordTokenTimeout();
-
-                $this->getEventManager()->triggerEvent(
-                    $this->createPasswordResetEvent(
-                        PasswordResetEvent::EVENT_PASSWORD_RESET_TOKEN_PRE,
-                        $user,
-                        $data
-                    )
-                );
-
-                $this->mapper->saveResetToken((array)$data);
-
-                $this->getEventManager()->triggerEvent($this->createPasswordResetEvent(
-                    PasswordResetEvent::EVENT_PASSWORD_RESET_TOKEN_POST,
-                    $user,
-                    $data
-                ));
-            }
-        } catch (\Exception $e) {
-            error_log("Password reset request error: " . $e->getMessage());
-
-            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_FORGOT_PASSWORD_ERROR);
-            $result = $this->createUserOperationResultWithException($e, $message, $user);
-
-            $this->getEventManager()->triggerEvent(
-                $this->createPasswordResetEvent(
-                    PasswordResetEvent::EVENT_PASSWORD_RESET_TOKEN_ERROR,
-                    $user,
-                    $data,
-                    $result
-                )
-            );
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param mixed $data
-     * @param ResultInterface|null $result
-     * @return PasswordResetEvent
-     */
-    protected function createPasswordResetEvent(
-        $name = PasswordResetEvent::EVENT_PASSWORD_RESET_PRE,
-        UserEntityInterface $user = null,
-        $data = null,
-        ResultInterface $result = null
-    ) {
-        $event = new PasswordResetEvent($this, $name, $user, $result);
-        if ($data) {
-            $event->setData($data);
-        }
-
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @param $email
-     * @param $token
-     * @param $newPassword
-     * @return UserOperationResult
-     */
-    public function resetPassword($email, $token, $newPassword)
-    {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_SUCCESS));
-
-        $user = null;
-
-        if (empty($email) || empty($token)) {
-            $result = $this->createUserOperationResultWithMessages($this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_MISSING_PARAMS));
-        } else {
-            try {
-                /** @var UserEntityInterface $user */
-                $user = $this->find(['email' => $email]);
-                $user->setPassword(null);
-
-                if (!$user) {
-                    $result = $this->createUserOperationResultWithMessages($this->options->getMessagesOptions()
-                        ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_EMAIL));
-                } else {
-                    $r = $this->mapper->findResetToken((int)$user->getId(), $token);
+                    $mapper->beginTransaction();
+                    $r = $mapper->delete($user, ['atomic' => false]);
                     if ($r) {
-                        $expireAt = $r['expireAt'];
+                        $this->tokenService->deleteConfirmTokens($user);
 
-                        if ($expireAt >= time()) {
-                            $user->setPassword($this->passwordService->create($newPassword));
+                        $mapper->commit();
+                        $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_OPT_OUT, [
+                            'user' => $user,
+                            'token' => $token,
+                            'mapper' => $mapper
+                        ]);
 
-                            $this->getEventManager()->triggerEvent($this->createPasswordResetEvent(
-                                PasswordResetEvent::EVENT_PASSWORD_RESET_PRE,
-                                $user
-                            ));
-
-                            $this->save($user);
-
-                            $this->getEventManager()->triggerEvent($this->createPasswordResetEvent(
-                                PasswordResetEvent::EVENT_PASSWORD_RESET_POST,
-                                $user
-                            ));
-                        } else {
-                            $result = $this->createUserOperationResultWithMessages(
-                                $this->options->getMessagesOptions()
-                                    ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_TOKEN_EXPIRED)
-                            );
-                        }
+                        return new Result(['token' => $token, 'user' => $user, 'mapper' => $mapper]);
                     } else {
-                        $result = $this->createUserOperationResultWithMessages(
-                            $this->options->getMessagesOptions()
-                                ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_INVALID_TOKEN)
+                        $this->dispatchEvent(UserEvent::EVENT_USER_OPT_OUT_ERROR, [
+                            'user' => $user,
+                            'token' => $token,
+                            'mapper' => $mapper,
+                            'error' => ErrorCode::USER_DELETE_ERROR
+                        ]);
+                        $mapper->rollback();
+                        return new Result(
+                            ['token' => $token, 'user' => $user, 'mapper' => $mapper],
+                            $this->userOptions->getMessagesOptions()
+                                ->getMessage(MessagesOptions::OPT_OUT_ERROR)
                         );
                     }
                 }
-            } catch (\Exception $e) {
-                error_log("Password reset error: " . $e->getMessage());
-
-                $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
-                    ->getMessage(MessagesOptions::MESSAGE_RESET_PASSWORD_ERROR);
-                $result = $this->createUserOperationResultWithException($e, $message, $user);
-
-                $this->getEventManager()->triggerEvent(
-                    $this->createPasswordResetEvent(
-                        PasswordResetEvent::EVENT_PASSWORD_RESET_ERROR,
-                        $user,
-                        null,
-                        $result
-                    )
+                $this->dispatchEvent(UserEvent::EVENT_USER_OPT_OUT_ERROR, [
+                    'user' => $user,
+                    'token' => $token,
+                    'mapper' => $mapper,
+                    'error' => ErrorCode::TOKEN_NOT_FOUND
+                ]);
+                return new Result(
+                    ['user' => $user, 'mapper' => $mapper, 'token' => $token],
+                    $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::OPT_OUT_INVALID_PARAMS)
                 );
             }
-        }
+            $this->dispatchEvent(UserEvent::EVENT_USER_OPT_OUT_ERROR, [
+                'email' => $email,
+                'mapper' => $mapper,
+                'error' => ErrorCode::USER_NOT_FOUND
+            ]);
+            return new Result(
+                ['email' => $email, 'mapper' => $mapper],
+                $this->userOptions->getMessagesOptions()
+                    ->getMessage(MessagesOptions::OPT_OUT_INVALID_PARAMS)
+            );
+        } catch (\Exception $e) {
+            $errorData = ['mapper' => $mapper];
+            if (isset($user)) {
+                $errorData['user'] = $user;
+            }
+            if (isset($token)) {
+                $errorData['token'] = $token;
+            }
+            $this->dispatchEvent(UserEvent::EVENT_USER_OPT_OUT_ERROR, $errorData + ['error' => $e]);
+            $mapper->rollback();
+            $result = new Result($errorData, $e);
 
-        return $result;
+            return $result;
+        }
     }
 
     /**
-     * @param $oldPassword
-     * @param $newPassword
-     * @return UserOperationResult
+     * @param array $data
+     * @return Result
      */
-    public function changePassword($oldPassword, $newPassword)
+    public function resetPassword(array $data): Result
     {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_OK));
+        $email = $data['email'] ?? '';
+        $token = $data['token'] ?? '';
+        $newPassword = $data['user']['password'];
 
-        $identity = $this->authentication->getIdentity();
-        //we always get it from DB, just to make sure hashed password is not missing
-        $currentUser = $this->find([$this->getMapper()->getIdentifierName() => $identity->getId()]);
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+        $user = null;
+        try {
+            $user = $mapper->getByEmail(
+                $email,
+                ['conditions' => ['status' => $this->userOptions->getLoginOptions()->getAllowedStatus()]]
+            );
+            if ($user) {
+                $token = $this->tokenService->findResetToken($user, $token);
+                if ($token) {
+                    //check validity
+                    if ((int)$token->getExpire() >= time()) {
+                        $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_PASSWORD_RESET, [
+                            'user' => $user,
+                            'token' => $token,
+                            'mapper' => $mapper
+                        ]);
+                        if ($event->stopped()) {
+                            return $event->last();
+                        }
 
-        if (!$currentUser) {
-            return $this->createUserOperationResultWithMessages(
-                $this->options->getMessagesOptions()
-                    ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_USER)
+                        $user->setPassword($this->passwordService->create($newPassword));
+                        $r = $mapper->save($user);
+                        if ($r) {
+                            // delete reset tokens for this user, as a security measure, if reset successful
+                            $this->tokenService->deleteResetTokens($user);
+
+                            $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_PASSWORD_RESET, [
+                                'user' => $user,
+                                'token' => $token,
+                                'mapper' => $mapper
+                            ]);
+                            return new Result(['user' => $user, 'token' => $token, 'mapper' => $mapper]);
+                        }
+
+                        $this->dispatchEvent(UserEvent::EVENT_USER_RESET_PASSWORD_ERROR, [
+                            'user' => $user,
+                            'token' => $token,
+                            'mapper' => $mapper,
+                            'error' => ErrorCode::USER_SAVE_ERROR
+                        ]);
+                        return new Result(
+                            ['user' => $user, 'token' => $token, 'mapper' => $mapper],
+                            $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::RESET_PASSWORD_ERROR)
+                        );
+                    }
+                    // delete the expired token
+                    if ($token instanceof ResetTokenEntity && $token->getId()) {
+                        $this->tokenService->deleteResetToken($token);
+                    }
+
+                    $this->dispatchEvent(UserEvent::EVENT_USER_RESET_PASSWORD_ERROR, [
+                        'user' => $user,
+                        'token' => $token,
+                        'mapper' => $mapper,
+                        'error' => ErrorCode::TOKEN_EXPIRED
+                    ]);
+                    return new Result(
+                        ['user' => $user, 'token' => $token, 'mapper' => $mapper],
+                        $this->userOptions->getMessagesOptions()
+                            ->getMessage(MessagesOptions::RESET_TOKEN_EXPIRED)
+                    );
+                }
+
+                $this->dispatchEvent(UserEvent::EVENT_USER_RESET_PASSWORD_ERROR, [
+                    'user' => $user,
+                    'token' => $token,
+                    'mapper' => $mapper,
+                    'error' => ErrorCode::TOKEN_NOT_FOUND
+                ]);
+                return new Result(
+                    ['user' => $user, 'mapper' => $mapper, 'token' => $token],
+                    $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::RESET_TOKEN_INVALID)
+                );
+            }
+
+            $this->dispatchEvent(UserEvent::EVENT_USER_RESET_PASSWORD_ERROR, [
+                'email' => $email,
+                'mapper' => $mapper,
+                'error' => ErrorCode::USER_NOT_FOUND
+            ]);
+            return new Result([], $this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::RESET_PASSWORD_INVALID_EMAIL));
+        } catch (\Exception $e) {
+            $errorData = ['mapper' => $mapper];
+            if ($user) {
+                $errorData['user'] = $user;
+            }
+            if ($token) {
+                $errorData['token'] = $token;
+            }
+            $this->dispatchEvent(UserEvent::EVENT_USER_RESET_PASSWORD_ERROR, $errorData + ['error' => $e]);
+            $result = new Result($errorData, $e);
+
+            return $result;
+        }
+    }
+
+    /**
+     * @param UserEntity $user
+     * @param array $data
+     * @return Result
+     */
+    public function changePassword(UserEntity $user, array $data): Result
+    {
+        $currentPassword = $data['currentPassword'];
+        $newPassword = $data['user']['password'];
+
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+
+        try {
+            if ($this->passwordService->verify($currentPassword, $user->getPassword())) {
+                $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_CHANGE_PASSWORD, [
+                    'user' => $user,
+                    'currentPassword' => $currentPassword,
+                    'newPassword' => $newPassword,
+                    'mapper' => $mapper,
+                ]);
+                if ($event->stopped()) {
+                    return $event->last();
+                }
+
+                $user->setPassword($this->passwordService->create($newPassword));
+                $r = $mapper->save($user);
+                if ($r) {
+                    // does not sign out the user, but at least deletes any remember tokens and cookies
+                    // to force user to sign up after its session expires
+                    $this->tokenService->deleteRememberTokens(['userId' => $user->getId()]);
+                    $this->tokenService->clearRememberCookie();
+
+                    $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_CHANGE_PASSWORD, [
+                        'user' => $user,
+                        'mapper' => $mapper
+                    ]);
+                    return new Result(['user' => $user, 'mapper' => $mapper]);
+                }
+                $this->dispatchEvent(UserEvent::EVENT_USER_CHANGE_PASSWORD_ERROR, [
+                    'user' => $user,
+                    'mapper' => $mapper,
+                    'currentPassword' => $currentPassword,
+                    'newPassword' => $newPassword,
+                    'error' => ErrorCode::USER_SAVE_ERROR
+                ]);
+                return new Result(
+                    [
+                        'user' => $user,
+                        'mapper' => $mapper,
+                        'currentPassword' => $currentPassword,
+                        'newPassword' => $newPassword
+                    ],
+                    $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::CHANGE_PASSWORD_ERROR)
+                );
+            }
+            $this->dispatchEvent(UserEvent::EVENT_USER_CHANGE_PASSWORD_ERROR, [
+                'user' => $user,
+                'mapper' => $mapper,
+                'currentPassword' => $currentPassword,
+                'newPassword' => $newPassword,
+                'error' => ErrorCode::USER_PASSWORD_INVALID
+            ]);
+            return new Result(
+                [
+                    'user' => $user,
+                    'mapper' => $mapper,
+                    'currentPassword' => $currentPassword,
+                    'newPassword' => $newPassword
+                ],
+                $this->userOptions->getMessagesOptions()->getMessage(MessagesOptions::CURRENT_PASSWORD_INVALID)
+            );
+        } catch (\Exception $e) {
+            $this->dispatchEvent(UserEvent::EVENT_USER_CHANGE_PASSWORD_ERROR, [
+                'user' => $user,
+                'mapper' => $mapper,
+                'currentPassword' => $currentPassword,
+                'newPassword' => $newPassword,
+                'error' => $e
+            ]);
+            return new Result(
+                [
+                    'user' => $user,
+                    'mapper' => $mapper,
+                    'currentPassword' => $currentPassword,
+                    'newPassword' => $newPassword
+                ],
+                $e
             );
         }
-
-        try {
-            if ($this->passwordService->verify($oldPassword, $currentUser->getPassword())) {
-                //update password
-                $currentUser->setPassword($this->passwordService->create($newPassword));
-
-                $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
-                    ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE,
-                    $currentUser
-                ));
-
-                $this->save($currentUser);
-
-                $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
-                    ChangePasswordEvent::EVENT_CHANGE_PASSWORD_POST,
-                    $currentUser
-                ));
-            } else {
-                $result = $this->createUserOperationResultWithMessages(
-                    $this->options->getMessagesOptions()
-                        ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_INVALID_CURRENT_PASSWORD)
-                );
-            }
-        } catch (\Exception $e) {
-            error_log("Change password error: " . $e->getMessage());
-
-            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_CHANGE_PASSWORD_ERROR);
-            $result = $this->createUserOperationResultWithException($e, $message, $currentUser);
-
-            $this->getEventManager()->triggerEvent($this->createChangePasswordEvent(
-                ChangePasswordEvent::EVENT_CHANGE_PASSWORD_ERROR,
-                $currentUser,
-                $result
-            ));
-        }
-
-        return $result;
     }
 
     /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param ResultInterface|null $result
-     * @return Event
+     * @param UserEntity $user
+     * @return Result
      */
-    protected function createChangePasswordEvent(
-        $name = ChangePasswordEvent::EVENT_CHANGE_PASSWORD_PRE,
-        UserEntityInterface $user = null,
-        ResultInterface $result = null
-    ) {
-        $event = new ChangePasswordEvent($this, $name, $user, $result);
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * Store a new user into the db, after it validates the data
-     * trigger register events
-     *
-     * @param UserEntityInterface $user
-     * @return UserOperationResult
-     */
-    public function register(UserEntityInterface $user)
+    public function register(UserEntity $user): Result
     {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_REGISTER_SUCCESS));
-
-        $isAtomic = $this->isAtomicOperations();
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
 
         try {
-            $this->setAtomicOperations(false);
-            $this->mapper->beginTransaction();
+            $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_REGISTRATION, [
+                'user' => $user,
+                'mapper' => $mapper,
+            ]);
+            if ($event->stopped()) {
+                return $event->last();
+            }
+
+            $mapper->beginTransaction();
 
             $user->setPassword($this->passwordService->create($user->getPassword()));
-            if ($this->options->isEnableUserStatus()) {
-                $user->setStatus($this->options->getRegisterOptions()->getDefaultUserStatus());
+            $user->setStatus($this->userOptions->getRegisterOptions()->getDefaultUserStatus());
+
+            $r = $mapper->save($user, ['atomic' => false]);
+            if ($r) {
+                if ($this->userOptions->isEnableAccountConfirmation()) {
+                    $t = $this->tokenService->generateConfirmToken($user);
+                    if ($t->isValid()) {
+                        // everything ok, commit transaction
+                        $mapper->commit();
+                        $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_REGISTRATION, [
+                            'user' => $user,
+                            'mapper' => $mapper,
+                            'token' => $t->getParam('token')
+                        ]);
+                        return new Result(
+                            ['user' => $user, 'token' => $t->getParam('token'), 'mapper' => $mapper]
+                        );
+                    }
+                    // if reach here, failed confirm token create
+                    $mapper->rollback();
+                    $this->dispatchEvent(UserEvent::EVENT_USER_REGISTRATION_ERROR, [
+                        'user' => $user,
+                        'mapper' => $mapper,
+                        'error' => $t->getParam('error')
+                    ]);
+                    return new Result(['user' => $user, 'mapper' => $mapper], $this->userOptions->getMessagesOptions()
+                        ->getMessage(MessagesOptions::CONFIRM_TOKEN_SAVE_ERROR));
+                }
+                // here is valid registration, without confirm token
+                $mapper->commit();
+                $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_REGISTRATION, [
+                    'user' => $user,
+                    'mapper' => $mapper,
+                ]);
+                return new Result(['user' => $user, 'mapper' => $mapper]);
             }
-
-            //trigger pre register event
-            $this->getEventManager()->triggerEvent(
-                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_PRE, $user)
-            );
-
-            $this->save($user);
-
-            //get newly created user id and save it to the object
-            $id = $this->mapper->lastInsertValue();
-            if ($id) {
-                $user->setId($id);
-            }
-
-            $result->setUser($user);
-
-            //generate a confirm token if enabled and also trigger events
-            if ($this->options->getConfirmAccountOptions()->isEnableAccountConfirmation()) {
-                $this->generateConfirmToken($user);
-            }
-
-            //trigger post register event
-            $this->getEventManager()->triggerEvent(
-                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_POST, $user)
-            );
-
-            $this->mapper->commit();
-            $this->setAtomicOperations($isAtomic);
+            // here is invalid user save
+            $mapper->rollback();
+            $this->dispatchEvent(UserEvent::EVENT_USER_REGISTRATION_ERROR, [
+                'user' => $user,
+                'mapper' => $mapper,
+                'error' => ErrorCode::USER_SAVE_ERROR
+            ]);
+            return new Result(['user' => $user, 'mapper' => $mapper], $this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::USER_REGISTER_ERROR));
         } catch (\Exception $e) {
-            error_log("Register error: " . $e->getMessage());
-
-            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_REGISTER_ERROR);
-            $result = $this->createUserOperationResultWithException($e, $message, $user);
-
-            //trigger error event
-            $this->getEventManager()->triggerEvent(
-                $this->createRegisterEvent(RegisterEvent::EVENT_REGISTER_ERROR, $user, $result)
-            );
-
-            $this->mapper->rollback();
-            $this->setAtomicOperations($isAtomic);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string $name
-     * @param UserEntityInterface|null $user
-     * @param ResultInterface|null $result
-     * @return RegisterEvent
-     */
-    protected function createRegisterEvent(
-        $name = RegisterEvent::EVENT_REGISTER_PRE,
-        UserEntityInterface $user = null,
-        ResultInterface $result = null
-    ) {
-        $event = new RegisterEvent($this, $name, $user, $result);
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @param UserEntityInterface $user
-     * @throws \Exception
-     */
-    protected function generateConfirmToken(UserEntityInterface $user)
-    {
-        $data = null;
-
-        try {
-            $data = new \stdClass();
-            $data->userId = $user->getId();
-            $data->token = md5(Rand::getString(32) . time() . $user->getEmail());
-
-            $this->getEventManager()->triggerEvent(
-                $this->createConfirmAccountEvent(
-                    ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_TOKEN_PRE,
-                    $user,
-                    $data
-                )
-            );
-
-            $this->mapper->saveConfirmToken((array)$data);
-
-            $this->getEventManager()->triggerEvent(
-                $this->createConfirmAccountEvent(
-                    ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_TOKEN_POST,
-                    $user,
-                    $data
-                )
-            );
-        } catch (\Exception $e) {
-            error_log("Confirm token generation error: " . $e->getMessage());
-
-            $this->getEventManager()->triggerEvent(
-                $this->createConfirmAccountEvent(
-                    ConfirmAccountEvent::EVENT_CONFIRM_ACCOUNT_TOKEN_ERROR,
-                    $user,
-                    $data
-                )
-            );
-
-            throw $e;
+            $mapper->rollback();
+            $this->dispatchEvent(UserEvent::EVENT_USER_REGISTRATION_ERROR, [
+                'user' => $user,
+                'mapper' => $mapper,
+                'error' => $e
+            ]);
+            return new Result(['user' => $user, 'mapper' => $mapper], $e);
         }
     }
 
     /**
-     * @param UserEntityInterface $user
-     * @return UserOperationResult
+     * @param UserEntity $user
+     * @param bool $hashPassword
+     * @return Result
      */
-    public function updateAccount(UserEntityInterface $user)
+    public function updateAccount(UserEntity $user, bool $hashPassword = false): Result
     {
-        $result = new UserOperationResult(true, $this->options->getMessagesOptions()
-            ->getMessage(MessagesOptions::MESSAGE_ACCOUNT_UPDATE_OK));
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
 
-        $isAtomic = $this->isAtomicOperations();
         try {
-            $identity = $this->authentication->getIdentity();
-            //last check if identity ID and the user ID to be updated are matching
-            if ($user->getId() !== $identity->getId()) {
-                //trying to update a different account?...
-                throw new RuntimeException('Identity ID and user ID do not match.');
+            $event = $this->dispatchEvent(UserEvent::EVENT_USER_BEFORE_ACCOUNT_UPDATE, [
+                'user' => $user,
+                'mapper' => $mapper,
+            ]);
+            if ($event->stopped()) {
+                return $event->last();
             }
 
-            $this->setAtomicOperations(false);
-            $this->mapper->beginTransaction();
-
-            $this->getEventManager()->triggerEvent(
-                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_PRE, $user)
-            );
-
-            if (!empty($user->getPassword())) {
+            if ($hashPassword) {
                 $user->setPassword($this->passwordService->create($user->getPassword()));
             }
-            $this->save($user);
 
-            $result->setUser($user);
+            $r = $mapper->save($user);
+            if ($r) {
+                $this->dispatchEvent(UserEvent::EVENT_USER_AFTER_ACCOUNT_UPDATE, [
+                    'user' => $user,
+                    'mapper' => $mapper
+                ]);
+                return new Result(['user' => $user, 'mapper' => $mapper]);
+            }
 
-            $this->getEventManager()->triggerEvent(
-                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_POST, $user)
-            );
-
-            $this->mapper->commit();
-            $this->setAtomicOperations($isAtomic);
+            $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_UPDATE_ERROR, [
+                'user' => $user,
+                'mapper' => $mapper,
+                'error' => ErrorCode::USER_SAVE_ERROR
+            ]);
+            return new Result(['user' => $user, 'mapper' => $mapper], $this->userOptions->getMessagesOptions()
+                ->getMessage(MessagesOptions::USER_UPDATE_ERROR));
         } catch (\Exception $e) {
-            error_log('Update user error: ' . $e->getMessage());
+            $this->dispatchEvent(UserEvent::EVENT_USER_ACCOUNT_UPDATE_ERROR, [
+                'user' => $user,
+                'mapper' => $mapper,
+                'error' => $e
+            ]);
+            return new Result(['user' => $user, 'mapper' => $mapper], $e);
+        }
+    }
 
-            $message = $this->debug ? $e->getMessage() : $this->options->getMessagesOptions()
-                ->getMessage(MessagesOptions::MESSAGE_ACCOUNT_UPDATE_ERROR);
+    /**
+     * @param array $data
+     * @return Result
+     */
+    public function resetPasswordRequest(array $data): Result
+    {
+        $email = $data['email'] ?? '';
 
-            $result = $this->createUserOperationResultWithException($e, $message, $user);
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+        $user = $mapper->getByEmail($email, [
+            'conditions' => [
+                'status' => $this->userOptions->getLoginOptions()->getAllowedStatus()
+            ]
+        ]);
 
-            $this->getEventManager()->triggerEvent(
-                $this->createUpdateEvent(UserUpdateEvent::EVENT_UPDATE_ERROR, $user, $result)
-            );
-
-            $this->mapper->rollback();
-            $this->setAtomicOperations($isAtomic);
+        if ($user) {
+            return $this->tokenService->generateResetToken($user);
         }
 
-        return $result;
+        // if email is not a registered account, return a valid response, as if the request succeeded
+        return new Result([]);
     }
 
     /**
-     * @param $name
-     * @param UserEntityInterface|null $user
-     * @param ResultInterface|null $result
-     * @return Event
+     * @return UserEntity
      */
-    protected function createUpdateEvent(
-        $name = UserUpdateEvent::EVENT_UPDATE_PRE,
-        UserEntityInterface $user = null,
-        ResultInterface $result = null
-    ) {
-        $event = new UserUpdateEvent($this, $name, $user, $result);
-        return $this->setupEventPsr7Messages($event);
-    }
-
-    /**
-     * @return PasswordInterface
-     */
-    public function getPasswordService()
+    public function newUser(): UserEntity
     {
-        return $this->passwordService;
+        /** @var UserMapperInterface $mapper */
+        $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
+        /** @var UserEntity $entity */
+        $entity = $mapper->newEntity();
+        return $entity;
     }
 
     /**
-     * @param PasswordInterface $passwordService
-     * @return UserService
+     * @return TokenServiceInterface
      */
-    public function setPasswordService($passwordService)
+    public function getTokenService(): TokenServiceInterface
     {
-        $this->passwordService = $passwordService;
-        return $this;
+        return $this->tokenService;
     }
 
     /**
-     * @return ServerRequestInterface
+     * @param EventManagerInterface $events
+     * @param int $priority
      */
-    public function getServerRequest()
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        return $this->request;
+        $identifiers = $events->getIdentifiers();
+        if (in_array(UserService::class, $identifiers)) {
+            $this->userEventAttach($events, $priority);
+        }
+
+        if (in_array(TokenService::class, $identifiers)) {
+            $this->tokenEventAttach($events, $priority);
+        }
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @return UserService
+     * @param EventManagerInterface $events
      */
-    public function setServerRequest(ServerRequestInterface $request)
+    public function detach(EventManagerInterface $events)
     {
-        $this->request = $request;
-        return $this;
-    }
+        $identifiers = $events->getIdentifiers();
+        if (in_array(UserService::class, $identifiers)) {
+            $this->userEventDetach($events);
+        }
 
-    /**
-     * @return ResponseInterface
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param ResponseInterface $response
-     * @return UserService
-     */
-    public function setResponse(ResponseInterface $response)
-    {
-        $this->response = $response;
-        return $this;
+        if (in_array(TokenService::class, $identifiers)) {
+            $this->tokenEventDetach($events);
+        }
     }
 }

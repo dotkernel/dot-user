@@ -1,3 +1,17 @@
+## 0.1.1 - 2017-03-10
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Updated mapper validators with correct name in UserFieldset
+
 ## 0.1.0 - 2017-03-10
 
 Initial tagged release

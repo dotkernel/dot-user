@@ -1,7 +1,7 @@
 {
   "name": "dotkernel/dot-user",
   "type": "library",
-  "description": "Complete configurable user module for DK built around dot-authentication-web",
+  "description": "DotKernel configurable user component providing common user functions and extending the authentication flow",
   "license": "MIT",
   "authors": [
     {
@@ -20,59 +20,29 @@
     "zendframework/zend-math": "^3.0",
     "zendframework/zend-crypt": "^3.1",
 
-    "dotkernel/dot-helpers": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-mapper": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-filter": "0.6.x-dev",
-    "dotkernel/dot-validator": "0.6.x-dev",
-    "dotkernel/dot-inputfilter": "0.6.x-dev",
-    "dotkernel/dot-hydrator": "0.6.x-dev",
-    "dotkernel/dot-form": "0.6.x-dev",
-    "dotkernel/dot-event": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-flashmessenger": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-controller": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-controller-plugin-flashmessenger": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-controller-plugin-authentication": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-controller-plugin-authorization": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-controller-plugin-forms": "0.6.x-dev",
-    "dotkernel/dot-authentication": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-authentication-web": "dev-develop as 0.6.x-dev",
-    "dotkernel/dot-authorization": "dev-develop as 0.6.x-dev"
+    "dotkernel/dot-helpers": "~0.1",
+    "dotkernel/dot-event": "~0.1",
+    "dotkernel/dot-mapper": "~0.1",
+    "dotkernel/dot-filter": "^1.0",
+    "dotkernel/dot-validator": "^1.0",
+    "dotkernel/dot-inputfilter": "^1.0",
+    "dotkernel/dot-hydrator": "^1.0",
+    "dotkernel/dot-form": "^1.0",
+    "dotkernel/dot-flashmessenger": "~0.1",
+    "dotkernel/dot-controller": "~0.1",
+    "dotkernel/dot-controller-plugin-flashmessenger": "~0.1",
+    "dotkernel/dot-controller-plugin-authentication": "~0.1",
+    "dotkernel/dot-controller-plugin-authorization": "~0.1",
+    "dotkernel/dot-controller-plugin-forms": "~0.1",
+    "dotkernel/dot-authentication": "~0.1",
+    "dotkernel/dot-authentication-web": "~0.1",
+    "dotkernel/dot-authorization": "~0.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^4.8",
     "squizlabs/php_codesniffer": "^2.3",
     "zendframework/zend-captcha": "^2.7"
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-mapper"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-form"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-inputfilter"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-filter"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-validator"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-hydrator"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/dotkernel/dot-controller-plugin-forms"
-    }
-  ],
   "autoload": {
     "psr-4": {
       "Dot\\User\\": "src/"
@@ -85,7 +55,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.6-dev"
+      "dev-master": "0.2-dev"
     }
   }
 }

@@ -15,7 +15,7 @@ use Dot\User\Entity\UserEntity;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptionsAwareInterface;
 use Dot\User\Options\UserOptionsAwareTrait;
-use Dot\Validator\Ems\NoRecordExists;
+use Dot\Validator\Mapper\NoRecordExists;
 use Zend\Form\Form;
 use Zend\Form\FormInterface;
 use Zend\InputFilter\InputFilter;

@@ -119,7 +119,7 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
                         ]
                     ],
                     [
-                        'name' => 'EmsNoRecordExists',
+                        'name' => 'MapperNoRecordExists',
                         'options' => [
                             'field' => 'username',
                             'entity' => $this->userOptions->getUserEntity(),
@@ -150,7 +150,7 @@ class UserFieldset extends Fieldset implements InputFilterProviderInterface, Use
                         ]
                     ],
                     [
-                        'name' => 'EmsNoRecordExists',
+                        'name' => 'MapperNoRecordExists',
                         'options' => [
                             'field' => 'email',
                             'entity' => $this->userOptions->getUserEntity(),

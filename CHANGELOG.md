@@ -1,3 +1,20 @@
+## 0.1.2 - 2017-03-11
+
+Updated php file headers doc blocks
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Nothing
+
+
 ## 0.1.1 - 2017-03-10
 
 ### Added

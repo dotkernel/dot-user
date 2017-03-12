@@ -1,3 +1,18 @@
+## 0.1.3 - 2017-03-12
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Added type submit to all form submit buttons
+
+
 ## 0.1.2 - 2017-03-11
 
 Updated php file headers doc blocks

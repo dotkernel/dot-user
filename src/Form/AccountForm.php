@@ -60,6 +60,7 @@ class AccountForm extends Form implements UserOptionsAwareInterface
 
         $this->add([
             'name' => 'submit',
+            'type' => 'submit',
             'attributes' => [
                 'type' => 'submit',
                 'value' => 'Update account'

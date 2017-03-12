@@ -67,6 +67,7 @@ class ChangePasswordForm extends Form implements InputFilterProviderInterface, U
 
         $this->add([
             'name' => 'submit',
+            'type' => 'submit',
             'attributes' => [
                 'type' => 'submit',
                 'value' => 'Change password'

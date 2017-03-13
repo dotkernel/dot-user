@@ -84,8 +84,9 @@ class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
                 } else {
                     $user->setRoles([]);
                 }
+            } else {
+                $user->setRoles([]);
             }
-            $user->setRoles([]);
         }
     }
 

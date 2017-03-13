@@ -73,14 +73,19 @@ class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
                     $roleIds[] = $row['roleId'];
                 }
 
-                /** @var MapperInterface $rolesMapper */
-                $rolesMapper = $this->mapperManager->get($this->userOptions->getRoleEntity());
-                $roles = $rolesMapper->find('all', [
-                    'conditions' => ['id' => $roleIds]
-                ]);
+                if (!empty($roleIds)) {
+                    /** @var MapperInterface $rolesMapper */
+                    $rolesMapper = $this->mapperManager->get($this->userOptions->getRoleEntity());
+                    $roles = $rolesMapper->find('all', [
+                        'conditions' => ['id' => $roleIds]
+                    ]);
 
-                $user->setRoles($roles);
+                    $user->setRoles($roles);
+                } else {
+                    $user->setRoles([]);
+                }
             }
+            $user->setRoles([]);
         }
     }
 
@@ -95,13 +100,14 @@ class UserDbMapper extends AbstractDbMapper implements UserMapperInterface
         if (empty($user->getRoles())) {
             // set the user with the default role as set in config
             $defaultRoles = $this->userOptions->getDefaultRoles();
+            if (!empty($defaultRoles)) {
+                /** @var MapperInterface $rolesMapper */
+                $rolesMapper = $this->mapperManager->get($this->userOptions->getRoleEntity());
 
-            /** @var MapperInterface $rolesMapper */
-            $rolesMapper = $this->mapperManager->get($this->userOptions->getRoleEntity());
-
-            $roles = $rolesMapper->find('all', ['conditions' => ['name' => $defaultRoles]]);
-            if (!empty($roles)) {
-                $user->setRoles($roles);
+                $roles = $rolesMapper->find('all', ['conditions' => ['name' => $defaultRoles]]);
+                if (!empty($roles)) {
+                    $user->setRoles($roles);
+                }
             }
         }
 

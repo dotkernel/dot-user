@@ -58,29 +58,6 @@ class ConfigProvider
         return [
             'dependencies' => $this->getDependenciesConfig(),
 
-            'middleware_pipeline' => [
-                [
-                    'middleware' => AutoLogin::class,
-                    'priority' => 9999,
-                ]
-            ],
-
-            'routes' => [
-                'login_route' => [
-                    'name' => 'login',
-                    'path' => '/user/login',
-                ],
-                'logout_route' => [
-                    'name' => 'logout',
-                    'path' => '/user/logout',
-                ],
-                'user_route' => [
-                    'name' => 'user',
-                    'path' => '/user[/{action}]',
-                    'middleware' => UserController::class,
-                ],
-            ],
-
             'templates' => [
                 'paths' => [
                     'dot-user-form' => [realpath(__DIR__ . '/../templates/dot-user-form')],
@@ -89,12 +66,6 @@ class ConfigProvider
 
             'dot_authentication' => [
                 'web' => [
-                    'login_route' => ['route_name' => 'login'],
-                    'logout_route' => ['route_name' => 'logout'],
-
-                    'after_login_route' => ['route_name' => 'user', 'route_params' => ['action' => 'account']],
-                    'after_logout_route' => ['route_name' => 'login'],
-
                     'event_listeners' => [
                         [
                             'type' => InjectLoginForm::class,
@@ -119,8 +90,6 @@ class ConfigProvider
             ],
 
             'dot_ems' => [
-                'default_adapter' => 'database',
-
                 'mapper_manager' => [
                     'factories' => [
                         RoleDbMapper::class => DbMapperFactory::class,

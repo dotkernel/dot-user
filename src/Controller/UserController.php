@@ -17,7 +17,7 @@ use Dot\Controller\Plugin\FlashMessenger\FlashMessengerPlugin;
 use Dot\Controller\Plugin\Forms\FormsPlugin;
 use Dot\Controller\Plugin\TemplatePlugin;
 use Dot\Controller\Plugin\UrlHelperPlugin;
-use Dot\Helpers\Route\RouteOptionHelper;
+use Dot\Helpers\Route\RouteHelper;
 use Dot\User\Entity\UserEntity;
 use Dot\User\Event\DispatchUserControllerEventsTrait;
 use Dot\User\Event\UserControllerEvent;
@@ -65,20 +65,20 @@ class UserController extends AbstractActionController implements UserControllerE
     /** @var  LoginAction */
     protected $loginAction;
 
-    /** @var  RouteOptionHelper */
+    /** @var  RouteHelper */
     protected $routeHelper;
 
     /**
      * UserController constructor.
      * @param UserServiceInterface $userService
      * @param UserOptions $userOptions
-     * @param RouteOptionHelper $routeHelper
+     * @param RouteHelper $routeHelper
      * @param LoginAction|null $loginAction
      */
     public function __construct(
         UserServiceInterface $userService,
         UserOptions $userOptions,
-        RouteOptionHelper $routeHelper,
+        RouteHelper $routeHelper,
         LoginAction $loginAction = null
     ) {
         $this->userService = $userService;
@@ -101,7 +101,7 @@ class UserController extends AbstractActionController implements UserControllerE
         if ($this->authentication()->hasIdentity()) {
             $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
-            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->isEnableAccountConfirmation()) {
@@ -134,7 +134,7 @@ class UserController extends AbstractActionController implements UserControllerE
         if ($this->authentication()->hasIdentity()) {
             $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
-            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->isEnableAccountConfirmation()) {
@@ -241,7 +241,7 @@ class UserController extends AbstractActionController implements UserControllerE
         if ($this->authentication()->hasIdentity()) {
             $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
-            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->getRegisterOptions()->isEnableRegistration()) {
@@ -392,7 +392,7 @@ class UserController extends AbstractActionController implements UserControllerE
         if ($this->authentication()->hasIdentity()) {
             $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
-            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
@@ -462,7 +462,7 @@ class UserController extends AbstractActionController implements UserControllerE
         if ($this->authentication()->hasIdentity()) {
             $this->messenger()->addWarning($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::SIGN_OUT_FIRST));
-            return new RedirectResponse($this->routeHelper->getUri($this->userOptions->getRouteDefault()));
+            return new RedirectResponse($this->routeHelper->generateUri($this->userOptions->getRouteDefault()));
         }
 
         if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
@@ -570,7 +570,7 @@ class UserController extends AbstractActionController implements UserControllerE
         $request = $request->withParsedBody($loginData);
         $request = $request->withUri(new Uri($this->url(static::LOGIN_ROUTE_NAME)));
 
-        return $this->loginAction->__invoke($request, $this->response);
+        return $this->loginAction->process($request, $this->delegate);
     }
 
     /**

@@ -6,7 +6,10 @@ return [
         'user_entity' => \Dot\User\Entity\UserEntity::class,
 
         'default_roles' => ['user'],
-        'route_default' => ['route_name' => 'user', 'route_params' => ['action' => 'account']],
+        'route_default' => [
+            'route_name' => 'user',
+            'route_params' => ['action' => 'account'],
+        ],
 
         'enable_account_confirmation' => true,
         'confirmed_account_status' => \Dot\User\Entity\UserEntity::STATUS_ACTIVE,

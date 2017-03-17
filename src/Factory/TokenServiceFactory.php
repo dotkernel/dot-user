@@ -13,7 +13,7 @@ use Dot\User\Event\TokenEventListenerInterface;
 use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenService;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Zend\EventManager\EventManagerInterface;
 
 /**

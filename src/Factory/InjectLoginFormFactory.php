@@ -12,7 +12,7 @@ namespace Dot\User\Factory;
 use Dot\Controller\Plugin\PluginManager;
 use Dot\User\Authentication\InjectLoginForm;
 use Dot\User\Options\UserOptions;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class InjectLoginFormListenerFactory

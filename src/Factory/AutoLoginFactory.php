@@ -14,7 +14,7 @@ use Dot\User\Middleware\AutoLogin;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserServiceInterface;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class AutoLoginFactory
@@ -27,7 +27,7 @@ class AutoLoginFactory
      * @param string $requestedName
      * @return AutoLogin
      */
-    public function __invoke(ContainerInterface $container, string $requestedName): AutoLogin
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
         return new $requestedName(
             $container->get(AuthenticationInterface::class),

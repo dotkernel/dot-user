@@ -10,7 +10,7 @@ declare(strict_types = 1);
 namespace Dot\User\Factory;
 
 use Dot\User\Options\UserOptions;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class UserOptionsFactory

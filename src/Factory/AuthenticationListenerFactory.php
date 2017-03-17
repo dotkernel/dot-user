@@ -10,11 +10,10 @@ declare(strict_types = 1);
 namespace Dot\User\Factory;
 
 use Dot\Controller\Plugin\PluginManager;
-use Dot\User\Authentication\AuthenticationListener;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserServiceInterface;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class BeforeAuthenticationListenerFactory
@@ -22,7 +21,7 @@ use Interop\Container\ContainerInterface;
  */
 class AuthenticationListenerFactory
 {
-    public function __invoke(ContainerInterface $container, string $requestedName): AuthenticationListener
+    public function __invoke(ContainerInterface $container, string $requestedName)
     {
         /** @var PluginManager $controllerPluginManager */
         $controllerPluginManager = $container->get(PluginManager::class);

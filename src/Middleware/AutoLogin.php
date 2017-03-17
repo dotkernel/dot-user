@@ -14,6 +14,8 @@ use Dot\User\Entity\RememberTokenEntity;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserServiceInterface;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -21,7 +23,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Class AutoLogin
  * @package Dot\User\Middleware
  */
-class AutoLogin
+class AutoLogin implements MiddlewareInterface
 {
     /** @var  UserOptions */
     protected $userOptions;
@@ -59,15 +61,11 @@ class AutoLogin
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable $next
+     * @param DelegateInterface $delegate
      * @return ResponseInterface
      */
-    public function __invoke(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next
-    ): ResponseInterface {
+    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    {
         $this->request = $request;
         if ($this->userOptions->getLoginOptions()->isEnableRemember() && !$this->authenticationService->hasIdentity()) {
             $cookies = $request->getCookieParams();
@@ -111,7 +109,7 @@ class AutoLogin
             }
         }
 
-        return $next($request, $response);
+        return $delegate->process($request);
     }
 
     /**

@@ -13,7 +13,7 @@ use Dot\User\Entity\UserEntity;
 use Dot\User\Exception\RuntimeException;
 use Dot\User\Form\UserFieldset;
 use Dot\User\Options\UserOptions;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Zend\Hydrator\HydratorPluginManager;
 
 /**

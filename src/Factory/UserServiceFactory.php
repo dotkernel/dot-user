@@ -14,7 +14,7 @@ use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserService;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Zend\Crypt\Password\PasswordInterface;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;

@@ -11,7 +11,7 @@ namespace Dot\User\Factory;
 
 use Dot\Mapper\Factory\DbMapperFactory;
 use Dot\User\Options\UserOptions;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class UserDbMapperFactory

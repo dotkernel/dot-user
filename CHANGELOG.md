@@ -1,3 +1,23 @@
+## 0.2.0 - unreleased
+
+### Changed
+* updated to PSR11 container
+* updated middleware to PSR15 `MiddlewareInterface`
+* updated to new `RouteHelper`
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Nothing
+
+
 ## 0.1.3 - 2017-03-12
 
 ### Added

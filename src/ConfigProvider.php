@@ -89,7 +89,7 @@ class ConfigProvider
                 'template_options' => [],
             ],
 
-            'dot_ems' => [
+            'dot_mapper' => [
                 'mapper_manager' => [
                     'factories' => [
                         RoleDbMapper::class => DbMapperFactory::class,

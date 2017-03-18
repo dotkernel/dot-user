@@ -21,9 +21,9 @@
 
     "dotkernel/dot-helpers": "^0.2",
     "dotkernel/dot-event": "^0.2",
-    "dotkernel/dot-mapper": "^0.2",
+    "dotkernel/dot-mapper": "^0.3",
     "dotkernel/dot-filter": "^1.1",
-    "dotkernel/dot-validator": "^1.1",
+    "dotkernel/dot-validator": "^1.2",
     "dotkernel/dot-inputfilter": "^1.1",
     "dotkernel/dot-hydrator": "^1.1",
     "dotkernel/dot-form": "^1.1",

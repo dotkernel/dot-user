@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace Dot\User\Factory;
 
 use Dot\Authentication\Web\Action\LoginAction;
+use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Helpers\Route\RouteHelper;
 use Dot\User\Controller\UserController;
 use Dot\User\Event\UserControllerEventListenerInterface;
@@ -39,6 +40,7 @@ class UserControllerFactory
         $controller = new $requestedName(
             $container->get(UserServiceInterface::class),
             $options,
+            $container->get(WebAuthenticationOptions::class),
             $container->get(RouteHelper::class),
             $container->get(LoginAction::class)
         );

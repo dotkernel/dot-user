@@ -4,6 +4,7 @@
 * updated to PSR11 container
 * updated middleware to PSR15 `MiddlewareInterface`
 * updated to new `RouteHelper`
+* removed any default route configuration or hard-coded route references
 
 ### Added
 * Nothing

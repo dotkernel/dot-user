@@ -68,10 +68,7 @@ class UserOptions extends AbstractOptions
     protected $messagesOptions;
 
     /** @var  array */
-    protected $routeDefault = [
-        'route_name' => 'user',
-        'route_params' => ['action' => 'account']
-    ];
+    protected $routeDefault = [];
 
     /**
      * @return string

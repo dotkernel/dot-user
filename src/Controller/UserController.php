@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace Dot\User\Controller;
 
 use Dot\Authentication\Web\Action\LoginAction;
+use Dot\Authentication\Web\Options\WebAuthenticationOptions;
 use Dot\Controller\AbstractActionController;
 use Dot\Controller\Plugin\Authentication\AuthenticationPlugin;
 use Dot\Controller\Plugin\Authorization\AuthorizationPlugin;
@@ -53,11 +54,11 @@ class UserController extends AbstractActionController implements UserControllerE
     use DispatchUserControllerEventsTrait;
     use UserControllerEventListenerTrait;
 
-    const LOGIN_ROUTE_NAME = 'login';
-    const USER_ROUTE_NAME = 'user';
-
     /** @var  UserOptions */
     protected $userOptions;
+
+    /** @var  WebAuthenticationOptions */
+    protected $webAuthenticationOptions;
 
     /** @var  UserServiceInterface */
     protected $userService;
@@ -72,15 +73,18 @@ class UserController extends AbstractActionController implements UserControllerE
      * UserController constructor.
      * @param UserServiceInterface $userService
      * @param UserOptions $userOptions
+     * @param WebAuthenticationOptions $webAuthenticationOptions
      * @param RouteHelper $routeHelper
      * @param LoginAction|null $loginAction
      */
     public function __construct(
         UserServiceInterface $userService,
         UserOptions $userOptions,
+        WebAuthenticationOptions $webAuthenticationOptions,
         RouteHelper $routeHelper,
         LoginAction $loginAction = null
     ) {
+        $this->webAuthenticationOptions = $webAuthenticationOptions;
         $this->userService = $userService;
         $this->userOptions = $userOptions;
         $this->loginAction = $loginAction;
@@ -107,7 +111,8 @@ class UserController extends AbstractActionController implements UserControllerE
         if (!$this->userOptions->isEnableAccountConfirmation()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_DISABLED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->routeHelper
+                ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
         }
 
         $request = $this->getRequest();
@@ -123,7 +128,8 @@ class UserController extends AbstractActionController implements UserControllerE
             $this->messenger()->addError($message);
         }
 
-        return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+        return new RedirectResponse($this->routeHelper
+            ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
     }
 
     /**
@@ -140,7 +146,8 @@ class UserController extends AbstractActionController implements UserControllerE
         if (!$this->userOptions->isEnableAccountConfirmation()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::CONFIRM_ACCOUNT_DISABLED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->routeHelper
+                ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
         }
 
         $request = $this->getRequest();
@@ -156,7 +163,8 @@ class UserController extends AbstractActionController implements UserControllerE
             $this->messenger()->addError($message);
         }
 
-        return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+        return new RedirectResponse($this->routeHelper
+            ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
     }
 
     /**
@@ -167,7 +175,8 @@ class UserController extends AbstractActionController implements UserControllerE
         if (!$this->authentication()->hasIdentity()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::UNAUTHORIZED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->routeHelper
+                ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
         }
 
         $request = $this->getRequest();
@@ -186,7 +195,8 @@ class UserController extends AbstractActionController implements UserControllerE
                 $this->authentication()->clearIdentity();
                 $this->messenger()->addError($this->userOptions->getMessagesOptions()
                     ->getMessage(MessagesOptions::ACCOUNT_INVALID));
-                return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+                return new RedirectResponse($this->routeHelper
+                    ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
             }
 
             $form->setBindOnValidate(FormInterface::BIND_MANUAL);
@@ -247,7 +257,8 @@ class UserController extends AbstractActionController implements UserControllerE
         if (!$this->userOptions->getRegisterOptions()->isEnableRegistration()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::REGISTER_DISABLED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->routeHelper
+                ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
         }
 
         $request = $this->getRequest();
@@ -269,7 +280,10 @@ class UserController extends AbstractActionController implements UserControllerE
                     } else {
                         $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
                             ->getMessage(MessagesOptions::REGISTER_SUCCESS));
-                        return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
+                        return $this->redirectTo(
+                            $this->routeHelper->generateUri($this->webAuthenticationOptions->getLoginRoute()),
+                            $request->getQueryParams()
+                        );
                     }
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
@@ -312,7 +326,8 @@ class UserController extends AbstractActionController implements UserControllerE
         if (!$this->authentication()->hasIdentity()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::UNAUTHORIZED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->routeHelper
+                ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
         }
 
         $request = $this->getRequest();
@@ -326,7 +341,8 @@ class UserController extends AbstractActionController implements UserControllerE
             $this->authentication()->clearIdentity();
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::ACCOUNT_INVALID));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->routeHelper
+                ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
         }
 
         $form->bind($user);
@@ -398,7 +414,8 @@ class UserController extends AbstractActionController implements UserControllerE
         if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::RESET_PASSWORD_DISABLED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->routeHelper
+                ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
         }
 
         $request = $this->getRequest();
@@ -419,7 +436,10 @@ class UserController extends AbstractActionController implements UserControllerE
                     $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::RESET_PASSWORD_SUCCESS));
 
-                    return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
+                    return $this->redirectTo(
+                        $this->routeHelper->generateUri($this->webAuthenticationOptions->getLoginRoute()),
+                        $request->getQueryParams()
+                    );
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::RESET_PASSWORD_ERROR));
@@ -468,7 +488,8 @@ class UserController extends AbstractActionController implements UserControllerE
         if (!$this->userOptions->getPasswordRecoveryOptions()->isEnableRecovery()) {
             $this->messenger()->addError($this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::RESET_PASSWORD_DISABLED));
-            return new RedirectResponse($this->url(static::LOGIN_ROUTE_NAME));
+            return new RedirectResponse($this->routeHelper
+                ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
         }
 
         $request = $this->getRequest();
@@ -486,7 +507,10 @@ class UserController extends AbstractActionController implements UserControllerE
                     $this->messenger()->addInfo(sprintf($this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::FORGOT_PASSWORD_SUCCESS), $data['email']));
 
-                    return $this->redirectTo($this->url(static::LOGIN_ROUTE_NAME), $request->getQueryParams());
+                    return $this->redirectTo(
+                        $this->routeHelper->generateUri($this->webAuthenticationOptions->getLoginRoute()),
+                        $request->getQueryParams()
+                    );
                 } else {
                     $message = $this->getResultErrorMessage($result, $this->userOptions->getMessagesOptions()
                         ->getMessage(MessagesOptions::RESET_TOKEN_SAVE_ERROR));
@@ -568,7 +592,8 @@ class UserController extends AbstractActionController implements UserControllerE
         /** @var ServerRequestInterface $request */
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody($loginData);
-        $request = $request->withUri(new Uri($this->url(static::LOGIN_ROUTE_NAME)));
+        $request = $request->withUri(new Uri($this->routeHelper
+            ->generateUri($this->webAuthenticationOptions->getLoginRoute())));
 
         return $this->loginAction->process($request, $this->delegate);
     }

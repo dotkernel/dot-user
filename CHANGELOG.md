@@ -1,4 +1,4 @@
-## 0.2.0 - unreleased
+## 0.2.0 - 2017-03-22
 
 ### Changed
 * updated to PSR11 container

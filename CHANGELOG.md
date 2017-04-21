@@ -1,3 +1,21 @@
+## 0.3.0 - 2017-04-21
+
+### Changed
+* Nothing
+
+### Added
+* token service class generate methods accept mapper options(to enable/disable atomic operations for example) - more for internal purposes
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* possible call to rollback after commit operation, resulting in an unhandled exception
+
+
 ## 0.2.0 - 2017-03-22
 
 ### Changed

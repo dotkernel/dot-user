@@ -536,6 +536,9 @@ class UserService implements
                 return $event->last();
             }
 
+            // this is more of a demo of manual transaction handling
+            // if the user confirm token fails to be created, it will rollback the registration
+            // this certainly could have been implemented in more than one way
             $mapper->beginTransaction();
 
             $user->setPassword($this->passwordService->create($user->getPassword()));
@@ -544,7 +547,7 @@ class UserService implements
             $r = $mapper->save($user, ['atomic' => false]);
             if ($r) {
                 if ($this->userOptions->isEnableAccountConfirmation()) {
-                    $t = $this->tokenService->generateConfirmToken($user);
+                    $t = $this->tokenService->generateConfirmToken($user, ['atomic' => false]);
                     if ($t->isValid()) {
                         // everything ok, commit transaction
                         $mapper->commit();
@@ -576,7 +579,10 @@ class UserService implements
                 return new Result(['user' => $user, 'mapper' => $mapper]);
             }
             // here is invalid user save
-            $mapper->rollback();
+            if ($mapper->inTransaction()) {
+                $mapper->rollback();
+            }
+
             $this->dispatchEvent(UserEvent::EVENT_USER_REGISTRATION_ERROR, [
                 'user' => $user,
                 'mapper' => $mapper,
@@ -585,7 +591,10 @@ class UserService implements
             return new Result(['user' => $user, 'mapper' => $mapper], $this->userOptions->getMessagesOptions()
                 ->getMessage(MessagesOptions::USER_REGISTER_ERROR));
         } catch (\Exception $e) {
-            $mapper->rollback();
+            if ($mapper->inTransaction()) {
+                $mapper->rollback();
+            }
+
             $this->dispatchEvent(UserEvent::EVENT_USER_REGISTRATION_ERROR, [
                 'user' => $user,
                 'mapper' => $mapper,

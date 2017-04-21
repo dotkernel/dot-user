@@ -122,9 +122,10 @@ class TokenService implements
 
     /**
      * @param UserEntity $user
+     * @param array $mapperOptions
      * @return Result
      */
-    public function generateConfirmToken(UserEntity $user): Result
+    public function generateConfirmToken(UserEntity $user, array $mapperOptions = []): Result
     {
         /** @var TokenMapperInterface $mapper */
         $mapper = $this->getMapperManager()->get($this->userOptions->getConfirmTokenEntity());
@@ -145,7 +146,7 @@ class TokenService implements
                 return $event->last();
             }
 
-            $t = $mapper->save($token);
+            $t = $mapper->save($token, $mapperOptions);
             if ($t) {
                 $this->dispatchEvent(TokenEvent::EVENT_TOKEN_AFTER_SAVE_CONFIRM_TOKEN, [
                     'token' => $token,
@@ -178,9 +179,10 @@ class TokenService implements
 
     /**
      * @param UserEntity $user
+     * @param array $mapperOptions
      * @return Result
      */
-    public function generateRememberToken(UserEntity $user): Result
+    public function generateRememberToken(UserEntity $user, array $mapperOptions = []): Result
     {
         /** @var TokenMapperInterface $mapper */
         $mapper = $this->getMapperManager()->get($this->userOptions->getRememberTokenEntity());
@@ -207,7 +209,7 @@ class TokenService implements
             $tokenValue = $token->getToken();
             // hash the token value just before we save it
             $token->setToken(md5($token->getToken()));
-            $r = $mapper->save($token);
+            $r = $mapper->save($token, $mapperOptions);
 
             if ($r) {
                 $token->setToken($tokenValue);
@@ -444,9 +446,10 @@ class TokenService implements
 
     /**
      * @param UserEntity $user
+     * @param array $mapperOptions
      * @return Result
      */
-    public function generateResetToken(UserEntity $user): Result
+    public function generateResetToken(UserEntity $user, array $mapperOptions = []): Result
     {
         /** @var TokenMapperInterface $mapper */
         $mapper = $this->getMapperManager()->get($this->userOptions->getResetTokenEntity());
@@ -469,7 +472,7 @@ class TokenService implements
                 return $event->last();
             }
 
-            $t = $mapper->save($token);
+            $t = $mapper->save($token, $mapperOptions);
             if ($t) {
                 $this->dispatchEvent(TokenEvent::EVENT_TOKEN_AFTER_SAVE_RESET_TOKEN, [
                     'token' => $token,

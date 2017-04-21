@@ -48,15 +48,17 @@ interface TokenServiceInterface
 
     /**
      * @param UserEntity $user
+     * @param array $mapperOptions
      * @return Result
      */
-    public function generateConfirmToken(UserEntity $user): Result;
+    public function generateConfirmToken(UserEntity $user, array $mapperOptions = []): Result;
 
     /**
      * @param UserEntity $user
+     * @param array $mapperOptions
      * @return Result
      */
-    public function generateRememberToken(UserEntity $user): Result;
+    public function generateRememberToken(UserEntity $user, array $mapperOptions = []): Result;
 
     /**
      * @param RememberTokenEntity $token
@@ -102,9 +104,10 @@ interface TokenServiceInterface
 
     /**
      * @param UserEntity $user
+     * @param array $mapperOptions
      * @return Result
      */
-    public function generateResetToken(UserEntity $user): Result;
+    public function generateResetToken(UserEntity $user, array $mapperOptions = []): Result;
 
     /**
      * @param UserEntity $user

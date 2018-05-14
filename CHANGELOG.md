@@ -1,3 +1,22 @@
+## 1.0.0 - 2018-05-14
+
+### Changed
+* updated dependencies
+* middleware implementation changed to `psr/http-server-middleware` 
+
+### Added
+* Nothing
+
+### Deprecated
+* Nothing
+
+### Removed
+* Nothing
+
+### Fixed
+* Nothing
+
+
 ## 0.3.1 - 2017-04-21
 
 ### Changed

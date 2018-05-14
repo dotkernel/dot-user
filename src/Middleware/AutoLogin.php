@@ -14,10 +14,10 @@ use Dot\User\Entity\RememberTokenEntity;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserServiceInterface;
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Class AutoLogin
@@ -64,7 +64,7 @@ class AutoLogin implements MiddlewareInterface
      * @param DelegateInterface $delegate
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $this->request = $request;
         if ($this->userOptions->getLoginOptions()->isEnableRemember() && !$this->authenticationService->hasIdentity()) {
@@ -109,7 +109,7 @@ class AutoLogin implements MiddlewareInterface
             }
         }
 
-        return $delegate->process($request);
+        return $handler->handle($request);
     }
 
     /**

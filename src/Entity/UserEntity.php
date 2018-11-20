@@ -1,19 +1,23 @@
 <?php
 /**
- * @see https://github.com/dotkernel/dot-user/ for the canonical source repository
- * @copyright Copyright (c) 2017 Apidemia (https://www.apidemia.com)
- * @license https://github.com/dotkernel/dot-user/blob/master/LICENSE.md MIT License
+ * see https://github.com/dotkernel/dot-user/ for the canonical source repository
+ * copyright Copyright (c) 2017 Apidemia (https://www.apidemia.com)
+ * license https://github.com/dotkernel/dot-user/blob/master/LICENSE.md MIT License
  */
 
 namespace Dot\User\Entity;
 
+use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentity;
 use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentity;
-use Dot\Mapper\Entity\Entity;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class UserEntity
  * @package Dot\User\Entity
+ * @ORM\Table("user")
+ * @ORM\Entity
  */
 class UserEntity extends Entity implements
     AuthenticationIdentity,
@@ -25,29 +29,49 @@ class UserEntity extends Entity implements
     const STATUS_INACTIVE = 'inactive';
     const STATUS_DELETED = 'deleted';
 
-    /** @var  mixed */
+    /** @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue *
+     */
     protected $id;
 
-    /** @var  string */
-    protected $username;
-
-    /** @var  string */
+    /** @var string @ORM\Column(type="string") **/
     protected $email;
 
-    /** @var  string */
+    /** @var string @ORM\Column(type="string") **/
+    protected $username;
+
+    /** @var string @ORM\Column(type="string") **/
     protected $password;
 
-    /** @var array */
-    protected $roles = [];
+    /** @var string @ORM\Column(type="string") **/
+    protected $status;
 
-    /** @var string */
-    protected $status = UserEntity::STATUS_PENDING;
-
-    /** @var  string */
+    /** @var DateTime @ORM\Column(type="datetime") **/
     protected $dateCreated;
 
     /**
-     * @return string
+     * Many Users have Many Groups.
+     * @ORM\OneToMany(targetEntity="RoleEntity", inversedBy="user")
+     * @ORM\JoinTable(name="user_roles",
+     *            joinColumns={@ORM\JoinColumn(name="userId", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="roleId", referencedColumnName="id")}
+     *   )
+     * @var ArrayCollection
+     */
+    private $roles;
+
+    /**
+     * @return mixed
+     */
+    public function getRoles(): array
+    {
+        return $this->roles->toArray() ?? [];
+    }
+
+
+    /**
+     * @return mixed
      */
     public function getId()
     {
@@ -55,9 +79,9 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @param mixed $id
+     * @ORM\param mixed $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -65,31 +89,15 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
-     * @param string $username
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
     /**
-     * @param string $email
+     * @ORM\param string $email
      */
-    public function setEmail($email)
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
@@ -97,65 +105,73 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getPassword()
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @ORM\param string $username
+     */
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword(): string
     {
         return $this->password;
     }
 
     /**
-     * @param string $password
+     * @ORM\param string $password
      */
-    public function setPassword($password)
+    public function setPassword(string $password): void
     {
         $this->password = $password;
     }
 
     /**
-     * @return array
-     */
-    public function getRoles(): array
-    {
-        return $this->roles ?? [];
-    }
-
-    /**
-     * @param array $roles
-     */
-    public function setRoles(array $roles)
-    {
-        $this->roles = $roles;
-    }
-
-    /**
      * @return string
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->status;
     }
 
     /**
-     * @param string $status
+     * @ORM\param string $status
      */
-    public function setStatus($status)
+    public function setStatus(string $status): void
     {
         $this->status = $status;
     }
 
     /**
-     * @return string
+     * @return DateTime
      */
-    public function getDateCreated()
+    public function getDateCreated(): DateTime
     {
         return $this->dateCreated;
     }
 
     /**
-     * @param string $dateCreated
+     * @ORM\param DateTime $dateCreated
      */
-    public function setDateCreated($dateCreated)
+    public function setDateCreated(DateTime $dateCreated): void
     {
         $this->dateCreated = $dateCreated;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->getUsername();
     }
 
     /**

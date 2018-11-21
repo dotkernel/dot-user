@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentity;
 use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentity;
 use Doctrine\ORM\Mapping as ORM;
+use Dot\Mapper\Entity\Entity;
 
 /**
  * Class UserEntity
@@ -29,30 +30,46 @@ class UserEntity extends Entity implements
     const STATUS_INACTIVE = 'inactive';
     const STATUS_DELETED = 'deleted';
 
-    /** @ORM\Id
+    /**
+     * @ORM\Id
      * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue *
+     * @ORM\GeneratedValue
      */
     protected $id;
 
-    /** @var string @ORM\Column(type="string") **/
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
     protected $email;
 
-    /** @var string @ORM\Column(type="string") **/
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
     protected $username;
 
-    /** @var string @ORM\Column(type="string") **/
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
     protected $password;
 
-    /** @var string @ORM\Column(type="string") **/
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
     protected $status;
 
-    /** @var DateTime @ORM\Column(type="datetime") **/
+    /**
+     * @ORM\Column(type="datetime")
+     * @var DateTime
+     */
     protected $dateCreated;
 
     /**
      * Many Users have Many Groups.
-     * @ORM\OneToMany(targetEntity="RoleEntity", inversedBy="user")
+     * @ORM\ManyToMany(targetEntity="RoleEntity", inversedBy="user", fetch="EXTRA_LAZY")
      * @ORM\JoinTable(name="user_roles",
      *            joinColumns={@ORM\JoinColumn(name="userId", referencedColumnName="id")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="roleId", referencedColumnName="id")}
@@ -79,7 +96,7 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @ORM\param mixed $id
+     * @param mixed $id
      */
     public function setId($id): void
     {
@@ -95,7 +112,7 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @ORM\param string $email
+     * @param string $email
      */
     public function setEmail(string $email): void
     {
@@ -111,7 +128,7 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @ORM\param string $username
+     * @param string $username
      */
     public function setUsername(string $username): void
     {
@@ -127,7 +144,7 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @ORM\param string $password
+     * @param string $password
      */
     public function setPassword(string $password): void
     {
@@ -143,7 +160,7 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @ORM\param string $status
+     * @param string $status
      */
     public function setStatus(string $status): void
     {
@@ -159,19 +176,11 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @ORM\param DateTime $dateCreated
+     * @param DateTime $dateCreated
      */
     public function setDateCreated(DateTime $dateCreated): void
     {
         $this->dateCreated = $dateCreated;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->getUsername();
     }
 
     /**
@@ -183,6 +192,20 @@ class UserEntity extends Entity implements
             return $this->username;
         }
         return $this->email ?? '';
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->getUsername();
+    }
+
+
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
     }
 
     /**

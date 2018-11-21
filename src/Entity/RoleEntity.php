@@ -22,18 +22,22 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class RoleEntity extends Entity implements \JsonSerializable
 {
-    /** @ORM\Id
+    /**
+     * @ORM\Id
      * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue *
+     * @ORM\GeneratedValue
      */
     protected $id;
 
-    /** @var string @ORM\Column(type="string") **/
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
     protected $name;
 
     /**
      * Many Groups have Many Users.
-     * @ORM\OneToMany(targetEntity="UserEntity", mappedBy="roles")
+     * @ORM\OneToMany(targetEntity="UserEntity", mappedBy="roles", fetch="EXTRA_LAZY")
      * @ORM\JoinTable(name="user_roles",
      *            joinColumns={@ORM\JoinColumn(name="userId", referencedColumnName="id")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="roleId", referencedColumnName="id")}
@@ -47,10 +51,6 @@ class RoleEntity extends Entity implements \JsonSerializable
     public function getUsers() : array
     {
         return $this->users->toArray() ?? [];
-    }
-
-    public function __construct() {
-        $this->users = new ArrayCollection();
     }
 
     /**
@@ -75,6 +75,12 @@ class RoleEntity extends Entity implements \JsonSerializable
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
     }
 
     /**

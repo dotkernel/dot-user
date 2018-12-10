@@ -7,13 +7,13 @@
 
 namespace Dot\User\Entity;
 
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentity;
 use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentity;
 use Doctrine\ORM\Mapping as ORM;
 // use Dot\Mapper\Entity\Entity;
 use Dot\User\Entity\UserEntityRepository;
+use Dot\Mapper\Entity\Entity;
 
 /**
  * Class UserEntity
@@ -64,7 +64,7 @@ class UserEntity /* extends Entity*/ implements
 
     /**
      * @ORM\Column(type="datetime")
-     * @var string
+     * @var DateTime
      */
     protected $dateCreated;
 

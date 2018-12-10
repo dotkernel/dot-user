@@ -13,7 +13,6 @@ use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentity;
 use Doctrine\ORM\Mapping as ORM;
 // use Dot\Mapper\Entity\Entity;
 use Dot\User\Entity\UserEntityRepository;
-use Dot\Mapper\Entity\Entity;
 
 /**
  * Class UserEntity

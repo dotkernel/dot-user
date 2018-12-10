@@ -9,12 +9,14 @@ declare(strict_types = 1);
 
 namespace Dot\User\Factory;
 
+use Doctrine\ORM\EntityManager;
 use Dot\User\Entity\UserEntity;
 use Dot\User\Event\UserEventListenerInterface;
 use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserService;
+use Dot\User\Service\UserServiceInterface;
 use Psr\Container\ContainerInterface;
 use Zend\Crypt\Password\PasswordInterface;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -24,15 +26,18 @@ use Zend\EventManager\EventManagerInterface;
  * Class UserServiceFactory
  * @package Dot\User\Factory
  */
-class UserServiceFactory
+class UserDoctrineServiceFactory
 {
     /**
      * @param ContainerInterface $container
      * @param $requestedName
      * @return mixed
      */
-    public function __invoke(ContainerInterface $container, $requestedName): UserService
+    public function __invoke(ContainerInterface $container, $requestedName): UserServiceInterface
     {
+        /** @var EntityManager $em */
+        $em = $container->get('doctrine.entity_manager.orm_default');
+
         /** @var TokenServiceInterface $tokenService */
         $tokenService = $container->get(TokenServiceInterface::class);
         /** @var UserOptions $options */
@@ -53,6 +58,8 @@ class UserServiceFactory
         if (isset($options->getEventListeners()['user']) && is_array($options->getEventListeners()['user'])) {
             $this->attachListeners($container, $options->getEventListeners()['user'], $service->getEventManager());
         }
+
+        $service->setEntityManager($em);
 
         return $service;
     }

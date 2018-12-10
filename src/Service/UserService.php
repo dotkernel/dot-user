@@ -9,6 +9,8 @@ declare(strict_types = 1);
 
 namespace Dot\User\Service;
 
+use Dot\Doctrine\Mapper\EntityManagerAwareInterface;
+use Dot\Doctrine\Mapper\EntityManagerAwareTrait;
 use Dot\Mapper\Mapper\MapperManagerAwareInterface;
 use Dot\Mapper\Mapper\MapperManagerAwareTrait;
 use Dot\User\Entity\ResetTokenEntity;
@@ -35,10 +37,12 @@ class UserService implements
     UserServiceInterface,
     MapperManagerAwareInterface,
     UserEventListenerInterface,
-    TokenEventListenerInterface
+    TokenEventListenerInterface,
+    EntityManagerAwareInterface
 {
     use MapperManagerAwareTrait;
     use DispatchUserEventsTrait;
+    use EntityManagerAwareTrait;
     use UserEventListenerTrait,
         TokenEventListenerTrait {
         UserEventListenerTrait::attach as userEventAttach;
@@ -67,6 +71,7 @@ class UserService implements
         PasswordInterface $passwordService,
         UserOptions $userOptions
     ) {
+        exit(__FILE__ . ':' . __LINE__);
         $this->tokenService = $tokenService;
         $this->userOptions = $userOptions;
         $this->passwordService = $passwordService;
@@ -79,7 +84,9 @@ class UserService implements
      */
     public function find($id, array $options = []): ?UserEntity
     {
+        exit(__FILE__ . ':' . __LINE__);
         /** @var UserMapperInterface $mapper */
+
         $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
         return $mapper->get($id, $options);
     }
@@ -322,6 +329,7 @@ class UserService implements
      */
     public function resetPassword(array $data): Result
     {
+        exit(__FILE__ . ':' . __LINE__);
         $email = $data['email'] ?? '';
         $token = $data['token'] ?? '';
         $newPassword = $data['user']['password'];
@@ -450,7 +458,7 @@ class UserService implements
                 if ($event->stopped()) {
                     return $event->last();
                 }
-
+                exit(__FILE__ . ':' . __LINE__);
                 $user->setPassword($this->passwordService->create($newPassword));
                 $r = $mapper->save($user);
                 if ($r) {
@@ -540,7 +548,7 @@ class UserService implements
             // if the user confirm token fails to be created, it will rollback the registration
             // this certainly could have been implemented in more than one way
             $mapper->beginTransaction();
-
+            exit(__FILE__ . ':' . __LINE__);
             $user->setPassword($this->passwordService->create($user->getPassword()));
             $user->setStatus($this->userOptions->getRegisterOptions()->getDefaultUserStatus());
 
@@ -611,6 +619,7 @@ class UserService implements
      */
     public function updateAccount(UserEntity $user, bool $hashPassword = false): Result
     {
+        exit(__FILE__ . ':' . __LINE__);
         /** @var UserMapperInterface $mapper */
         $mapper = $this->getMapperManager()->get($this->userOptions->getUserEntity());
 

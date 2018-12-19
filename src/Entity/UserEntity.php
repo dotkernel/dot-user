@@ -13,12 +13,13 @@ use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentity;
 use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentity;
 use Doctrine\ORM\Mapping as ORM;
 use Dot\Mapper\Entity\Entity;
+use Dot\User\Entity\UserEntityRepository;
 
 /**
  * Class UserEntity
  * @package Dot\User\Entity
  * @ORM\Table("user")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="UserEntityRepository")
  */
 class UserEntity extends Entity implements
     AuthenticationIdentity,
@@ -68,15 +69,14 @@ class UserEntity extends Entity implements
     protected $dateCreated;
 
     /**
-     * Many Users have Many Groups.
-     * @ORM\ManyToMany(targetEntity="RoleEntity", inversedBy="user", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="user_roles",
-     *            joinColumns={@ORM\JoinColumn(name="userId", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="roleId", referencedColumnName="id")}
-     *   )
-     * @var ArrayCollection
+     * @ORM\ManyToMany(targetEntity="RoleEntity", fetch="EAGER")
+     * @ORM\JoinTable(
+     *     name="user_roles",
+     *     joinColumns={@ORM\JoinColumn(name="userId", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="roleId", referencedColumnName="id")})
+     * @var array
      */
-    private $roles;
+    protected $roles;
 
     /**
      * @return mixed
@@ -138,7 +138,7 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getPassword(): string
+    public function getPassword():? string
     {
         return $this->password;
     }
@@ -168,7 +168,7 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @return DateTime
+     * @return string
      */
     public function getDateCreated(): DateTime
     {
@@ -176,9 +176,9 @@ class UserEntity extends Entity implements
     }
 
     /**
-     * @param DateTime $dateCreated
+     * @param string $dateCreated
      */
-    public function setDateCreated(DateTime $dateCreated): void
+    public function setDateCreated(string $dateCreated): void
     {
         $this->dateCreated = $dateCreated;
     }
@@ -205,7 +205,7 @@ class UserEntity extends Entity implements
 
     public function __construct()
     {
-        $this->users = new ArrayCollection();
+        $this->roles = new ArrayCollection();
     }
 
     /**

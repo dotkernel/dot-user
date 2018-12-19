@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class RoleEntity
  * @package Dot\User\Entity
  * @ORM\Entity()
- * @ORM\Table("role")
+ * @ORM\Table("user_role")
  */
 class RoleEntity extends Entity implements \JsonSerializable
 {

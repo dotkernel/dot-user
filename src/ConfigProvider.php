@@ -25,6 +25,7 @@ use Dot\User\Factory\PasswordCheckFactory;
 use Dot\User\Factory\TokenServiceFactory;
 use Dot\User\Factory\UserControllerFactory;
 use Dot\User\Factory\UserDbMapperFactory;
+use Dot\User\Factory\UserDoctrineServiceFactory;
 use Dot\User\Factory\UserFieldsetFactory;
 use Dot\User\Factory\UserOptionsFactory;
 use Dot\User\Factory\UserServiceFactory;
@@ -43,6 +44,7 @@ use Dot\User\Options\UserOptions;
 use Dot\User\Service\PasswordCheck;
 use Dot\User\Service\TokenService;
 use Dot\User\Service\TokenServiceInterface;
+use Dot\User\Service\UserDoctrineService;
 use Dot\User\Service\UserService;
 use Dot\User\Service\UserServiceInterface;
 use Zend\Crypt\Password\PasswordInterface;
@@ -142,6 +144,7 @@ class ConfigProvider
                 UserOptions::class => UserOptionsFactory::class,
                 UserController::class => UserControllerFactory::class,
                 UserService::class => UserServiceFactory::class,
+                UserDoctrineService::class => UserDoctrineServiceFactory::class,
                 TokenService::class => TokenServiceFactory::class,
 
                 AutoLogin::class => AutoLoginFactory::class,
@@ -149,6 +152,7 @@ class ConfigProvider
                 AuthenticationListener::class => AuthenticationListenerFactory::class,
             ],
             'aliases' => [
+                UserService::class => UserDoctrineService::class,
                 UserServiceInterface::class => UserService::class,
                 'UserService' => UserServiceInterface::class,
                 TokenServiceInterface::class => TokenService::class,

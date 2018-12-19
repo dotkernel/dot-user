@@ -7,11 +7,11 @@
 
 namespace Dot\User\Entity;
 
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Dot\Authentication\Identity\IdentityInterface as AuthenticationIdentity;
 use Dot\Authorization\Identity\IdentityInterface as AuthorizationIdentity;
 use Doctrine\ORM\Mapping as ORM;
+
 use Dot\Mapper\Entity\Entity;
 use Dot\User\Entity\UserEntityRepository;
 
@@ -21,7 +21,7 @@ use Dot\User\Entity\UserEntityRepository;
  * @ORM\Table("user")
  * @ORM\Entity(repositoryClass="UserEntityRepository")
  */
-class UserEntity extends Entity implements
+class UserEntity /* extends Entity*/ implements
     AuthenticationIdentity,
     AuthorizationIdentity,
     \JsonSerializable
@@ -170,7 +170,7 @@ class UserEntity extends Entity implements
     /**
      * @return string
      */
-    public function getDateCreated(): DateTime
+    public function getDateCreated(): string
     {
         return $this->dateCreated;
     }

@@ -14,7 +14,7 @@ use Dot\User\Exception\RuntimeException;
 use Dot\User\Form\UserFieldset;
 use Dot\User\Options\UserOptions;
 use Psr\Container\ContainerInterface;
-use Zend\Hydrator\HydratorPluginManager;
+use Laminas\Hydrator\HydratorPluginManager;
 
 /**
  * Class UserFieldsetFactory

@@ -12,8 +12,8 @@ namespace Dot\User\Form;
 use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptionsAwareInterface;
 use Dot\User\Options\UserOptionsAwareTrait;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
+use Laminas\Form\Form;
+use Laminas\InputFilter\InputFilter;
 
 /**
  * Class ResetPasswordForm

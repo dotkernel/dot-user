@@ -11,7 +11,7 @@ namespace Dot\User\Factory;
 
 use Dot\User\Service\PasswordCheck;
 use Psr\Container\ContainerInterface;
-use Zend\Crypt\Password\PasswordInterface;
+use Laminas\Crypt\Password\PasswordInterface;
 
 /**
  * Class PasswordCheckFactory

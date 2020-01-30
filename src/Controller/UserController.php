@@ -32,11 +32,11 @@ use Dot\User\Service\UserServiceInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
-use Zend\Diactoros\Response\HtmlResponse;
-use Zend\Diactoros\Response\RedirectResponse;
-use Zend\Diactoros\Uri;
-use Zend\Form\Form;
-use Zend\Form\FormInterface;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\Uri;
+use Laminas\Form\Form;
+use Laminas\Form\FormInterface;
 
 /**
  * Class UserController

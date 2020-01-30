@@ -17,8 +17,8 @@ use Dot\User\Entity\RoleEntity;
 use Dot\User\Entity\UserEntity;
 use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
-use Zend\Db\Adapter\Driver\ResultInterface;
-use Zend\Db\ResultSet\ResultSet;
+use Laminas\Db\Adapter\Driver\ResultInterface;
+use Laminas\Db\ResultSet\ResultSet;
 
 /**
  * Class UserDbMapper

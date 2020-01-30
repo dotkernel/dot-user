@@ -14,7 +14,7 @@ use Dot\User\Entity\RememberTokenEntity;
 use Dot\User\Entity\ResetTokenEntity;
 use Dot\User\Entity\RoleEntity;
 use Dot\User\Entity\UserEntity;
-use Zend\Stdlib\AbstractOptions;
+use Laminas\Stdlib\AbstractOptions;
 
 /**
  * Class UserOptions

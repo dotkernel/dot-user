@@ -11,7 +11,7 @@ namespace Dot\User\Factory;
 
 use Dot\User\Options\UserOptions;
 use Psr\Container\ContainerInterface;
-use Zend\Crypt\Password\Bcrypt;
+use Laminas\Crypt\Password\Bcrypt;
 
 /**
  * Class BcryptFactory

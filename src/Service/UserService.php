@@ -24,8 +24,8 @@ use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Dot\User\Result\ErrorCode;
 use Dot\User\Result\Result;
-use Zend\Crypt\Password\PasswordInterface;
-use Zend\EventManager\EventManagerInterface;
+use Laminas\Crypt\Password\PasswordInterface;
+use Laminas\EventManager\EventManagerInterface;
 
 /**
  * Class UserService

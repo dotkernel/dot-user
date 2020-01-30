@@ -10,7 +10,7 @@ declare(strict_types = 1);
 namespace Dot\User\Event;
 
 use Dot\User\Result\Result;
-use Zend\EventManager\EventManagerAwareTrait;
+use Laminas\EventManager\EventManagerAwareTrait;
 
 /**
  * Class DispatchUserEventsTrait
@@ -24,7 +24,7 @@ trait DispatchUserEventsTrait
      * @param string $name
      * @param array $data
      * @param null $target
-     * @return \Zend\EventManager\ResponseCollection
+     * @return \Laminas\EventManager\ResponseCollection
      */
     public function dispatchEvent(string $name, array $data = [], $target = null)
     {

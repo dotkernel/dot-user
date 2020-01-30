@@ -14,7 +14,7 @@ use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenService;
 use Psr\Container\ContainerInterface;
-use Zend\EventManager\EventManagerInterface;
+use Laminas\EventManager\EventManagerInterface;
 
 /**
  * Class TokenServiceFactory

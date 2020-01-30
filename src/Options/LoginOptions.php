@@ -10,7 +10,7 @@ declare(strict_types = 1);
 namespace Dot\User\Options;
 
 use Dot\User\Entity\UserEntity;
-use Zend\Stdlib\AbstractOptions;
+use Laminas\Stdlib\AbstractOptions;
 
 /**
  * Class LoginOptions

@@ -10,8 +10,8 @@ declare(strict_types = 1);
 namespace Dot\User\Event;
 
 use Psr\Http\Message\ResponseInterface;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\EventManager\ResponseCollection;
+use Laminas\EventManager\EventManagerAwareTrait;
+use Laminas\EventManager\ResponseCollection;
 
 /**
  * Trait DispatchControllerEventsTrait

@@ -14,9 +14,9 @@ use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptionsAwareInterface;
 use Dot\User\Options\UserOptionsAwareTrait;
 use Dot\Validator\Mapper\NoRecordExists;
-use Zend\Form\Form;
-use Zend\Form\FormInterface;
-use Zend\InputFilter\InputFilter;
+use Laminas\Form\Form;
+use Laminas\Form\FormInterface;
+use Laminas\InputFilter\InputFilter;
 
 /**
  * Class AccountForm

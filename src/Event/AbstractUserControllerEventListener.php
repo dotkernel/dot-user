@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 namespace Dot\User\Event;
 
-use Zend\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\AbstractListenerAggregate;
 
 /**
  * Class AbstractControllerEventListener

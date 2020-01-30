@@ -45,7 +45,7 @@ use Dot\User\Service\TokenService;
 use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserService;
 use Dot\User\Service\UserServiceInterface;
-use Zend\Crypt\Password\PasswordInterface;
+use Laminas\Crypt\Password\PasswordInterface;
 
 /**
  * Class ConfigProvider

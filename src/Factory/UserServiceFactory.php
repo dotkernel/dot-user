@@ -15,9 +15,9 @@ use Dot\User\Options\UserOptions;
 use Dot\User\Service\TokenServiceInterface;
 use Dot\User\Service\UserService;
 use Psr\Container\ContainerInterface;
-use Zend\Crypt\Password\PasswordInterface;
-use Zend\EventManager\EventManagerAwareInterface;
-use Zend\EventManager\EventManagerInterface;
+use Laminas\Crypt\Password\PasswordInterface;
+use Laminas\EventManager\EventManagerAwareInterface;
+use Laminas\EventManager\EventManagerInterface;
 
 /**
  * Class UserServiceFactory

@@ -25,7 +25,7 @@ use Dot\User\Options\MessagesOptions;
 use Dot\User\Options\UserOptions;
 use Dot\User\Result\ErrorCode;
 use Dot\User\Result\Result;
-use Zend\Math\Rand;
+use Laminas\Math\Rand;
 
 /**
  * Class TokenService

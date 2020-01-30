@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Dot\User\Event;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateTrait;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateTrait;
 
 /**
  * Class ControllerEventListenerTrait

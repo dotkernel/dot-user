@@ -18,7 +18,7 @@ use Dot\User\Exception\RuntimeException;
 use Dot\User\Options\UserOptions;
 use Dot\User\Service\UserServiceInterface;
 use Interop\Container\ContainerInterface;
-use Zend\EventManager\EventManagerInterface;
+use Laminas\EventManager\EventManagerInterface;
 
 /**
  * Class UserControllerFactory

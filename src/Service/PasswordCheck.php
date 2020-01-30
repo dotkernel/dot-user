@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 namespace Dot\User\Service;
 
-use Zend\Crypt\Password\PasswordInterface;
+use Laminas\Crypt\Password\PasswordInterface;
 
 /**
  * Class PasswordCheck

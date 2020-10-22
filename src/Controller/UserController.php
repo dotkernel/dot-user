@@ -276,7 +276,7 @@ class UserController extends AbstractActionController implements UserControllerE
                 $result = $this->userService->register($user);
                 if ($result->isValid()) {
                     if ($this->userOptions->getRegisterOptions()->isLoginAfterRegistration()) {
-                        return $this->autoLogin($user, $data['password']);
+                        return $this->autoLogin($user, $data['user']['password']);
                     } else {
                         $this->messenger()->addSuccess($this->userOptions->getMessagesOptions()
                             ->getMessage(MessagesOptions::REGISTER_SUCCESS));
@@ -592,10 +592,10 @@ class UserController extends AbstractActionController implements UserControllerE
         /** @var ServerRequestInterface $request */
         $request = $request->withMethod('POST');
         $request = $request->withParsedBody($loginData);
-        $request = $request->withUri(new Uri($this->routeHelper
-            ->generateUri($this->webAuthenticationOptions->getLoginRoute())));
+        $request = $request->withUri($this->routeHelper
+            ->generateUri($this->webAuthenticationOptions->getLoginRoute()));
 
-        return $this->loginAction->process($request, $this->delegate);
+        return $this->loginAction->process($request, $this->getHandler());
     }
 
     /**

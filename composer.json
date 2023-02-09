@@ -35,7 +35,7 @@
         "dotkernel/dot-controller-plugin-forms": "~2.9.0",
         "dotkernel/dot-authentication": "^2.0",
         "dotkernel/dot-authentication-web": "~2.9.0",
-        "dotkernel/dot-authorization": "^2.0",
+        "dotkernel/dot-authorization": "^3.2",
         "laminas/laminas-dependency-plugin": "^2.0"
     },
     "require-dev": {

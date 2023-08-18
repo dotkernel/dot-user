@@ -46,10 +46,7 @@ class UserEntity extends Entity implements
     /** @var  string */
     protected $dateCreated;
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }

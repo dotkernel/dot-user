@@ -9,8 +9,10 @@ declare(strict_types = 1);
 
 namespace Dot\User\Event;
 
+use Dot\Event\Event;
 use Dot\User\Result\Result;
 use Laminas\EventManager\EventManagerAwareTrait;
+use Laminas\EventManager\ResponseCollection;
 
 /**
  * Class DispatchUserEventsTrait
@@ -20,13 +22,8 @@ trait DispatchUserEventsTrait
 {
     use EventManagerAwareTrait;
 
-    /**
-     * @param string $name
-     * @param array $data
-     * @param null $target
-     * @return \Laminas\EventManager\ResponseCollection
-     */
-    public function dispatchEvent(string $name, array $data = [], $target = null)
+
+    public function dispatchEvent(string $name, array $data = [], $target = null):Event|ResponseCollection
     {
         if ($target === null) {
             $target = $this;

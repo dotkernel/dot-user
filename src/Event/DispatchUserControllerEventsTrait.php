@@ -9,6 +9,7 @@ declare(strict_types = 1);
 
 namespace Dot\User\Event;
 
+use Dot\Event\Event;
 use Psr\Http\Message\ResponseInterface;
 use Laminas\EventManager\EventManagerAwareTrait;
 use Laminas\EventManager\ResponseCollection;
@@ -21,13 +22,7 @@ trait DispatchUserControllerEventsTrait
 {
     use EventManagerAwareTrait;
 
-    /**
-     * @param string $name
-     * @param array $data
-     * @param null $target
-     * @return UserControllerEvent|ResponseCollection
-     */
-    public function dispatchEvent(string $name, array $data = [], $target = null)
+    public function dispatchEvent(string $name, array $data = [], $target = null):Event|ResponseCollection
     {
         if ($target === null) {
             $target = $this;

@@ -46,7 +46,7 @@ class UserEntity extends Entity implements
     /** @var  string */
     protected $dateCreated;
 
-    public function getId(): int
+    public function getId(): mixed
     {
         return $this->id;
     }
